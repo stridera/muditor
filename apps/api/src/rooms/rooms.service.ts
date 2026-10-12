@@ -11,6 +11,9 @@ import {
   BatchUpdateResult,
   CreateRoomExitInput,
   CreateRoomInput,
+  MAX_EXTRA_DESC_KEYWORD_LENGTH,
+  MAX_EXTRA_DESC_TEXT_LENGTH,
+  MAX_ROOM_EXTRA_DESCRIPTIONS,
   RoomExtraDescriptionInput,
   UpdateRoomExitInput,
   UpdateRoomInput,
@@ -740,7 +743,27 @@ export class RoomsService {
     id: number,
     extras: RoomExtraDescriptionInput[]
   ): Promise<RoomServiceResult> {
+    // The ValidationPipe skips bare array arguments, so the DTO caps are
+    // enforced here too.
+    if (extras.length > MAX_ROOM_EXTRA_DESCRIPTIONS) {
+      throw new BadRequestException(
+        `A room can have at most ${MAX_ROOM_EXTRA_DESCRIPTIONS} extra descriptions`
+      );
+    }
     const cleaned = extras.map((e, i) => {
+      if (
+        e.keywords.length > MAX_ROOM_EXTRA_DESCRIPTIONS ||
+        e.keywords.some(k => k.length > MAX_EXTRA_DESC_KEYWORD_LENGTH)
+      ) {
+        throw new BadRequestException(
+          `Extra description ${i + 1} has too many or overlong keywords (max ${MAX_ROOM_EXTRA_DESCRIPTIONS} keywords of ${MAX_EXTRA_DESC_KEYWORD_LENGTH} characters)`
+        );
+      }
+      if (e.description.length > MAX_EXTRA_DESC_TEXT_LENGTH) {
+        throw new BadRequestException(
+          `Extra description ${i + 1} text is over ${MAX_EXTRA_DESC_TEXT_LENGTH} characters`
+        );
+      }
       const keywords = e.keywords
         .map(k => k.trim().toLowerCase())
         .filter(Boolean);

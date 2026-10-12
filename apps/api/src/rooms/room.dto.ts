@@ -7,6 +7,7 @@ import {
 } from '@nestjs/graphql';
 import { Direction, ExitFlag, ExitState, Sector } from '@muditor/db';
 import {
+  ArrayMaxSize,
   ArrayMinSize,
   IsArray,
   IsBoolean,
@@ -16,6 +17,7 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
 } from 'class-validator';
 import { MobDto } from '../mobs/mob.dto';
@@ -673,15 +675,23 @@ export class UpdateRoomExitInput {
   hitPoints?: number | null;
 }
 
+/** Caps on updateRoomExtraDescriptions, enforced by the DTO and the service. */
+export const MAX_ROOM_EXTRA_DESCRIPTIONS = 100;
+export const MAX_EXTRA_DESC_KEYWORD_LENGTH = 200;
+export const MAX_EXTRA_DESC_TEXT_LENGTH = 8000;
+
 @InputType()
 export class RoomExtraDescriptionInput {
   @Field(() => [String])
   @IsArray()
   @ArrayMinSize(1, { message: 'Each extra description needs a keyword' })
+  @ArrayMaxSize(MAX_ROOM_EXTRA_DESCRIPTIONS)
   @IsString({ each: true })
+  @MaxLength(MAX_EXTRA_DESC_KEYWORD_LENGTH, { each: true })
   keywords: string[];
 
   @Field()
   @IsString()
+  @MaxLength(MAX_EXTRA_DESC_TEXT_LENGTH)
   description: string;
 }

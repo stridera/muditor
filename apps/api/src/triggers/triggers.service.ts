@@ -257,6 +257,23 @@ export class TriggersService {
     return existing;
   }
 
+  /**
+   * A link row to a mob, object, room or trigger that does not exist fails the
+   * foreign key (P2003); report that as a 404 instead of a raw 500.
+   */
+  private async linkOrReject(write: Promise<unknown>): Promise<void> {
+    try {
+      await write;
+    } catch (e) {
+      if ((e as { code?: string } | null)?.code === 'P2003') {
+        throw new NotFoundException(
+          'The trigger or the mob, object or room to attach it to does not exist'
+        );
+      }
+      throw e;
+    }
+  }
+
   async attachToEntity(data: AttachTriggerInput, userId?: string) {
     // Triggers no longer carry direct mob/object FKs — attachments live in
     // MobTriggers/ObjectTriggers junction tables. Create the link rows.
@@ -290,67 +307,73 @@ export class TriggersService {
       data.mobZoneId != null &&
       data.attachType === ScriptType.MOB
     ) {
-      await this.prisma.mobTriggers.upsert({
-        where: {
-          mobZoneId_mobId_triggerZoneId_triggerId: {
+      await this.linkOrReject(
+        this.prisma.mobTriggers.upsert({
+          where: {
+            mobZoneId_mobId_triggerZoneId_triggerId: {
+              mobZoneId: data.mobZoneId,
+              mobId: data.mobId,
+              triggerZoneId: data.triggerZoneId,
+              triggerId: data.triggerId,
+            },
+          },
+          create: {
             mobZoneId: data.mobZoneId,
             mobId: data.mobId,
             triggerZoneId: data.triggerZoneId,
             triggerId: data.triggerId,
           },
-        },
-        create: {
-          mobZoneId: data.mobZoneId,
-          mobId: data.mobId,
-          triggerZoneId: data.triggerZoneId,
-          triggerId: data.triggerId,
-        },
-        update: {},
-      });
+          update: {},
+        })
+      );
     } else if (
       data.objectId != null &&
       data.objectZoneId != null &&
       data.attachType === ScriptType.OBJECT
     ) {
-      await this.prisma.objectTriggers.upsert({
-        where: {
-          objectZoneId_objectId_triggerZoneId_triggerId: {
+      await this.linkOrReject(
+        this.prisma.objectTriggers.upsert({
+          where: {
+            objectZoneId_objectId_triggerZoneId_triggerId: {
+              objectZoneId: data.objectZoneId,
+              objectId: data.objectId,
+              triggerZoneId: data.triggerZoneId,
+              triggerId: data.triggerId,
+            },
+          },
+          create: {
             objectZoneId: data.objectZoneId,
             objectId: data.objectId,
             triggerZoneId: data.triggerZoneId,
             triggerId: data.triggerId,
           },
-        },
-        create: {
-          objectZoneId: data.objectZoneId,
-          objectId: data.objectId,
-          triggerZoneId: data.triggerZoneId,
-          triggerId: data.triggerId,
-        },
-        update: {},
-      });
+          update: {},
+        })
+      );
     } else if (
       data.roomId != null &&
       data.roomZoneId != null &&
       data.attachType === ScriptType.WORLD
     ) {
-      await this.prisma.roomTriggers.upsert({
-        where: {
-          roomZoneId_roomId_triggerZoneId_triggerId: {
+      await this.linkOrReject(
+        this.prisma.roomTriggers.upsert({
+          where: {
+            roomZoneId_roomId_triggerZoneId_triggerId: {
+              roomZoneId: data.roomZoneId,
+              roomId: data.roomId,
+              triggerZoneId: data.triggerZoneId,
+              triggerId: data.triggerId,
+            },
+          },
+          create: {
             roomZoneId: data.roomZoneId,
             roomId: data.roomId,
             triggerZoneId: data.triggerZoneId,
             triggerId: data.triggerId,
           },
-        },
-        create: {
-          roomZoneId: data.roomZoneId,
-          roomId: data.roomId,
-          triggerZoneId: data.triggerZoneId,
-          triggerId: data.triggerId,
-        },
-        update: {},
-      });
+          update: {},
+        })
+      );
     }
 
     // Optionally bump attachType + updatedBy on the trigger row

@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { ParseIntPipe, UseGuards } from '@nestjs/common';
 import type { Users } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
@@ -62,7 +62,7 @@ export class MobResetResolver {
   @Query(() => MobResetDto, { name: 'mobReset', nullable: true })
   @UseGuards(OptionalJwtAuthGuard)
   async findOne(
-    @Args('id', { type: () => ID }) id: number,
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number,
     @CurrentUser() user?: Users | null
   ): Promise<MobResetDto | null> {
     return this.mobResetService.findOne(id, hidesGodZones(user ?? null));
@@ -84,7 +84,7 @@ export class MobResetResolver {
     lookup: zoneLookups.mobReset('id'),
   })
   async updateMobReset(
-    @Args('id', { type: () => ID }) id: number,
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number,
     @Args('data') data: UpdateMobResetInput
   ): Promise<MobResetDto> {
     return this.mobResetService.update(id, data);
@@ -93,7 +93,7 @@ export class MobResetResolver {
   @Mutation(() => Boolean)
   @RequireZoneWrite({ lookup: zoneLookups.mobReset('id') })
   async deleteMobReset(
-    @Args('id', { type: () => ID }) id: number
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number
   ): Promise<boolean> {
     return this.mobResetService.delete(id);
   }
@@ -101,7 +101,7 @@ export class MobResetResolver {
   @Mutation(() => Boolean)
   @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipment('id') })
   async deleteMobResetEquipment(
-    @Args('id', { type: () => ID }) id: number
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number
   ): Promise<boolean> {
     return this.mobResetService.deleteEquipment(id);
   }
@@ -109,7 +109,7 @@ export class MobResetResolver {
   @Mutation(() => MobResetDto)
   @RequireZoneWrite({ lookup: zoneLookups.mobReset('resetId') })
   async addMobResetEquipment(
-    @Args('resetId', { type: () => ID }) resetId: number,
+    @Args('resetId', { type: () => ID }, ParseIntPipe) resetId: number,
     @Args('objectZoneId', { type: () => Int }) objectZoneId: number,
     @Args('objectId', { type: () => Int }) objectId: number,
     @Args('wearLocation', { type: () => WearFlag, nullable: true })
@@ -142,7 +142,7 @@ export class MobResetResolver {
   @Mutation(() => Boolean)
   @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipment('id') })
   async updateMobResetEquipment(
-    @Args('id', { type: () => ID }) id: number,
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number,
     @Args('wearLocation', { type: () => WearFlag, nullable: true })
     wearLocation?: WearFlag,
     @Args('maxInstances', { type: () => Int, nullable: true })
@@ -168,7 +168,7 @@ export class MobResetResolver {
   @Mutation(() => MobResetDto)
   @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipment('equipmentId') })
   async addMobResetEquipmentContent(
-    @Args('equipmentId', { type: () => ID }) equipmentId: number,
+    @Args('equipmentId', { type: () => ID }, ParseIntPipe) equipmentId: number,
     @Args('data') data: ResetContentInput
   ): Promise<MobResetDto> {
     return this.mobResetService.addEquipmentContent(equipmentId, data);
@@ -177,7 +177,7 @@ export class MobResetResolver {
   @Mutation(() => Boolean)
   @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipmentContent('id') })
   async updateMobResetEquipmentContent(
-    @Args('id', { type: () => ID }) id: number,
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number,
     @Args('data') data: UpdateResetContentInput
   ): Promise<boolean> {
     return this.mobResetService.updateEquipmentContent(id, data);
@@ -186,7 +186,7 @@ export class MobResetResolver {
   @Mutation(() => Boolean)
   @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipmentContent('id') })
   async deleteMobResetEquipmentContent(
-    @Args('id', { type: () => ID }) id: number
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number
   ): Promise<boolean> {
     return this.mobResetService.deleteEquipmentContent(id);
   }

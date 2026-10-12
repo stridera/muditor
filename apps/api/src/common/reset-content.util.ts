@@ -1,8 +1,24 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ObjectType } from '@muditor/db';
 
 /** Object types that can hold other objects in a reset (legacy `P` command). */
 export const CONTAINER_TYPES: readonly ObjectType[] = [ObjectType.CONTAINER];
+
+/**
+ * Surfaces a failed update/delete of a reset row: a missing row (Prisma P2025)
+ * becomes a NotFoundException, anything else is rethrown untouched so real
+ * failures (bad input, DB down) are never reported as a quiet `false`.
+ */
+export function rethrowResetRowError(
+  e: unknown,
+  what: string,
+  id: number
+): never {
+  if ((e as { code?: string } | null)?.code === 'P2025') {
+    throw new NotFoundException(`${what} ${id} not found`);
+  }
+  throw e;
+}
 
 /** Turns a foreign-key failure on a reset write into a message a builder can act on. */
 export function rethrowResetWriteError(e: unknown): never {

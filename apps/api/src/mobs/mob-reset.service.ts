@@ -15,6 +15,7 @@ import { DatabaseService } from '../database/database.service';
 import {
   assertContainerObject,
   assertSameTree,
+  rethrowResetRowError,
   rethrowResetWriteError,
 } from '../common/reset-content.util';
 import {
@@ -384,8 +385,8 @@ export class MobResetService {
         data: update,
       });
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      return rethrowResetRowError(e, 'Equipment content', id);
     }
   }
 
@@ -393,8 +394,8 @@ export class MobResetService {
     try {
       await this.prisma.mobResetEquipmentContents.delete({ where: { id } });
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      return rethrowResetRowError(e, 'Equipment content', id);
     }
   }
 

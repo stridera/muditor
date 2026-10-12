@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { WearFlag } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
@@ -338,8 +339,11 @@ describe('MobResetService mapping', () => {
         data: { maxInstances: { set: 8 } },
       });
       expect(await service.deleteEquipmentContent(1)).toBe(true);
-      contentsDb().delete!.mockRejectedValue(new Error('gone'));
-      expect(await service.deleteEquipmentContent(1)).toBe(false);
+      const gone = Object.assign(new Error('gone'), { code: 'P2025' });
+      contentsDb().delete!.mockRejectedValue(gone);
+      await expect(service.deleteEquipmentContent(1)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 

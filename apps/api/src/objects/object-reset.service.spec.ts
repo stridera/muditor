@@ -300,7 +300,8 @@ describe('ObjectResetService', () => {
     });
     (db.objectResetContents.delete as Mock).mockResolvedValue({});
     expect(await service.deleteContent(3)).toBe(true);
-    (db.objectResetContents.delete as Mock).mockRejectedValue(new Error('x'));
-    expect(await service.deleteContent(3)).toBe(false);
+    const gone = Object.assign(new Error('x'), { code: 'P2025' });
+    (db.objectResetContents.delete as Mock).mockRejectedValue(gone);
+    await expect(service.deleteContent(3)).rejects.toThrow(NotFoundException);
   });
 });

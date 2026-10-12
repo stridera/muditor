@@ -1,5 +1,5 @@
 import { ScriptType } from '@muditor/db';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { TriggersService } from './triggers.service';
 
 describe('TriggersService.detachFromEntity', () => {
@@ -162,5 +162,45 @@ describe('TriggersService room attachments', () => {
     expect(prisma.roomTriggers.deleteMany).toHaveBeenCalledWith({
       where: { triggerZoneId: 30, triggerId: 5, roomZoneId: 31, roomId: 2 },
     });
+  });
+});
+
+describe('TriggersService attach to a missing entity', () => {
+  const fkError = Object.assign(new Error('fk'), { code: 'P2003' });
+
+  it('maps a foreign-key failure on a room link to NotFoundException', async () => {
+    const prisma = {
+      roomTriggers: { upsert: jest.fn().mockRejectedValue(fkError) },
+      triggers: { update: jest.fn() },
+    };
+    const service = new TriggersService(prisma as never);
+    await expect(
+      service.attachToEntity({
+        triggerZoneId: 30,
+        triggerId: 5,
+        attachType: ScriptType.WORLD,
+        roomZoneId: 31,
+        roomId: 9999,
+      })
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(prisma.triggers.update).not.toHaveBeenCalled();
+  });
+
+  it('rethrows unrelated errors untouched', async () => {
+    const boom = new Error('db down');
+    const prisma = {
+      roomTriggers: { upsert: jest.fn().mockRejectedValue(boom) },
+      triggers: { update: jest.fn() },
+    };
+    const service = new TriggersService(prisma as never);
+    await expect(
+      service.attachToEntity({
+        triggerZoneId: 30,
+        triggerId: 5,
+        attachType: ScriptType.WORLD,
+        roomZoneId: 31,
+        roomId: 1,
+      })
+    ).rejects.toBe(boom);
   });
 });

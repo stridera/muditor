@@ -213,3 +213,31 @@ describe('room extra descriptions', () => {
     ]);
   });
 });
+
+describe('replaceExtraDescriptions limits', () => {
+  const svc = () =>
+    new RoomsService({ room: { findUnique: jest.fn() } } as never);
+
+  it('rejects more than 100 extra descriptions', async () => {
+    const many = Array.from({ length: 101 }, () => ({
+      keywords: ['a'],
+      description: 'x',
+    }));
+    await expect(svc().replaceExtraDescriptions(30, 4, many)).rejects.toThrow(
+      /at most 100/
+    );
+  });
+
+  it('rejects overlong keywords and text', async () => {
+    await expect(
+      svc().replaceExtraDescriptions(30, 4, [
+        { keywords: ['k'.repeat(201)], description: 'x' },
+      ])
+    ).rejects.toThrow(/overlong keywords/);
+    await expect(
+      svc().replaceExtraDescriptions(30, 4, [
+        { keywords: ['k'], description: 'x'.repeat(8001) },
+      ])
+    ).rejects.toThrow(/over 8000/);
+  });
+});

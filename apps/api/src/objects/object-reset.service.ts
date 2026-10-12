@@ -7,6 +7,7 @@ import { Prisma } from '@muditor/db';
 import {
   assertContainerObject,
   assertSameTree,
+  rethrowResetRowError,
   rethrowResetWriteError,
 } from '../common/reset-content.util';
 import { inVisibleZone } from '../common/god-zone-visibility';
@@ -213,8 +214,8 @@ export class ObjectResetService {
         data: update,
       });
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      return rethrowResetRowError(e, 'Reset content', id);
     }
   }
 
@@ -222,8 +223,8 @@ export class ObjectResetService {
     try {
       await this.prisma.objectResetContents.delete({ where: { id } });
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      return rethrowResetRowError(e, 'Reset content', id);
     }
   }
 

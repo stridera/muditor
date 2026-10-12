@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { ParseIntPipe, UseGuards } from '@nestjs/common';
 import type { Users } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
@@ -52,7 +52,7 @@ export class ObjectResetResolver {
   @Query(() => ObjectResetDto, { name: 'objectReset', nullable: true })
   @UseGuards(OptionalJwtAuthGuard)
   async findOne(
-    @Args('id', { type: () => ID }) id: number,
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number,
     @CurrentUser() user?: Users | null
   ): Promise<ObjectResetDto | null> {
     return this.objectResetService.findOne(id, hidesGodZones(user ?? null));
@@ -74,7 +74,7 @@ export class ObjectResetResolver {
     lookup: zoneLookups.objectReset('id'),
   })
   async updateObjectReset(
-    @Args('id', { type: () => ID }) id: number,
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number,
     @Args('data') data: UpdateObjectResetInput
   ): Promise<ObjectResetDto> {
     return this.objectResetService.update(id, data);
@@ -83,7 +83,7 @@ export class ObjectResetResolver {
   @Mutation(() => Boolean)
   @RequireZoneWrite({ lookup: zoneLookups.objectReset('id') })
   async deleteObjectReset(
-    @Args('id', { type: () => ID }) id: number
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number
   ): Promise<boolean> {
     return this.objectResetService.delete(id);
   }
@@ -91,7 +91,7 @@ export class ObjectResetResolver {
   @Mutation(() => ObjectResetDto)
   @RequireZoneWrite({ lookup: zoneLookups.objectReset('resetId') })
   async addObjectResetContent(
-    @Args('resetId', { type: () => ID }) resetId: number,
+    @Args('resetId', { type: () => ID }, ParseIntPipe) resetId: number,
     @Args('data') data: ResetContentInput
   ): Promise<ObjectResetDto> {
     return this.objectResetService.addContent(resetId, data);
@@ -100,7 +100,7 @@ export class ObjectResetResolver {
   @Mutation(() => Boolean)
   @RequireZoneWrite({ lookup: zoneLookups.objectResetContent('id') })
   async updateObjectResetContent(
-    @Args('id', { type: () => ID }) id: number,
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number,
     @Args('data') data: UpdateResetContentInput
   ): Promise<boolean> {
     return this.objectResetService.updateContent(id, data);
@@ -109,7 +109,7 @@ export class ObjectResetResolver {
   @Mutation(() => Boolean)
   @RequireZoneWrite({ lookup: zoneLookups.objectResetContent('id') })
   async deleteObjectResetContent(
-    @Args('id', { type: () => ID }) id: number
+    @Args('id', { type: () => ID }, ParseIntPipe) id: number
   ): Promise<boolean> {
     return this.objectResetService.deleteContent(id);
   }
