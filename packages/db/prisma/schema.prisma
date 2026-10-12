@@ -213,6 +213,28 @@ model CreationRecipe {
   @@map("CreationRecipe")
 }
 
+// What a new character is handed in their pack at creation (legacy
+// give_newbie_eq in class.cpp: a common pack plus per-class gear). One row per
+// item, handed out in `id` order:
+//   - `classId`: the row applies to that class only; NULL is every class (the
+//     bag, rations, water skin, torch, map and journal).
+//   - `quantity`: how many copies.
+// Legacy gave no coin, so there is no coin column. No FK on the object: a
+// partial world import must not block the seed, and the game logs a missing
+// proto. Postgres treats NULLs in the unique index as distinct, so the SQL
+// seeds guard with NOT EXISTS rather than ON CONFLICT.
+model StartingKit {
+  id             Int             @id @default(autoincrement())
+  classId        Int?            @map("class_id")
+  characterClass CharacterClass? @relation(fields: [classId], references: [id], onDelete: Cascade)
+  objectZoneId   Int             @map("object_zone_id")
+  objectId       Int             @map("object_id")
+  quantity       Int             @default(1)
+
+  @@unique([classId, objectZoneId, objectId])
+  @@map("StartingKit")
+}
+
 model AbilitySchool {
   id          Int       @id @default(autoincrement())
   name        String    @unique
@@ -506,6 +528,7 @@ model CharacterClass {
   classAbilities      ClassAbilities[]
   classAbilityCircles ClassAbilityCircles[]
   creationRecipes     CreationRecipe[]
+  startingKit         StartingKit[]
   mobs                Mobs[]
 
   @@map("Class")
