@@ -44,6 +44,7 @@ import {
   ShoppingBag,
   Sparkles,
   Swords,
+  Terminal,
   User,
   Users,
   Users2,
@@ -107,6 +108,10 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
   '/dashboard/socials': {
     name: 'Socials',
     icon: <MessageCircle className='h-5 w-5' />,
+  },
+  '/dashboard/commands': {
+    name: 'Commands',
+    icon: <Terminal className='h-5 w-5' />,
   },
   '/dashboard/system-messages': {
     name: 'System Messages',
@@ -474,6 +479,12 @@ export function Navigation() {
                             <Link href='/dashboard/creation-recipes'>
                               <Hammer className='mr-2 h-4 w-4' />
                               Creation Recipes
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href='/dashboard/commands'>
+                              <Terminal className='mr-2 h-4 w-4' />
+                              Commands
                             </Link>
                           </DropdownMenuItem>
                         </>

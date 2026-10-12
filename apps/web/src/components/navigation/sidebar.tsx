@@ -326,6 +326,11 @@ export function Sidebar() {
         name: 'Creation Recipes',
         href: '/dashboard/creation-recipes',
         icon: <Hammer className='h-4 w-4' />,
+      },
+      {
+        name: 'Commands',
+        href: '/dashboard/commands',
+        icon: <Terminal className='h-4 w-4' />,
       }
     );
   }

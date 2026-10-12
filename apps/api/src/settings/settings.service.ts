@@ -19,6 +19,9 @@ import {
   SystemTextCategory,
 } from '@muditor/db';
 
+export const COMMAND_HELP_SUMMARY_MAX = 200;
+export const COMMAND_HELP_TEXT_MAX = 8000;
+
 @Injectable()
 export class SettingsService {
   constructor(private readonly db: DatabaseService) {}
@@ -456,6 +459,45 @@ export class SettingsService {
     }
 
     return command;
+  }
+
+  /**
+   * Update only the in-game help text of a command. Blank/null clears the
+   * column so the game falls back to its built-in string.
+   * Arguments left undefined are not touched.
+   */
+  async updateCommandHelp(
+    name: string,
+    helpSummary?: string | null,
+    helpText?: string | null
+  ) {
+    const data: { helpSummary?: string | null; helpText?: string | null } = {};
+
+    if (helpSummary !== undefined) {
+      const summary = (helpSummary ?? '').trim();
+      if (/[\r\n]/.test(summary)) {
+        throw new BadRequestException('Summary must be a single line');
+      }
+      if (summary.length > COMMAND_HELP_SUMMARY_MAX) {
+        throw new BadRequestException(
+          `Summary must be at most ${COMMAND_HELP_SUMMARY_MAX} characters`
+        );
+      }
+      data.helpSummary = summary === '' ? null : summary;
+    }
+
+    if (helpText !== undefined) {
+      const text = (helpText ?? '').trim();
+      if (text.length > COMMAND_HELP_TEXT_MAX) {
+        throw new BadRequestException(
+          `Help text must be at most ${COMMAND_HELP_TEXT_MAX} characters`
+        );
+      }
+      data.helpText = text === '' ? null : text;
+    }
+
+    await this.findCommand(name); // Ensure exists
+    return this.db.command.update({ where: { name }, data });
   }
 
   /**

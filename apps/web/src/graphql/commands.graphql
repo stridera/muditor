@@ -1,0 +1,29 @@
+# Command in-game help (summary/text) operations
+
+query GetCommandHelp {
+  commands {
+    name
+    aliases
+    category
+    helpSummary
+    helpText
+    updatedAt
+  }
+}
+
+mutation UpdateCommandHelp(
+  $name: String!
+  $helpSummary: String
+  $helpText: String
+) {
+  updateCommandHelp(
+    name: $name
+    helpSummary: $helpSummary
+    helpText: $helpText
+  ) {
+    name
+    helpSummary
+    helpText
+    updatedAt
+  }
+}

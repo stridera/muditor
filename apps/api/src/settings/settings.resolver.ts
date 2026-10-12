@@ -277,7 +277,7 @@ export class SettingsResolver {
     name: 'commands',
     description: 'Get all command definitions',
   })
-  @MinimumRole(UserRole.CODER)
+  @MinimumRole(UserRole.BUILDER)
   async findAllCommands() {
     return this.settingsService.findAllCommands();
   }
@@ -327,5 +327,24 @@ export class SettingsResolver {
   @MinimumRole(UserRole.CODER)
   getCommandCategories() {
     return this.settingsService.getCommandCategories();
+  }
+
+  // ============================================
+  // Command help Mutation
+  // ============================================
+
+  @Mutation(() => CommandDto, {
+    description:
+      'Update the in-game help summary/text of a command (empty clears it, falling back to the built-in text)',
+  })
+  @MinimumRole(UserRole.BUILDER)
+  async updateCommandHelp(
+    @Args('name') name: string,
+    @Args('helpSummary', { type: () => String, nullable: true })
+    helpSummary?: string | null,
+    @Args('helpText', { type: () => String, nullable: true })
+    helpText?: string | null
+  ) {
+    return this.settingsService.updateCommandHelp(name, helpSummary, helpText);
   }
 }
