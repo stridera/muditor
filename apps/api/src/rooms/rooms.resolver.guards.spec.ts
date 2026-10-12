@@ -13,6 +13,7 @@ describe('RoomsResolver guards', () => {
       'updateRoomPosition',
       'batchUpdateRoomPositions',
       'updateRoomEnvironmentalEffects',
+      'updateRoomExtraDescriptions',
     ]);
   });
 });

@@ -18,6 +18,9 @@ describe('MobResetResolver guards', () => {
       'deleteMobResetEquipment',
       'addMobResetEquipment',
       'updateMobResetEquipment',
+      'addMobResetEquipmentContent',
+      'updateMobResetEquipmentContent',
+      'deleteMobResetEquipmentContent',
     ]);
   });
 });

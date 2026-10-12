@@ -1,0 +1,268 @@
+# Mob and object resets (what spawns where), used by the room editor's Resets
+# panel and the zone editor's entity palette. All mutations are zone-scoped
+# (RequireZoneWrite) on the API.
+
+fragment ResetObjectSummary on ObjectSummaryDto {
+  id
+  zoneId
+  name
+  type
+}
+
+fragment MobResetFull on MobResetDto {
+  id
+  zoneId
+  mobZoneId
+  mobId
+  roomZoneId
+  roomId
+  maxInstances
+  probability
+  comment
+  mob {
+    id
+    zoneId
+    name
+  }
+  equipment {
+    id
+    objectZoneId
+    objectId
+    wearLocation
+    maxInstances
+    probability
+    decorative
+    object {
+      ...ResetObjectSummary
+    }
+    contents {
+      id
+      parentContentId
+      objectZoneId
+      objectId
+      quantity
+      maxInstances
+      comment
+      object {
+        ...ResetObjectSummary
+      }
+    }
+  }
+}
+
+fragment ObjectResetFull on ObjectResetDto {
+  id
+  zoneId
+  objectZoneId
+  objectId
+  roomZoneId
+  roomId
+  maxInstances
+  probability
+  comment
+  object {
+    ...ResetObjectSummary
+  }
+  contents {
+    id
+    parentContentId
+    objectZoneId
+    objectId
+    quantity
+    maxInstances
+    comment
+    object {
+      ...ResetObjectSummary
+    }
+  }
+}
+
+query MobResetsByRoom($roomZoneId: Int!, $roomId: Int!) {
+  mobResetsByRoom(roomZoneId: $roomZoneId, roomId: $roomId) {
+    ...MobResetFull
+  }
+}
+
+query ObjectResetsByRoom($roomZoneId: Int!, $roomId: Int!) {
+  objectResetsByRoom(roomZoneId: $roomZoneId, roomId: $roomId) {
+    ...ObjectResetFull
+  }
+}
+
+query ResetPickerZoneMobs($zoneId: Int!) {
+  mobsByZone(zoneId: $zoneId) {
+    id
+    zoneId
+    name
+    level
+  }
+}
+
+query ResetPickerZoneObjects($zoneId: Int!) {
+  objectsByZone(zoneId: $zoneId) {
+    id
+    zoneId
+    name
+    type
+    level
+  }
+}
+
+query ResetPickerSearchMobs($search: String!, $limit: Int!) {
+  searchMobs(search: $search, limit: $limit) {
+    id
+    zoneId
+    name
+    level
+  }
+}
+
+query ResetPickerSearchObjects($search: String!, $limit: Int!) {
+  searchObjects(search: $search, limit: $limit) {
+    id
+    zoneId
+    name
+    type
+    level
+  }
+}
+
+mutation CreateMobReset($data: CreateMobResetInput!) {
+  createMobReset(data: $data) {
+    ...MobResetFull
+  }
+}
+
+mutation UpdateMobReset($id: ID!, $data: UpdateMobResetInput!) {
+  updateMobReset(id: $id, data: $data) {
+    ...MobResetFull
+  }
+}
+
+mutation DeleteMobReset($id: ID!) {
+  deleteMobReset(id: $id)
+}
+
+mutation AddMobResetEquipment(
+  $resetId: ID!
+  $objectZoneId: Int!
+  $objectId: Int!
+  $wearLocation: WearFlag
+  $maxInstances: Int
+  $probability: Float
+  $decorative: Boolean
+) {
+  addMobResetEquipment(
+    resetId: $resetId
+    objectZoneId: $objectZoneId
+    objectId: $objectId
+    wearLocation: $wearLocation
+    maxInstances: $maxInstances
+    probability: $probability
+    decorative: $decorative
+  ) {
+    ...MobResetFull
+  }
+}
+
+mutation UpdateMobResetEquipment(
+  $id: ID!
+  $wearLocation: WearFlag
+  $maxInstances: Int
+  $probability: Float
+  $decorative: Boolean
+) {
+  updateMobResetEquipment(
+    id: $id
+    wearLocation: $wearLocation
+    maxInstances: $maxInstances
+    probability: $probability
+    decorative: $decorative
+  )
+}
+
+mutation DeleteMobResetEquipment($id: ID!) {
+  deleteMobResetEquipment(id: $id)
+}
+
+mutation AddMobResetEquipmentContent(
+  $equipmentId: ID!
+  $data: ResetContentInput!
+) {
+  addMobResetEquipmentContent(equipmentId: $equipmentId, data: $data) {
+    ...MobResetFull
+  }
+}
+
+mutation UpdateMobResetEquipmentContent(
+  $id: ID!
+  $data: UpdateResetContentInput!
+) {
+  updateMobResetEquipmentContent(id: $id, data: $data)
+}
+
+mutation DeleteMobResetEquipmentContent($id: ID!) {
+  deleteMobResetEquipmentContent(id: $id)
+}
+
+mutation CreateObjectReset($data: CreateObjectResetInput!) {
+  createObjectReset(data: $data) {
+    ...ObjectResetFull
+  }
+}
+
+mutation UpdateObjectReset($id: ID!, $data: UpdateObjectResetInput!) {
+  updateObjectReset(id: $id, data: $data) {
+    ...ObjectResetFull
+  }
+}
+
+mutation DeleteObjectReset($id: ID!) {
+  deleteObjectReset(id: $id)
+}
+
+mutation AddObjectResetContent($resetId: ID!, $data: ResetContentInput!) {
+  addObjectResetContent(resetId: $resetId, data: $data) {
+    ...ObjectResetFull
+  }
+}
+
+mutation UpdateObjectResetContent($id: ID!, $data: UpdateResetContentInput!) {
+  updateObjectResetContent(id: $id, data: $data)
+}
+
+mutation DeleteObjectResetContent($id: ID!) {
+  deleteObjectResetContent(id: $id)
+}
+
+mutation UpdateRoomExtraDescriptions(
+  $zoneId: Int!
+  $id: Int!
+  $extraDescs: [RoomExtraDescriptionInput!]!
+) {
+  updateRoomExtraDescriptions(
+    zoneId: $zoneId
+    id: $id
+    extraDescs: $extraDescs
+  ) {
+    id
+    zoneId
+    extraDescs {
+      id
+      keywords
+      description
+    }
+  }
+}
+
+query RoomExtraDescriptions($zoneId: Int!, $id: Int!) {
+  room(zoneId: $zoneId, id: $id) {
+    id
+    zoneId
+    extraDescs {
+      id
+      keywords
+      description
+    }
+  }
+}

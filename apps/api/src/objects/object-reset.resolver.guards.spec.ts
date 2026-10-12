@@ -7,6 +7,9 @@ describe('ObjectResetResolver guards', () => {
       'createObjectReset',
       'updateObjectReset',
       'deleteObjectReset',
+      'addObjectResetContent',
+      'updateObjectResetContent',
+      'deleteObjectResetContent',
     ]);
   });
 });

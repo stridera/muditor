@@ -10,7 +10,9 @@ import { WearFlag } from '@muditor/db';
 import {
   CreateMobResetInput,
   MobResetDto,
+  ResetContentInput,
   UpdateMobResetInput,
+  UpdateResetContentInput,
 } from './mob-reset.dto';
 import { MobResetService } from './mob-reset.service';
 
@@ -30,6 +32,29 @@ export class MobResetResolver {
     return this.mobResetService.findByMob(
       mobZoneId,
       mobId,
+      hidesGodZones(user ?? null)
+    );
+  }
+
+  @Query(() => [MobResetDto], { name: 'mobResetsByZone' })
+  @UseGuards(OptionalJwtAuthGuard)
+  async findByZone(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @CurrentUser() user?: Users | null
+  ): Promise<MobResetDto[]> {
+    return this.mobResetService.findByZone(zoneId, hidesGodZones(user ?? null));
+  }
+
+  @Query(() => [MobResetDto], { name: 'mobResetsByRoom' })
+  @UseGuards(OptionalJwtAuthGuard)
+  async findByRoom(
+    @Args('roomZoneId', { type: () => Int }) roomZoneId: number,
+    @Args('roomId', { type: () => Int }) roomId: number,
+    @CurrentUser() user?: Users | null
+  ): Promise<MobResetDto[]> {
+    return this.mobResetService.findByRoom(
+      roomZoneId,
+      roomId,
       hidesGodZones(user ?? null)
     );
   }
@@ -92,7 +117,9 @@ export class MobResetResolver {
     @Args('maxInstances', { type: () => Int, nullable: true })
     maxInstances?: number,
     @Args('probability', { type: () => Number, nullable: true })
-    probability?: number
+    probability?: number,
+    @Args('decorative', { type: () => Boolean, nullable: true })
+    decorative?: boolean
   ): Promise<MobResetDto> {
     const equipmentData: {
       objectZoneId: number;
@@ -100,6 +127,7 @@ export class MobResetResolver {
       wearLocation?: WearFlag;
       maxInstances?: number;
       probability?: number;
+      decorative?: boolean;
     } = {
       objectZoneId,
       objectId,
@@ -107,6 +135,7 @@ export class MobResetResolver {
     if (wearLocation !== undefined) equipmentData.wearLocation = wearLocation;
     if (maxInstances !== undefined) equipmentData.maxInstances = maxInstances;
     if (probability !== undefined) equipmentData.probability = probability;
+    if (decorative !== undefined) equipmentData.decorative = decorative;
     return this.mobResetService.addEquipment(resetId, equipmentData);
   }
 
@@ -119,16 +148,46 @@ export class MobResetResolver {
     @Args('maxInstances', { type: () => Int, nullable: true })
     maxInstances?: number,
     @Args('probability', { type: () => Number, nullable: true })
-    probability?: number
+    probability?: number,
+    @Args('decorative', { type: () => Boolean, nullable: true })
+    decorative?: boolean
   ): Promise<boolean> {
     const updates: {
       wearLocation?: WearFlag;
       maxInstances?: number;
       probability?: number;
+      decorative?: boolean;
     } = {};
     if (wearLocation !== undefined) updates.wearLocation = wearLocation;
     if (maxInstances !== undefined) updates.maxInstances = maxInstances;
     if (probability !== undefined) updates.probability = probability;
+    if (decorative !== undefined) updates.decorative = decorative;
     return this.mobResetService.updateEquipment(id, updates);
+  }
+
+  @Mutation(() => MobResetDto)
+  @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipment('equipmentId') })
+  async addMobResetEquipmentContent(
+    @Args('equipmentId', { type: () => ID }) equipmentId: number,
+    @Args('data') data: ResetContentInput
+  ): Promise<MobResetDto> {
+    return this.mobResetService.addEquipmentContent(equipmentId, data);
+  }
+
+  @Mutation(() => Boolean)
+  @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipmentContent('id') })
+  async updateMobResetEquipmentContent(
+    @Args('id', { type: () => ID }) id: number,
+    @Args('data') data: UpdateResetContentInput
+  ): Promise<boolean> {
+    return this.mobResetService.updateEquipmentContent(id, data);
+  }
+
+  @Mutation(() => Boolean)
+  @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipmentContent('id') })
+  async deleteMobResetEquipmentContent(
+    @Args('id', { type: () => ID }) id: number
+  ): Promise<boolean> {
+    return this.mobResetService.deleteEquipmentContent(id);
   }
 }

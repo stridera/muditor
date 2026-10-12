@@ -40,11 +40,23 @@ export interface RoomMapperSource {
   allowsSummon?: boolean;
   allowsTeleport?: boolean;
   isDeathTrap?: boolean;
+  isIndoors?: boolean;
+  isSoundproof?: boolean;
+  isArena?: boolean;
+  isGuildhall?: boolean;
+  allowsMobs?: boolean;
+  allowsTracking?: boolean;
+  allowsPortals?: boolean;
+  allowsScanning?: boolean;
+  isInn?: boolean;
+  innName?: string | null;
   exits?: (PrismaRoomExit & {
     defaultState?: ExitState;
     hitPoints?: number | null;
   })[];
   roomExtraDescriptions?: RoomExtraDescriptions[];
+  /** Same rows under the name RoomsService results use */
+  extraDescs?: Array<{ id: number; keywords: string[]; description: string }>;
   environmentalEffects?: (RoomEnvironmentalEffect & { effect: Effect })[];
   deletedAt?: Date | null;
   [key: string]: unknown;

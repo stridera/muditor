@@ -17,6 +17,7 @@ import {
 } from 'class-validator';
 import {
   Alignment,
+  DamageType,
   ObjectFlag,
   ObjectRestriction,
   ObjectType as ObjectTypeEnum,
@@ -38,6 +39,8 @@ registerEnumType(ObjectFlag, { name: 'ObjectFlag' });
 registerEnumType(WearFlag, { name: 'WearFlag' });
 registerEnumType(ObjectRestriction, { name: 'ObjectRestriction' });
 registerEnumType(Alignment, { name: 'Alignment' });
+// Also registered by mob.dto; registering the same enum twice with one name is harmless
+registerEnumType(DamageType, { name: 'DamageType' });
 
 @ObjectType()
 export class ObjectDto {
@@ -127,6 +130,26 @@ export class ObjectDto {
 
   @Field(() => GraphQLJSON)
   values: Prisma.JsonValue;
+
+  @Field(() => Int, { description: 'WEAPON: number of damage dice (NdS+B)' })
+  weaponDiceNum: number;
+
+  @Field(() => Int, { description: 'WEAPON: sides per damage die' })
+  weaponDiceSize: number;
+
+  @Field(() => Int, { description: 'WEAPON: flat damage bonus' })
+  weaponDiceBonus: number;
+
+  @Field(() => DamageType, {
+    nullable: true,
+    description: 'WEAPON: damage type of a hit',
+  })
+  weaponDamageType?: DamageType;
+
+  @Field(() => Int, {
+    description: 'ARMOR: armor value (mitigation percent scale; higher = more)',
+  })
+  armorPct: number;
 
   @Field(() => Int)
   zoneId: number;
@@ -280,6 +303,33 @@ export class CreateObjectInput {
   @Field(() => GraphQLJSON, { nullable: true })
   @IsOptional()
   values?: Prisma.JsonValue;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  weaponDiceNum?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  weaponDiceSize?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  weaponDiceBonus?: number;
+
+  @Field(() => DamageType, { nullable: true })
+  @IsOptional()
+  @IsEnum(DamageType)
+  weaponDamageType?: DamageType | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  armorPct?: number;
 }
 
 @InputType()
@@ -408,6 +458,33 @@ export class UpdateObjectInput {
   @Field(() => GraphQLJSON, { nullable: true })
   @IsOptional()
   values?: Prisma.JsonValue;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  weaponDiceNum?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  weaponDiceSize?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  weaponDiceBonus?: number;
+
+  @Field(() => DamageType, { nullable: true })
+  @IsOptional()
+  @IsEnum(DamageType)
+  weaponDamageType?: DamageType | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  armorPct?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

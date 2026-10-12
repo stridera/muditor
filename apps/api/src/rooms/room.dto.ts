@@ -7,6 +7,7 @@ import {
 } from '@nestjs/graphql';
 import { Direction, ExitFlag, ExitState, Sector } from '@muditor/db';
 import {
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsEnum,
@@ -165,6 +166,36 @@ export class RoomDto {
   @Field({ defaultValue: false })
   isDeathTrap: boolean;
 
+  @Field({ defaultValue: false })
+  isIndoors: boolean;
+
+  @Field({ defaultValue: false })
+  isSoundproof: boolean;
+
+  @Field({ defaultValue: false })
+  isArena: boolean;
+
+  @Field({ defaultValue: false })
+  isGuildhall: boolean;
+
+  @Field({ defaultValue: true })
+  allowsMobs: boolean;
+
+  @Field({ defaultValue: true })
+  allowsTracking: boolean;
+
+  @Field({ defaultValue: true })
+  allowsPortals: boolean;
+
+  @Field({ defaultValue: true })
+  allowsScanning: boolean;
+
+  @Field({ defaultValue: false })
+  isInn: boolean;
+
+  @Field({ nullable: true })
+  innName?: string;
+
   // Environmental effects attached to this room
   @Field(() => [RoomEnvironmentalEffectDto], { defaultValue: [] })
   environmentalEffects: RoomEnvironmentalEffectDto[];
@@ -253,6 +284,56 @@ export class CreateRoomInput {
   @IsOptional()
   @IsBoolean()
   isDeathTrap?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  @IsBoolean()
+  isIndoors?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  @IsBoolean()
+  isSoundproof?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  @IsBoolean()
+  isArena?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  @IsBoolean()
+  isGuildhall?: boolean;
+
+  @Field({ defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsMobs?: boolean;
+
+  @Field({ defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsTracking?: boolean;
+
+  @Field({ defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsPortals?: boolean;
+
+  @Field({ defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsScanning?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  @IsBoolean()
+  isInn?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  innName?: string;
 }
 
 @InputType()
@@ -337,6 +418,56 @@ export class UpdateRoomInput {
   @IsOptional()
   @IsBoolean()
   isDeathTrap?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isIndoors?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isSoundproof?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isArena?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isGuildhall?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsMobs?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsTracking?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsPortals?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsScanning?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isInn?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  innName?: string;
 }
 
 @InputType()
@@ -540,4 +671,17 @@ export class UpdateRoomExitInput {
   @IsOptional()
   @IsInt()
   hitPoints?: number | null;
+}
+
+@InputType()
+export class RoomExtraDescriptionInput {
+  @Field(() => [String])
+  @IsArray()
+  @ArrayMinSize(1, { message: 'Each extra description needs a keyword' })
+  @IsString({ each: true })
+  keywords: string[];
+
+  @Field()
+  @IsString()
+  description: string;
 }

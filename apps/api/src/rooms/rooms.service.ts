@@ -1,5 +1,6 @@
 // CLEAN REWRITE START -------------------------------------------------------
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -10,6 +11,7 @@ import {
   BatchUpdateResult,
   CreateRoomExitInput,
   CreateRoomInput,
+  RoomExtraDescriptionInput,
   UpdateRoomExitInput,
   UpdateRoomInput,
   UpdateRoomPositionInput,
@@ -58,6 +60,16 @@ interface RoomServiceResultBase {
   allowsSummon: boolean;
   allowsTeleport: boolean;
   isDeathTrap: boolean;
+  isIndoors: boolean;
+  isSoundproof: boolean;
+  isArena: boolean;
+  isGuildhall: boolean;
+  allowsMobs: boolean;
+  allowsTracking: boolean;
+  allowsPortals: boolean;
+  allowsScanning: boolean;
+  isInn: boolean;
+  innName: string | null;
   environmentalEffects: Array<{
     effectId: number;
     effect: {
@@ -152,6 +164,16 @@ export class RoomsService {
     allowsSummon?: boolean;
     allowsTeleport?: boolean;
     isDeathTrap?: boolean;
+    isIndoors?: boolean;
+    isSoundproof?: boolean;
+    isArena?: boolean;
+    isGuildhall?: boolean;
+    allowsMobs?: boolean;
+    allowsTracking?: boolean;
+    allowsPortals?: boolean;
+    allowsScanning?: boolean;
+    isInn?: boolean;
+    innName?: string | null;
   }): RoomServiceResult {
     return {
       id: room.id,
@@ -181,6 +203,16 @@ export class RoomsService {
       allowsSummon: room.allowsSummon ?? true,
       allowsTeleport: room.allowsTeleport ?? true,
       isDeathTrap: room.isDeathTrap ?? false,
+      isIndoors: room.isIndoors ?? false,
+      isSoundproof: room.isSoundproof ?? false,
+      isArena: room.isArena ?? false,
+      isGuildhall: room.isGuildhall ?? false,
+      allowsMobs: room.allowsMobs ?? true,
+      allowsTracking: room.allowsTracking ?? true,
+      allowsPortals: room.allowsPortals ?? true,
+      allowsScanning: room.allowsScanning ?? true,
+      isInn: room.isInn ?? false,
+      innName: room.innName ?? null,
     };
   }
 
@@ -462,6 +494,16 @@ export class RoomsService {
           allowsSummon: data.allowsSummon ?? true,
           allowsTeleport: data.allowsTeleport ?? true,
           isDeathTrap: data.isDeathTrap ?? false,
+          isIndoors: data.isIndoors ?? false,
+          isSoundproof: data.isSoundproof ?? false,
+          isArena: data.isArena ?? false,
+          isGuildhall: data.isGuildhall ?? false,
+          allowsMobs: data.allowsMobs ?? true,
+          allowsTracking: data.allowsTracking ?? true,
+          allowsPortals: data.allowsPortals ?? true,
+          allowsScanning: data.allowsScanning ?? true,
+          isInn: data.isInn ?? false,
+          innName: data.innName ?? null,
         },
         include: this.includeFull,
       });
@@ -506,6 +548,20 @@ export class RoomsService {
     if (data.allowsTeleport !== undefined)
       update.allowsTeleport = data.allowsTeleport;
     if (data.isDeathTrap !== undefined) update.isDeathTrap = data.isDeathTrap;
+    if (data.isIndoors !== undefined) update.isIndoors = data.isIndoors;
+    if (data.isSoundproof !== undefined)
+      update.isSoundproof = data.isSoundproof;
+    if (data.isArena !== undefined) update.isArena = data.isArena;
+    if (data.isGuildhall !== undefined) update.isGuildhall = data.isGuildhall;
+    if (data.allowsMobs !== undefined) update.allowsMobs = data.allowsMobs;
+    if (data.allowsTracking !== undefined)
+      update.allowsTracking = data.allowsTracking;
+    if (data.allowsPortals !== undefined)
+      update.allowsPortals = data.allowsPortals;
+    if (data.allowsScanning !== undefined)
+      update.allowsScanning = data.allowsScanning;
+    if (data.isInn !== undefined) update.isInn = data.isInn;
+    if (data.innName !== undefined) update.innName = data.innName;
     const room = await this.db.room.update({
       where: { zoneId_id: { zoneId, id } },
       data: update,
@@ -668,6 +724,50 @@ export class RoomsService {
             roomId: id,
             effectId: e.effectId,
           })),
+        });
+      }
+    });
+    return this.findOne(zoneId, id);
+  }
+
+  /**
+   * Replace every extra description ("look at <keyword>") of a room with the
+   * given list. Keywords are trimmed and lower-cased; an entry with no
+   * keyword or no text is rejected so a half-filled form cannot save.
+   */
+  async replaceExtraDescriptions(
+    zoneId: number,
+    id: number,
+    extras: RoomExtraDescriptionInput[]
+  ): Promise<RoomServiceResult> {
+    const cleaned = extras.map((e, i) => {
+      const keywords = e.keywords
+        .map(k => k.trim().toLowerCase())
+        .filter(Boolean);
+      if (keywords.length === 0) {
+        throw new BadRequestException(
+          `Extra description ${i + 1} needs at least one keyword`
+        );
+      }
+      if (!e.description.trim()) {
+        throw new BadRequestException(
+          `Extra description ${i + 1} (${keywords.join(', ')}) has no text`
+        );
+      }
+      return { keywords, description: e.description };
+    });
+    const exists = await this.db.room.findUnique({
+      where: { zoneId_id: { zoneId, id } },
+      select: { id: true },
+    });
+    if (!exists) throw new NotFoundException(`Room ${zoneId}/${id} not found`);
+    await this.db.$transaction(async tx => {
+      await tx.roomExtraDescriptions.deleteMany({
+        where: { roomZoneId: zoneId, roomId: id },
+      });
+      if (cleaned.length > 0) {
+        await tx.roomExtraDescriptions.createMany({
+          data: cleaned.map(e => ({ roomZoneId: zoneId, roomId: id, ...e })),
         });
       }
     });

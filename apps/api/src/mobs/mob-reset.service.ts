@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   type MobResetEquipment,
   type MobResetEquipmentContents,
@@ -9,10 +13,17 @@ import {
 import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 import {
+  assertContainerObject,
+  assertSameTree,
+  rethrowResetWriteError,
+} from '../common/reset-content.util';
+import {
   CreateMobResetInput,
   MobResetDto,
   MobResetEquipmentDto,
+  ResetContentInput,
   UpdateMobResetInput,
+  UpdateResetContentInput,
 } from './mob-reset.dto';
 
 // Internal relation shape used after Prisma queries so we can drop all `any` usage.
@@ -49,6 +60,26 @@ function resetVisibility(hide: boolean): Prisma.MobResetsWhereInput {
   };
 }
 
+const OBJECT_SUMMARY = {
+  select: { id: true, zoneId: true, name: true, type: true },
+} as const;
+
+/** Everything mapToDto needs; shared so every read returns the same shape. */
+const RESET_INCLUDE = {
+  mobResetEquipment: {
+    orderBy: { id: 'asc' as const },
+    include: {
+      objects: OBJECT_SUMMARY,
+      contents: {
+        orderBy: { id: 'asc' as const },
+        include: { objects: OBJECT_SUMMARY },
+      },
+    },
+  },
+  mobs: { select: { id: true, zoneId: true, name: true } },
+  rooms: { select: { id: true, zoneId: true, name: true } },
+} satisfies Prisma.MobResetsInclude;
+
 @Injectable()
 export class MobResetService {
   constructor(private prisma: DatabaseService) {}
@@ -60,88 +91,41 @@ export class MobResetService {
   ): Promise<MobResetDto[]> {
     const resets = await this.prisma.mobResets.findMany({
       where: { mobZoneId, mobId, ...resetVisibility(hideGodZones) },
-      include: {
-        mobResetEquipment: {
-          include: {
-            objects: {
-              select: {
-                id: true,
-                zoneId: true,
-                name: true,
-                type: true,
-              },
-            },
-            contents: {
-              orderBy: { id: 'asc' as const },
-              include: {
-                objects: {
-                  select: { id: true, zoneId: true, name: true, type: true },
-                },
-              },
-            },
-          },
-        },
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        rooms: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-      },
+      include: RESET_INCLUDE,
     });
+    return resets.map(this.mapToDto);
+  }
 
+  async findByZone(
+    zoneId: number,
+    hideGodZones = false
+  ): Promise<MobResetDto[]> {
+    const resets = await this.prisma.mobResets.findMany({
+      where: { zoneId, ...resetVisibility(hideGodZones) },
+      include: RESET_INCLUDE,
+      orderBy: [{ roomZoneId: 'asc' }, { roomId: 'asc' }, { id: 'asc' }],
+    });
+    return resets.map(this.mapToDto);
+  }
+
+  async findByRoom(
+    roomZoneId: number,
+    roomId: number,
+    hideGodZones = false
+  ): Promise<MobResetDto[]> {
+    const resets = await this.prisma.mobResets.findMany({
+      where: { roomZoneId, roomId, ...resetVisibility(hideGodZones) },
+      include: RESET_INCLUDE,
+      orderBy: { id: 'asc' },
+    });
     return resets.map(this.mapToDto);
   }
 
   async findOne(id: number, hideGodZones = false): Promise<MobResetDto | null> {
     const reset = await this.prisma.mobResets.findFirst({
       where: { AND: [{ id }, resetVisibility(hideGodZones)] },
-      include: {
-        mobResetEquipment: {
-          include: {
-            objects: {
-              select: {
-                id: true,
-                zoneId: true,
-                name: true,
-                type: true,
-              },
-            },
-            contents: {
-              orderBy: { id: 'asc' as const },
-              include: {
-                objects: {
-                  select: { id: true, zoneId: true, name: true, type: true },
-                },
-              },
-            },
-          },
-        },
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        rooms: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-      },
+      include: RESET_INCLUDE,
     });
-
     return reset ? this.mapToDto(reset) : null;
   }
 
@@ -170,35 +154,26 @@ export class MobResetService {
           }
         : undefined;
 
-    const reset = await this.prisma.mobResets.create({
-      data: {
-        ...baseData,
-        ...(equipmentCreate && { mobResetEquipment: equipmentCreate }),
-      },
-      include: {
-        mobResetEquipment: {
-          include: {
-            objects: {
-              select: { id: true, zoneId: true, name: true, type: true },
-            },
-            contents: {
-              orderBy: { id: 'asc' as const },
-              include: {
-                objects: {
-                  select: { id: true, zoneId: true, name: true, type: true },
-                },
-              },
-            },
-          },
+    try {
+      const reset = await this.prisma.mobResets.create({
+        data: {
+          ...baseData,
+          ...(equipmentCreate && { mobResetEquipment: equipmentCreate }),
         },
-        mobs: { select: { id: true, zoneId: true, name: true } },
-        rooms: { select: { id: true, zoneId: true, name: true } },
-      },
-    });
-    return this.mapToDto(reset as MobResetWithRelations);
+        include: RESET_INCLUDE,
+      });
+      return this.mapToDto(reset as MobResetWithRelations);
+    } catch (e) {
+      return rethrowResetWriteError(e);
+    }
   }
 
   async update(id: number, data: UpdateMobResetInput): Promise<MobResetDto> {
+    if ((data.roomZoneId === undefined) !== (data.roomId === undefined)) {
+      throw new BadRequestException(
+        'Moving a reset needs both roomZoneId and roomId'
+      );
+    }
     // Handle equipment updates
     const equipmentOperations = (data.equipment || []).map(eq => {
       if (eq.id) {
@@ -213,8 +188,10 @@ export class MobResetService {
           updateData.maxInstances = { set: eq.maxInstances };
         if (eq.probability !== undefined)
           updateData.probability = { set: eq.probability };
-        return this.prisma.mobResetEquipment.update({
-          where: { id: eq.id },
+        // Scoped to this reset: an equipment id from another (possibly
+        // other-zone) reset must not be writable through this one.
+        return this.prisma.mobResetEquipment.updateMany({
+          where: { id: eq.id, resetId: id },
           data: updateData,
         });
       }
@@ -231,27 +208,31 @@ export class MobResetService {
     });
 
     // Execute all operations in transaction
-    // @ts-expect-error - Extended Prisma client type incompatibility with transaction array syntax
-    await this.prisma.$transaction([
-      ...equipmentOperations,
-      this.prisma.mobResets.update({
-        where: { id },
-        data: (() => {
-          const updateData: Prisma.MobResetsUncheckedUpdateInput = {};
-          if (data.maxInstances !== undefined)
-            updateData.maxInstances = { set: data.maxInstances };
-          if (data.probability !== undefined)
-            updateData.probability = { set: data.probability };
-          if (data.comment !== undefined)
-            updateData.comment = { set: data.comment };
-          if (data.roomZoneId !== undefined)
-            updateData.roomZoneId = { set: data.roomZoneId };
-          if (data.roomId !== undefined)
-            updateData.roomId = { set: data.roomId };
-          return updateData;
-        })(),
-      }),
-    ]);
+    try {
+      // @ts-expect-error - Extended Prisma client type incompatibility with transaction array syntax
+      await this.prisma.$transaction([
+        ...equipmentOperations,
+        this.prisma.mobResets.update({
+          where: { id },
+          data: (() => {
+            const updateData: Prisma.MobResetsUncheckedUpdateInput = {};
+            if (data.maxInstances !== undefined)
+              updateData.maxInstances = { set: data.maxInstances };
+            if (data.probability !== undefined)
+              updateData.probability = { set: data.probability };
+            if (data.comment !== undefined)
+              updateData.comment = { set: data.comment };
+            if (data.roomZoneId !== undefined)
+              updateData.roomZoneId = { set: data.roomZoneId };
+            if (data.roomId !== undefined)
+              updateData.roomId = { set: data.roomId };
+            return updateData;
+          })(),
+        }),
+      ]);
+    } catch (e) {
+      return rethrowResetWriteError(e);
+    }
 
     // Return updated reset
     const updatedReset = await this.findOne(id);
@@ -288,18 +269,24 @@ export class MobResetService {
       wearLocation?: WearFlag;
       maxInstances?: number;
       probability?: number;
+      decorative?: boolean;
     }
   ): Promise<MobResetDto> {
-    await this.prisma.mobResetEquipment.create({
-      data: {
-        resetId,
-        objectZoneId: equipment.objectZoneId,
-        objectId: equipment.objectId,
-        wearLocation: equipment.wearLocation ?? null,
-        maxInstances: equipment.maxInstances ?? 1,
-        probability: equipment.probability ?? 1.0,
-      },
-    });
+    try {
+      await this.prisma.mobResetEquipment.create({
+        data: {
+          resetId,
+          objectZoneId: equipment.objectZoneId,
+          objectId: equipment.objectId,
+          wearLocation: equipment.wearLocation ?? null,
+          maxInstances: equipment.maxInstances ?? 1,
+          probability: equipment.probability ?? 1.0,
+          decorative: equipment.decorative ?? false,
+        },
+      });
+    } catch (e) {
+      return rethrowResetWriteError(e);
+    }
 
     // Return updated reset
     const updatedReset = await this.findOne(resetId);
@@ -312,6 +299,7 @@ export class MobResetService {
       wearLocation?: WearFlag;
       maxInstances?: number;
       probability?: number;
+      decorative?: boolean;
     }
   ): Promise<boolean> {
     try {
@@ -322,10 +310,88 @@ export class MobResetService {
         data.maxInstances = { set: updates.maxInstances };
       if (updates.probability !== undefined)
         data.probability = { set: updates.probability };
+      if (updates.decorative !== undefined)
+        data.decorative = { set: updates.decorative };
       await this.prisma.mobResetEquipment.update({
         where: { id: equipmentId },
         data,
       });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Put an object inside a container the mob carries or wears. With
+   * `parentContentId` it nests inside another content row of the same
+   * equipment item. Returns the whole reset so the UI can refresh in one call.
+   */
+  async addEquipmentContent(
+    equipmentId: number,
+    data: ResetContentInput
+  ): Promise<MobResetDto> {
+    const equipment = await this.prisma.mobResetEquipment.findUnique({
+      where: { id: equipmentId },
+      include: { objects: OBJECT_SUMMARY },
+    });
+    if (!equipment) {
+      throw new NotFoundException(`Equipment ${equipmentId} not found`);
+    }
+
+    if (data.parentContentId != null) {
+      const parent = await this.prisma.mobResetEquipmentContents.findFirst({
+        where: { id: data.parentContentId, equipmentId },
+        include: { objects: OBJECT_SUMMARY },
+      });
+      assertSameTree(parent, data.parentContentId);
+      assertContainerObject(parent.objects, 'nested container');
+    } else {
+      assertContainerObject(equipment.objects, 'equipment item');
+    }
+
+    try {
+      await this.prisma.mobResetEquipmentContents.create({
+        data: {
+          equipmentId,
+          parentContentId: data.parentContentId ?? null,
+          objectZoneId: data.objectZoneId,
+          objectId: data.objectId,
+          quantity: data.quantity ?? 1,
+          maxInstances: data.maxInstances ?? 1,
+          comment: data.comment ?? null,
+        },
+      });
+    } catch (e) {
+      return rethrowResetWriteError(e);
+    }
+    const reset = await this.findOne(equipment.resetId);
+    return reset!;
+  }
+
+  async updateEquipmentContent(
+    id: number,
+    data: UpdateResetContentInput
+  ): Promise<boolean> {
+    const update: Prisma.MobResetEquipmentContentsUncheckedUpdateInput = {};
+    if (data.quantity !== undefined) update.quantity = { set: data.quantity };
+    if (data.maxInstances !== undefined)
+      update.maxInstances = { set: data.maxInstances };
+    if (data.comment !== undefined) update.comment = { set: data.comment };
+    try {
+      await this.prisma.mobResetEquipmentContents.update({
+        where: { id },
+        data: update,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async deleteEquipmentContent(id: number): Promise<boolean> {
+    try {
+      await this.prisma.mobResetEquipmentContents.delete({ where: { id } });
       return true;
     } catch {
       return false;
@@ -351,6 +417,7 @@ export class MobResetService {
           eq.wearLocation === null ? undefined : (eq.wearLocation as WearFlag),
         maxInstances: eq.maxInstances,
         probability: eq.probability,
+        decorative: eq.decorative ?? false,
         object: {
           id: eq.objects.id,
           zoneId: eq.objects.zoneId,
@@ -364,6 +431,9 @@ export class MobResetService {
           objectId: c.objectId,
           quantity: c.quantity,
           maxInstances: c.maxInstances,
+          ...(c.comment !== null && c.comment !== undefined
+            ? { comment: c.comment }
+            : {}),
           object: {
             id: c.objects.id,
             zoneId: c.objects.zoneId,

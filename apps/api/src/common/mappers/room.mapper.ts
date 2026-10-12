@@ -49,7 +49,8 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
     return exit;
   });
 
-  const extraDescSource = db.roomExtraDescriptions || [];
+  // Prisma rows carry `roomExtraDescriptions`, RoomsService results `extraDescs`
+  const extraDescSource = db.roomExtraDescriptions ?? db.extraDescs ?? [];
   const extraDescs: RoomExtraDescriptionDto[] = extraDescSource.map(ed => ({
     id: String(ed.id),
     keywords: ed.keywords,
@@ -83,6 +84,16 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
     allowsSummon: db.allowsSummon ?? true,
     allowsTeleport: db.allowsTeleport ?? true,
     isDeathTrap: db.isDeathTrap ?? false,
+    isIndoors: db.isIndoors ?? false,
+    isSoundproof: db.isSoundproof ?? false,
+    isArena: db.isArena ?? false,
+    isGuildhall: db.isGuildhall ?? false,
+    allowsMobs: db.allowsMobs ?? true,
+    allowsTracking: db.allowsTracking ?? true,
+    allowsPortals: db.allowsPortals ?? true,
+    allowsScanning: db.allowsScanning ?? true,
+    isInn: db.isInn ?? false,
+    ...(db.innName != null && { innName: db.innName }),
     ...(db.createdBy && { createdBy: db.createdBy }),
     ...(db.updatedBy && { updatedBy: db.updatedBy }),
     ...(db.layoutX !== null &&

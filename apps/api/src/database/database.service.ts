@@ -342,6 +342,14 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.mobResetEquipment;
   }
 
+  get mobResetEquipmentContents() {
+    return this.client.mobResetEquipmentContents;
+  }
+
+  get objectResetContents() {
+    return this.client.objectResetContents;
+  }
+
   get raceAbilities() {
     return this.client.raceAbilities;
   }

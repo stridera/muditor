@@ -55,6 +55,13 @@ export function mapObject(db: ObjectMapperSource): ObjectDto {
     level: db.level,
     concealment: db.concealment,
     values: (db.values ?? {}) as Prisma.JsonValue,
+    weaponDiceNum: db.weaponDiceNum,
+    weaponDiceSize: db.weaponDiceSize,
+    weaponDiceBonus: db.weaponDiceBonus,
+    ...(db.weaponDamageType != null && {
+      weaponDamageType: db.weaponDamageType,
+    }),
+    armorPct: db.armorPct,
     zoneId: db.zoneId,
     grantedEffects: (db.grantedEffects ?? []).map(ge => ({
       id: ge.id,

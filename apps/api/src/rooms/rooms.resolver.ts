@@ -40,6 +40,7 @@ import {
   RoomExitDto,
   UpdateRoomInput,
   UpdateRoomPositionInput,
+  RoomExtraDescriptionInput,
 } from './room.dto';
 import { RoomEnvironmentalEffectInput } from './room-effects.dto';
 import { RoomsService } from './rooms.service';
@@ -345,6 +346,25 @@ export class RoomsResolver {
       zoneId,
       id,
       effects
+    );
+    return mapRoom(room as unknown as RoomsMapperInput);
+  }
+
+  @Mutation(() => RoomDto, {
+    description:
+      'Replace all extra descriptions of a room (keywords + text shown by "look <keyword>")',
+  })
+  @RequireZoneWrite()
+  async updateRoomExtraDescriptions(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @Args('extraDescs', { type: () => [RoomExtraDescriptionInput] })
+    extraDescs: RoomExtraDescriptionInput[]
+  ): Promise<RoomDto> {
+    const room = await this.roomsService.replaceExtraDescriptions(
+      zoneId,
+      id,
+      extraDescs
     );
     return mapRoom(room as unknown as RoomsMapperInput);
   }

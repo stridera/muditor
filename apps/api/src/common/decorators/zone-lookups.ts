@@ -64,6 +64,28 @@ export const zoneLookups = {
         })
       )?.zoneId,
   }),
+  objectResetContent: (arg: string): ZoneScopeLookup => ({
+    arg,
+    resolve: async (db, id) =>
+      (
+        await db.objectResetContents.findUnique({
+          where: { id },
+          select: { reset: { select: { zoneId: true } } },
+        })
+      )?.reset.zoneId,
+  }),
+  mobResetEquipmentContent: (arg: string): ZoneScopeLookup => ({
+    arg,
+    resolve: async (db, id) =>
+      (
+        await db.mobResetEquipmentContents.findUnique({
+          where: { id },
+          select: {
+            equipment: { select: { mob_resets: { select: { zoneId: true } } } },
+          },
+        })
+      )?.equipment.mob_resets.zoneId,
+  }),
   questDialogue: (arg: string): ZoneScopeLookup => ({
     arg,
     resolve: async (db, id) =>

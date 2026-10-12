@@ -125,6 +125,9 @@ export class MobResetEquipmentContentDto {
   })
   maxInstances: number;
 
+  @Field({ nullable: true })
+  comment?: string;
+
   @Field(() => ObjectSummaryDto)
   object: ObjectSummaryDto;
 }
@@ -148,6 +151,12 @@ export class MobResetEquipmentDto {
 
   @Field(() => Float)
   probability: number;
+
+  @Field({
+    description:
+      'Decorative gear shows on the mob but cannot be looted or stolen',
+  })
+  decorative: boolean;
 
   @Field(() => ObjectSummaryDto, { description: 'The object being equipped' })
   object: ObjectSummaryDto;
@@ -348,4 +357,72 @@ export class UpdateMobResetInput {
   @ValidateNested({ each: true })
   @Type(() => UpdateMobResetEquipmentInput)
   equipment?: UpdateMobResetEquipmentInput[];
+}
+
+/**
+ * One item inside a container: the container reset's object (or equipment
+ * object), or another content row when parentContentId is set.
+ */
+@InputType()
+export class ResetContentInput {
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  objectZoneId: number;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  objectId: number;
+
+  @Field(() => Int, { nullable: true, defaultValue: 1 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  quantity?: number;
+
+  @Field(() => Int, {
+    nullable: true,
+    defaultValue: 1,
+    description: 'World-wide cap on live copies of this object',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxInstances?: number;
+
+  @Field(() => Int, {
+    nullable: true,
+    description:
+      'Content row this item sits inside; omit for directly inside the container',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  parentContentId?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  comment?: string;
+}
+
+@InputType()
+export class UpdateResetContentInput {
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  quantity?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxInstances?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  comment?: string;
 }

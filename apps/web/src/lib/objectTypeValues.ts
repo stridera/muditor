@@ -12,7 +12,8 @@ export type ValueFieldKind =
   | 'list'
   | 'select'
   | 'flags'
-  | 'objectRef';
+  | 'objectRef'
+  | 'recallRooms';
 
 export interface ValueField {
   /** Exact JSON key used by the game */
@@ -64,6 +65,72 @@ export const LIQUIDS = [
   'TEQUILA',
   'VODKA',
 ] as const;
+
+/** Damage types a weapon hit can deal (Prisma DamageType enum). */
+export const DAMAGE_TYPES = [
+  'HIT',
+  'STING',
+  'WHIP',
+  'SLASH',
+  'BITE',
+  'BLUDGEON',
+  'CRUSH',
+  'POUND',
+  'CLAW',
+  'MAUL',
+  'THRASH',
+  'PIERCE',
+  'BLAST',
+  'PUNCH',
+  'STAB',
+  'FIRE',
+  'COLD',
+  'ACID',
+  'SHOCK',
+  'POISON',
+  'ALIGN',
+  'MENTAL',
+  'ROT',
+  'ENERGY',
+  'WATER',
+] as const;
+
+/**
+ * Typed `Objects` columns the game reads for combat (not part of `values`):
+ * weapon damage is `weaponDiceNum`d`weaponDiceSize` + `weaponDiceBonus` of
+ * `weaponDamageType`; armor is `armorPct`.
+ */
+export interface CombatColumns {
+  weaponDiceNum: number;
+  weaponDiceSize: number;
+  weaponDiceBonus: number;
+  /** '' = none */
+  weaponDamageType: string;
+  armorPct: number;
+}
+
+export const EMPTY_COMBAT_COLUMNS: CombatColumns = {
+  weaponDiceNum: 0,
+  weaponDiceSize: 0,
+  weaponDiceBonus: 0,
+  weaponDamageType: '',
+  armorPct: 0,
+};
+
+/** Object types whose editor shows the weapon dice / damage type columns. */
+export const WEAPON_TYPES: readonly string[] = ['WEAPON'];
+/** Object types whose editor shows the armor value column. */
+export const ARMOR_TYPES: readonly string[] = ['ARMOR'];
+
+/**
+ * Recall scroll destinations, `Objects.values["Recall Rooms"]` (loader.rs
+ * parse_recall_rooms): a default room plus optional per-class rooms keyed by
+ * class name (matched case-insensitively by the game).
+ */
+export interface RecallRooms {
+  default?: ObjectRef;
+  classes?: Record<string, ObjectRef>;
+}
 
 export const CONTAINER_FLAGS = [
   'Closeable',
@@ -152,6 +219,43 @@ export const TYPE_VALUE_FIELDS: Record<string, ValueField[]> = {
       fallback: [],
       options: CONTAINER_FLAGS,
     },
+    {
+      key: 'IsCorpse',
+      label: 'Is a corpse?',
+      kind: 'bool',
+      fallback: false,
+    },
+  ],
+  WEAPON: [
+    {
+      key: 'HitRoll',
+      label: 'Hit Roll',
+      kind: 'int',
+      fallback: 0,
+      min: -1000,
+      max: 1000,
+      help: 'bonus to hit; dice and damage type are on the columns above',
+    },
+  ],
+  PORTAL: [
+    {
+      key: 'Destination',
+      label: 'Destination Room',
+      kind: 'int',
+      fallback: 0,
+      min: 0,
+      help: 'legacy room number (zone x 100 + room id); 0 = none',
+    },
+  ],
+  BOARD: [
+    {
+      key: 'Pages',
+      label: 'Board ID',
+      kind: 'int',
+      fallback: 0,
+      min: 0,
+      help: 'which message board this reads; 0 = none',
+    },
   ],
   LIGHT: [
     {
@@ -181,7 +285,16 @@ export const TYPE_VALUE_FIELDS: Record<string, ValueField[]> = {
   DRINKCONTAINER: LIQUID_FIELDS,
   FOUNTAIN: LIQUID_FIELDS,
   POTION: SPELL_LIST,
-  SCROLL: SPELL_LIST,
+  SCROLL: [
+    ...SPELL_LIST,
+    {
+      key: 'Recall Rooms',
+      label: 'Recall Rooms',
+      kind: 'recallRooms',
+      fallback: null,
+      help: 'where a recall scroll takes the reader; per-class overrides optional',
+    },
+  ],
   WAND: SPELL_CHARGES,
   STAFF: SPELL_CHARGES,
   INSTRUMENT: SPELL_CHARGES,

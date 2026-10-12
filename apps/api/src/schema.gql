@@ -1010,6 +1010,7 @@ input CreateMobResetInput {
 input CreateObjectInput {
   actionDescription: String
   allowedRaces: [Race!]! = []
+  armorPct: Int
   concealment: Int! = 0
   cost: Int! = 0
   decomposeTimer: Int! = 0
@@ -1031,17 +1032,25 @@ input CreateObjectInput {
   timer: Int! = 0
   type: ObjectType! = NOTHING
   values: JSON
+  weaponDamageType: DamageType
+  weaponDiceBonus: Int
+  weaponDiceNum: Int
+  weaponDiceSize: Int
   wearFlags: [WearFlag!]! = []
   weight: Float! = 0
   zoneId: Int!
 }
 
 input CreateObjectResetInput {
-  max: Int! = 1
-  name: String
+  comment: String
+  maxInstances: Int! = 1
   objectId: Int!
+  objectZoneId: Int!
   probability: Float! = 1
   roomId: Int!
+  roomZoneId: Int!
+
+  """Zone that owns the reset (needs WRITE)"""
   zoneId: Int!
 }
 
@@ -1186,16 +1195,26 @@ input CreateRoomExitInput {
 
 input CreateRoomInput {
   allowsMagic: Boolean! = true
+  allowsMobs: Boolean! = true
+  allowsPortals: Boolean! = true
   allowsRecall: Boolean! = true
+  allowsScanning: Boolean! = true
   allowsSummon: Boolean! = true
   allowsTeleport: Boolean! = true
+  allowsTracking: Boolean! = true
   baseLightLevel: Int! = 0
   capacity: Int! = 10
   description: String!
   entryRestriction: String
   id: Int!
+  innName: String
+  isArena: Boolean! = false
   isDeathTrap: Boolean! = false
+  isGuildhall: Boolean! = false
+  isIndoors: Boolean! = false
+  isInn: Boolean! = false
   isPeaceful: Boolean! = false
+  isSoundproof: Boolean! = false
   name: String!
   roomDescription: String @deprecated(reason: "Use description instead")
   sector: Sector! = STRUCTURE
@@ -2064,6 +2083,7 @@ type MobResetDto {
 }
 
 type MobResetEquipmentContentDto {
+  comment: String
   id: ID!
 
   """World-wide cap on live copies of this object (legacy P max)"""
@@ -2084,6 +2104,9 @@ type MobResetEquipmentDto {
   Items spawned inside this carried or worn container (flat list, nested via parentContentId)
   """
   contents: [MobResetEquipmentContentDto!]!
+
+  """Decorative gear shows on the mob but cannot be looted or stolen"""
+  decorative: Boolean!
   id: ID!
   maxInstances: Int!
 
@@ -2130,7 +2153,9 @@ enum MovementMode {
 }
 
 type Mutation {
-  addMobResetEquipment(maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: WearFlag): MobResetDto!
+  addMobResetEquipment(decorative: Boolean, maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: WearFlag): MobResetDto!
+  addMobResetEquipmentContent(data: ResetContentInput!, equipmentId: ID!): MobResetDto!
+  addObjectResetContent(data: ResetContentInput!, resetId: ID!): ObjectResetDto!
 
   """Create a password reset link for a user and return it to the admin"""
   adminCreatePasswordResetLink(userId: ID!): PasswordResetLink!
@@ -2274,9 +2299,11 @@ type Mutation {
   deleteMobAiRule(abilityId: Int!, mobId: Int!, zoneId: Int!): Boolean!
   deleteMobReset(id: ID!): Boolean!
   deleteMobResetEquipment(id: ID!): Boolean!
+  deleteMobResetEquipmentContent(id: ID!): Boolean!
   deleteMobs(keys: [EntityKeyInput!]!): Int!
   deleteObject(id: Int!, zoneId: Int!): ObjectDto!
   deleteObjectReset(id: ID!): Boolean!
+  deleteObjectResetContent(id: ID!): Boolean!
   deleteObjects(keys: [EntityKeyInput!]!): Int!
   deleteQuest(id: Int!, zoneId: Int!): QuestDto!
   deleteQuestDialogue(id: Int!): QuestDialogueDto!
@@ -2430,10 +2457,12 @@ type Mutation {
   updateMob(data: UpdateMobInput!, id: Int!, zoneId: Int!): MobDto!
   updateMobDefaultEffects(effects: [MobDefaultEffectInput!]!, id: Int!, zoneId: Int!): MobDto!
   updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
-  updateMobResetEquipment(id: ID!, maxInstances: Int, probability: Float, wearLocation: WearFlag): Boolean!
+  updateMobResetEquipment(decorative: Boolean, id: ID!, maxInstances: Int, probability: Float, wearLocation: WearFlag): Boolean!
+  updateMobResetEquipmentContent(data: UpdateResetContentInput!, id: ID!): Boolean!
   updateObject(data: UpdateObjectInput!, id: Int!, zoneId: Int!): ObjectDto!
   updateObjectEffects(effects: [ObjectEffectInput!]!, id: Int!, zoneId: Int!): ObjectDto!
   updateObjectReset(data: UpdateObjectResetInput!, id: ID!): ObjectResetDto!
+  updateObjectResetContent(data: UpdateResetContentInput!, id: ID!): Boolean!
   updateObjectResistances(id: Int!, resistances: [ObjectResistanceInput!]!, zoneId: Int!): ObjectDto!
   updateProfile(input: UpdateProfileInput!): User!
   updateQuest(data: UpdateQuestInput!, id: Int!, zoneId: Int!): QuestDto!
@@ -2453,6 +2482,11 @@ type Mutation {
   Update an exit in place by (roomZoneId, roomId, direction). Omitted fields are unchanged; null clears.
   """
   updateRoomExit(data: UpdateRoomExitInput!): RoomExitDto!
+
+  """
+  Replace all extra descriptions of a room (keywords + text shown by "look <keyword>")
+  """
+  updateRoomExtraDescriptions(extraDescs: [RoomExtraDescriptionInput!]!, id: Int!, zoneId: Int!): RoomDto!
   updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!, zoneId: Int!): RoomDto!
   updateShop(data: UpdateShopInput!, id: Int!, zoneId: Int!): ShopDto!
   updateShopInventory(data: UpdateShopInventoryInput!, id: Int!, zoneId: Int!): ShopDto!
@@ -2488,6 +2522,9 @@ type ObjectAffectDto {
 type ObjectDto {
   actionDescription: String
   allowedRaces: [Race!]!
+
+  """ARMOR: armor value (mitigation percent scale; higher = more)"""
+  armorPct: Int!
   concealment: Int!
   consumableEffects: [ConsumableEffectDto!]!
   cost: Int!
@@ -2518,6 +2555,18 @@ type ObjectDto {
   type: ObjectType!
   updatedAt: DateTime!
   values: JSON!
+
+  """WEAPON: damage type of a hit"""
+  weaponDamageType: DamageType
+
+  """WEAPON: flat damage bonus"""
+  weaponDiceBonus: Int!
+
+  """WEAPON: number of damage dice (NdS+B)"""
+  weaponDiceNum: Int!
+
+  """WEAPON: sides per damage die"""
+  weaponDiceSize: Int!
   wearFlags: [WearFlag!]!
   weight: Float!
   zoneId: Int!
@@ -2554,14 +2603,39 @@ enum ObjectFlag {
   VEHICLE
 }
 
-type ObjectResetDto {
-  id: String!
-  max: Int!
-  name: String
-  object: ObjectDto!
+type ObjectResetContentDto {
+  comment: String
+  id: ID!
+
+  """World-wide cap on live copies of this object"""
+  maxInstances: Int!
+  object: ObjectSummaryDto!
   objectId: Int!
+  objectZoneId: Int!
+
+  """
+  Id of the content row this one sits inside; null = directly inside the reset object
+  """
+  parentContentId: Int
+  quantity: Int!
+}
+
+type ObjectResetDto {
+  comment: String
+
+  """
+  Items spawned inside this container (flat list, nested via parentContentId)
+  """
+  contents: [ObjectResetContentDto!]!
+  id: ID!
+  maxInstances: Int!
+  object: ObjectSummaryDto!
+  objectId: Int!
+  objectZoneId: Int!
   probability: Float!
+  room: RoomSummaryDto
   roomId: Int!
+  roomZoneId: Int!
   zoneId: Int!
 }
 
@@ -2875,6 +2949,8 @@ type Query {
   mobCombatDefaults(classId: Int, level: Int! = 1, race: Race! = HUMANOID): MobCombatDefaultsDto!
   mobReset(id: ID!): MobResetDto
   mobResets(mobId: Int!, mobZoneId: Int!): [MobResetDto!]!
+  mobResetsByRoom(roomId: Int!, roomZoneId: Int!): [MobResetDto!]!
+  mobResetsByZone(zoneId: Int!): [MobResetDto!]!
   mobs(search: String, skip: Int, take: Int): [MobDto!]!
   mobsByZone(search: String, zoneId: Int!): [MobDto!]!
   mobsCount: Int!
@@ -3362,6 +3438,21 @@ type ReservedNameDto {
   reason: String
 }
 
+input ResetContentInput {
+  comment: String
+
+  """World-wide cap on live copies of this object"""
+  maxInstances: Int = 1
+  objectId: Int!
+  objectZoneId: Int!
+
+  """
+  Content row this item sits inside; omit for directly inside the container
+  """
+  parentContentId: Int
+  quantity: Int = 1
+}
+
 enum ResetMode {
   EMPTY
   NEVER
@@ -3375,9 +3466,13 @@ input ResetPasswordInput {
 
 type RoomDto {
   allowsMagic: Boolean!
+  allowsMobs: Boolean!
+  allowsPortals: Boolean!
   allowsRecall: Boolean!
+  allowsScanning: Boolean!
   allowsSummon: Boolean!
   allowsTeleport: Boolean!
+  allowsTracking: Boolean!
   baseLightLevel: Int!
   capacity: Int!
   createdAt: DateTime!
@@ -3388,8 +3483,14 @@ type RoomDto {
   exits: [RoomExitDto!]!
   extraDescs: [RoomExtraDescriptionDto!]!
   id: Int!
+  innName: String
+  isArena: Boolean!
   isDeathTrap: Boolean!
+  isGuildhall: Boolean!
+  isIndoors: Boolean!
+  isInn: Boolean!
   isPeaceful: Boolean!
+  isSoundproof: Boolean!
   layoutX: Int
   layoutY: Int
   layoutZ: Int
@@ -3433,6 +3534,11 @@ type RoomExitDto {
 type RoomExtraDescriptionDto {
   description: String!
   id: String!
+  keywords: [String!]!
+}
+
+input RoomExtraDescriptionInput {
+  description: String!
   keywords: [String!]!
 }
 
@@ -4246,6 +4352,7 @@ input UpdateMobResetInput {
 input UpdateObjectInput {
   actionDescription: String
   allowedRaces: [Race!]
+  armorPct: Int
   concealment: Int
   cost: Int
   decomposeTimer: Int
@@ -4266,15 +4373,21 @@ input UpdateObjectInput {
   timer: Int
   type: ObjectType
   values: JSON
+  weaponDamageType: DamageType
+  weaponDiceBonus: Int
+  weaponDiceNum: Int
+  weaponDiceSize: Int
   wearFlags: [WearFlag!]
   weight: Float
   zoneId: Int
 }
 
 input UpdateObjectResetInput {
-  max: Int
-  name: String
+  comment: String
+  maxInstances: Int
   probability: Float
+  roomId: Int
+  roomZoneId: Int
 }
 
 input UpdatePreferencesInput {
@@ -4412,6 +4525,12 @@ input UpdateReportInput {
   tags: [String!]
 }
 
+input UpdateResetContentInput {
+  comment: String
+  maxInstances: Int
+  quantity: Int
+}
+
 input UpdateRoomExitInput {
   defaultState: ExitState
   description: String
@@ -4429,15 +4548,25 @@ input UpdateRoomExitInput {
 
 input UpdateRoomInput {
   allowsMagic: Boolean
+  allowsMobs: Boolean
+  allowsPortals: Boolean
   allowsRecall: Boolean
+  allowsScanning: Boolean
   allowsSummon: Boolean
   allowsTeleport: Boolean
+  allowsTracking: Boolean
   baseLightLevel: Int
   capacity: Int
   description: String
   entryRestriction: String
+  innName: String
+  isArena: Boolean
   isDeathTrap: Boolean
+  isGuildhall: Boolean
+  isIndoors: Boolean
+  isInn: Boolean
   isPeaceful: Boolean
+  isSoundproof: Boolean
   layoutX: Int
   layoutY: Int
   layoutZ: Int

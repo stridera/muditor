@@ -48,6 +48,23 @@ import { updateExitInPlace } from './exit-update';
 import { zoneEditorFetch } from './zone-editor-fetch';
 import { graphqlRequestBody } from '@/lib/authenticated-fetch';
 import {
+  summarizeResets,
+  type RoomResetsSummary,
+} from '@/components/resets/RoomResetsPanel';
+import {
+  createMobReset,
+  createObjectReset,
+  describeResetError,
+  listZoneMobs,
+  listZoneObjects,
+  loadRoomResets,
+} from '@/lib/reset-api';
+import {
+  collectRoomFlagEdits,
+  pickRoomFlags,
+  type RoomFlagFields,
+} from '@/lib/room-flags';
+import {
   ZoneEditorCreateRoomDocument,
   ZoneEditorCreateRoomExitDocument,
   ZoneEditorDeleteRoomExitDocument,
@@ -99,7 +116,7 @@ interface RoomExit {
   keyId?: number | null;
 }
 
-interface Room {
+interface Room extends RoomFlagFields {
   id: number;
   zoneId: number;
   name: string;
@@ -148,7 +165,7 @@ interface PropertyPanelRoomExit {
   defaultState?: string;
   hitPoints?: number | null;
 }
-interface PropertyPanelRoom {
+interface PropertyPanelRoom extends RoomFlagFields {
   id: number;
   name: string;
   roomDescription: string;
@@ -683,7 +700,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             keeperId: number;
             flags?: string[] | null;
           };
-          type RawRoom = {
+          type RawRoom = RoomFlagFields & {
             id: number;
             zoneId: number;
             name: string;
@@ -730,6 +747,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               allowsSummon: r.allowsSummon ?? true,
               allowsTeleport: r.allowsTeleport ?? true,
               isDeathTrap: r.isDeathTrap ?? false,
+              ...pickRoomFlags(r),
               exits: (r.exits || []).map((e: RawExit) => ({
                 id: String(e.id ?? `${r.id}-${e.direction}`),
                 direction: e.direction,
@@ -929,9 +947,53 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     };
   }, [rooms]);
 
+  // The palette lists every mob and object of the zone, not only the ones
+  // already placed in a room, so a new zone has something to place.
+  const [zoneMobs, setZoneMobs] = useState<Mob[]>([]);
+  const [zoneObjects, setZoneObjects] = useState<GameObject[]>([]);
+  useEffect(() => {
+    if (activeZoneId === null || !isValidZoneId(activeZoneId)) return;
+    let cancelled = false;
+    listZoneMobs(activeZoneId)
+      .then(list => {
+        if (cancelled) return;
+        setZoneMobs(
+          list.map(m => ({
+            id: m.id,
+            zoneId: m.zoneId,
+            name: m.name,
+            level: m.level ?? 0,
+          }))
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setZoneMobs([]);
+      });
+    listZoneObjects(activeZoneId)
+      .then(list => {
+        if (cancelled) return;
+        setZoneObjects(
+          list.map(o => ({
+            id: o.id,
+            zoneId: o.zoneId,
+            name: o.name,
+            type: o.type ?? 'unknown',
+            ...(o.level != null ? { level: o.level } : {}),
+          }))
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setZoneObjects([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeZoneId]);
+
   // Aggregate all mobs from all rooms for EntityPanel
   const allMobs = useMemo(() => {
     const mobMap = new Map<number, Mob>();
+    zoneMobs.forEach(mob => mobMap.set(mob.id, mob));
     rooms.forEach(room => {
       room.mobs?.forEach(mob => {
         if (!mobMap.has(mob.id)) {
@@ -943,15 +1005,21 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           };
           if (mob.description) mobEntry.description = mob.description;
           mobMap.set(mob.id, mobEntry);
+        } else {
+          const entry = mobMap.get(mob.id)!;
+          if (entry.roomId === undefined) entry.roomId = room.id;
+          if (mob.description && !entry.description)
+            entry.description = mob.description;
         }
       });
     });
     return Array.from(mobMap.values());
-  }, [rooms]);
+  }, [rooms, zoneMobs]);
 
   // Aggregate all objects from all rooms for EntityPanel
   const allObjects = useMemo(() => {
     const objMap = new Map<number, GameObject>();
+    zoneObjects.forEach(obj => objMap.set(obj.id, obj));
     rooms.forEach(room => {
       room.objects?.forEach(obj => {
         if (!objMap.has(obj.id)) {
@@ -963,11 +1031,16 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           };
           if (obj.description) objEntry.description = obj.description;
           objMap.set(obj.id, objEntry);
+        } else {
+          const entry = objMap.get(obj.id)!;
+          if (entry.roomId === undefined) entry.roomId = room.id;
+          if (obj.description && !entry.description)
+            entry.description = obj.description;
         }
       });
     });
     return Array.from(objMap.values());
-  }, [rooms]);
+  }, [rooms, zoneObjects]);
 
   // Create a stable dependency key that changes only when room structure changes (not positions)
   // This prevents node regeneration when dragging
@@ -1582,6 +1655,119 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     [selectedRoomId]
   );
 
+  // The Resets tab changed what spawns in a room: show it on the map and in
+  // the room's mob/object lists without reloading the whole zone.
+  const [resetsRefreshKey, setResetsRefreshKey] = useState(0);
+  const handleResetsChanged = useCallback(
+    (roomId: number, summary: RoomResetsSummary) => {
+      setRooms(rs =>
+        rs.map(r =>
+          r.id === roomId
+            ? {
+                ...r,
+                mobs: summary.mobs.map(m => {
+                  const prev = r.mobs?.find(x => x.id === m.id);
+                  return {
+                    id: m.id,
+                    name: m.name,
+                    level: prev?.level ?? null,
+                    description: prev?.description ?? null,
+                  };
+                }),
+                objects: summary.objects.map(o => {
+                  const prev = r.objects?.find(x => x.id === o.id);
+                  return {
+                    id: o.id,
+                    name: o.name,
+                    description: prev?.description ?? null,
+                  };
+                }),
+              }
+            : r
+        )
+      );
+    },
+    []
+  );
+
+  // Place a palette mob/object in a room (button or drop): creates the reset
+  const handlePlaceEntity = useCallback(
+    async (
+      kind: 'mob' | 'object',
+      entity: { id: number; zoneId?: number; name: string },
+      roomId: number | null
+    ) => {
+      const room = rooms.find(r => r.id === (roomId ?? selectedRoomId));
+      if (!room) {
+        toast.error('Select a room first, then place the entity in it');
+        return;
+      }
+      const entityZone = entity.zoneId ?? activeZoneId ?? room.zoneId;
+      try {
+        if (kind === 'mob') {
+          await createMobReset({
+            zoneId: room.zoneId,
+            mobZoneId: entityZone,
+            mobId: entity.id,
+            roomZoneId: room.zoneId,
+            roomId: room.id,
+            maxInstances: 1,
+            probability: 1,
+          });
+        } else {
+          await createObjectReset({
+            zoneId: room.zoneId,
+            objectZoneId: entityZone,
+            objectId: entity.id,
+            roomZoneId: room.zoneId,
+            roomId: room.id,
+            maxInstances: 1,
+            probability: 1,
+          });
+        }
+        const fresh = await loadRoomResets(room.zoneId, room.id);
+        handleResetsChanged(
+          room.id,
+          summarizeResets(fresh.mobResets, fresh.objectResets)
+        );
+        setResetsRefreshKey(k => k + 1);
+        toast.success(`Placed ${entity.name} in room ${room.id}`);
+      } catch (e) {
+        toast.error(describeResetError(e, room.zoneId));
+      }
+    },
+    [rooms, selectedRoomId, activeZoneId, handleResetsChanged]
+  );
+
+  // Dropping a palette entry on a room node places it there
+  const handlePaletteDragOver = useCallback((e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes('application/json')) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    }
+  }, []);
+  const handlePaletteDrop = useCallback(
+    (e: React.DragEvent) => {
+      const raw = e.dataTransfer.getData('application/json');
+      if (!raw) return;
+      e.preventDefault();
+      try {
+        const { entity, type } = JSON.parse(raw) as {
+          entity: { id: number; zoneId?: number; name: string };
+          type: 'mob' | 'object';
+        };
+        const nodeId = (e.target as HTMLElement)
+          .closest('.react-flow__node')
+          ?.getAttribute('data-id');
+        const roomId = nodeId && /^\d+$/.test(nodeId) ? Number(nodeId) : null;
+        void handlePlaceEntity(type, entity, roomId);
+      } catch {
+        /* not a palette drag */
+      }
+    },
+    [handlePlaceEntity]
+  );
+
   // Save room changes via GraphQL
   const handleSaveRoom = useCallback(async () => {
     if (!selectedRoomId || !activeZoneId) return;
@@ -1618,6 +1804,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         updateInput.allowsTeleport = pendingRoomEdits.allowsTeleport;
       if (pendingRoomEdits.isDeathTrap !== undefined)
         updateInput.isDeathTrap = pendingRoomEdits.isDeathTrap;
+      Object.assign(updateInput, collectRoomFlagEdits(pendingRoomEdits));
 
       const response = await authenticatedFetch('/graphql', {
         method: 'POST',
@@ -1649,6 +1836,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                   allowsSummon: updated.allowsSummon,
                   allowsTeleport: updated.allowsTeleport,
                   isDeathTrap: updated.isDeathTrap,
+                  ...pickRoomFlags(updated),
                 }
               : r
           )
@@ -2657,6 +2845,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               onClearSelection={() => setSelectedEntity(null)}
               onMobDragStart={setDraggedMob}
               onObjectDragStart={setDraggedObject}
+              {...(canEditCurrentZone && selectedRoomId !== null
+                ? {
+                    onPlaceEntity: (
+                      kind: 'mob' | 'object',
+                      entity: { id: number; zoneId?: number; name: string }
+                    ) => void handlePlaceEntity(kind, entity, null),
+                  }
+                : {})}
               viewMode={editorMode}
               panelWidth={leftPanelWidth}
             />
@@ -2668,7 +2864,12 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           />
         </div>
       )}
-      <div className='flex-1 h-full relative' ref={reactFlowRef}>
+      <div
+        className='flex-1 h-full relative'
+        ref={reactFlowRef}
+        onDragOver={handlePaletteDragOver}
+        onDrop={handlePaletteDrop}
+      >
         <div className='absolute z-10 top-0 left-0 right-0'>
           <EditorToolbar
             viewMode={viewMode}
@@ -2845,6 +3046,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               allowsSummon: selectedRoom.allowsSummon ?? true,
               allowsTeleport: selectedRoom.allowsTeleport ?? true,
               isDeathTrap: selectedRoom.isDeathTrap ?? false,
+              ...pickRoomFlags(selectedRoom),
               exits: (selectedRoom.exits || []).map(e => {
                 const base: PropertyPanelRoomExit = {
                   id: e.id,
@@ -2891,6 +3093,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               allowsSummon: r.allowsSummon ?? true,
               allowsTeleport: r.allowsTeleport ?? true,
               isDeathTrap: r.isDeathTrap ?? false,
+              ...pickRoomFlags(r),
               exits: (r.exits || []).map(e => {
                 const base: PropertyPanelRoomExit = {
                   id: e.id,
@@ -2937,6 +3140,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 saving={savingRoom}
                 managingExits={managingExits}
                 viewMode={editorMode}
+                canEdit={canEditCurrentZone}
+                onResetsChanged={handleResetsChanged}
+                resetsRefreshKey={resetsRefreshKey}
                 onEntityClick={() => {}}
               />
             );

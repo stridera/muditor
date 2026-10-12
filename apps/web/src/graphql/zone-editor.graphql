@@ -41,6 +41,16 @@ query ZoneEditorGetRooms($zoneId: Int!, $lightweight: Boolean) {
     allowsSummon
     allowsTeleport
     isDeathTrap
+    isIndoors
+    isSoundproof
+    isArena
+    isGuildhall
+    allowsMobs
+    allowsTracking
+    allowsPortals
+    allowsScanning
+    isInn
+    innName
     exits {
       ...ZoneEditorExit
     }
@@ -167,6 +177,16 @@ mutation ZoneEditorUpdateRoom(
     allowsSummon
     allowsTeleport
     isDeathTrap
+    isIndoors
+    isSoundproof
+    isArena
+    isGuildhall
+    allowsMobs
+    allowsTracking
+    allowsPortals
+    allowsScanning
+    isInn
+    innName
     zoneId
   }
 }

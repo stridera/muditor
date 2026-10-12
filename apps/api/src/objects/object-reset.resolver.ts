@@ -7,6 +7,10 @@ import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { zoneLookups } from '../common/decorators/zone-lookups';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
+  ResetContentInput,
+  UpdateResetContentInput,
+} from '../mobs/mob-reset.dto';
+import {
   CreateObjectResetInput,
   ObjectResetDto,
   UpdateObjectResetInput,
@@ -54,8 +58,10 @@ export class ObjectResetResolver {
     return this.objectResetService.findOne(id, hidesGodZones(user ?? null));
   }
 
+  // The reset spawns into roomZoneId's room, so the builder needs WRITE on that
+  // zone too (otherwise a grant on zone A could place objects in zone B's rooms).
   @Mutation(() => ObjectResetDto)
-  @RequireZoneWrite()
+  @RequireZoneWrite({ keys: ['zoneId', 'roomZoneId'] })
   async createObjectReset(
     @Args('data') data: CreateObjectResetInput
   ): Promise<ObjectResetDto> {
@@ -63,7 +69,10 @@ export class ObjectResetResolver {
   }
 
   @Mutation(() => ObjectResetDto)
-  @RequireZoneWrite({ lookup: zoneLookups.objectReset('id') })
+  @RequireZoneWrite({
+    keys: ['zoneId', 'roomZoneId'],
+    lookup: zoneLookups.objectReset('id'),
+  })
   async updateObjectReset(
     @Args('id', { type: () => ID }) id: number,
     @Args('data') data: UpdateObjectResetInput
@@ -77,5 +86,31 @@ export class ObjectResetResolver {
     @Args('id', { type: () => ID }) id: number
   ): Promise<boolean> {
     return this.objectResetService.delete(id);
+  }
+
+  @Mutation(() => ObjectResetDto)
+  @RequireZoneWrite({ lookup: zoneLookups.objectReset('resetId') })
+  async addObjectResetContent(
+    @Args('resetId', { type: () => ID }) resetId: number,
+    @Args('data') data: ResetContentInput
+  ): Promise<ObjectResetDto> {
+    return this.objectResetService.addContent(resetId, data);
+  }
+
+  @Mutation(() => Boolean)
+  @RequireZoneWrite({ lookup: zoneLookups.objectResetContent('id') })
+  async updateObjectResetContent(
+    @Args('id', { type: () => ID }) id: number,
+    @Args('data') data: UpdateResetContentInput
+  ): Promise<boolean> {
+    return this.objectResetService.updateContent(id, data);
+  }
+
+  @Mutation(() => Boolean)
+  @RequireZoneWrite({ lookup: zoneLookups.objectResetContent('id') })
+  async deleteObjectResetContent(
+    @Args('id', { type: () => ID }) id: number
+  ): Promise<boolean> {
+    return this.objectResetService.deleteContent(id);
   }
 }

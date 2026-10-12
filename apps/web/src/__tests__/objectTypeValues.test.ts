@@ -110,6 +110,7 @@ describe('TYPE_VALUE_FIELDS', () => {
       'Key',
       'Weight Reduction',
       'Flags',
+      'IsCorpse',
     ]);
     expect(keys('LIGHT')).toEqual(['Capacity', 'Remaining']);
     expect(keys('FOOD')).toEqual(['Filling', 'Poisoned']);

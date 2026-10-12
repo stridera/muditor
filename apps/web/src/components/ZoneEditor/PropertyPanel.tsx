@@ -7,12 +7,19 @@ import {
 } from '@/lib/room-utils';
 import { ColoredTextEditor } from '@/components/ColoredTextEditor';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
+import {
+  RoomResetsPanel,
+  type RoomResetsSummary,
+} from '@/components/resets/RoomResetsPanel';
+import type { RoomFlagFields } from '@/lib/room-flags';
+import { RoomExtraDescriptionsEditor } from './RoomExtraDescriptionsEditor';
+import { RoomFlagsSection } from './RoomFlagsSection';
 import { useTheme } from 'next-themes';
 import TriggerManager from '@/components/TriggerManager';
 import { normalizeExitEdit } from './exit-update';
 import React, { useEffect, useState } from 'react';
 
-interface Room {
+interface Room extends RoomFlagFields {
   id: number;
   name: string;
   roomDescription: string;
@@ -105,6 +112,12 @@ interface PropertyPanelProps {
   saving: boolean;
   managingExits: boolean;
   viewMode: 'edit' | 'view';
+  /** Whether the viewer may change resets and extra descriptions (default true) */
+  canEdit?: boolean;
+  /** Called after the Resets tab changes what spawns in the room */
+  onResetsChanged?: (roomId: number, summary: RoomResetsSummary) => void;
+  /** Bump to reload the Resets tab (e.g. after a palette placement) */
+  resetsRefreshKey?: number;
   onEntityClick?: (entity: {
     type: 'mob' | 'object' | 'shop';
     id: number;
@@ -153,13 +166,16 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   saving,
   managingExits,
   viewMode,
+  canEdit = true,
+  onResetsChanged,
+  resetsRefreshKey,
   onEntityClick,
 }) => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
   const [activeTab, setActiveTab] = useState<
-    'basic' | 'exits' | 'entities' | 'advanced' | 'scripts'
+    'basic' | 'exits' | 'entities' | 'resets' | 'advanced' | 'scripts'
   >('basic');
   const [showCreateExit, setShowCreateExit] = useState(false);
   const [newExitDirection, setNewExitDirection] = useState('NORTH');
@@ -372,6 +388,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               { key: 'basic', label: 'Basic', icon: '⚙️' },
               { key: 'exits', label: 'Exits', icon: '🚪' },
               { key: 'entities', label: 'Entities', icon: '👹' },
+              { key: 'resets', label: 'Resets', icon: '📍' },
               { key: 'advanced', label: 'Advanced', icon: '🔧' },
               { key: 'scripts', label: 'Scripts', icon: '📜' },
             ].map(tab => (
@@ -1502,6 +1519,16 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           </div>
         )}
 
+        {viewMode === 'edit' && activeTab === 'resets' && (
+          <RoomResetsPanel
+            roomZoneId={room.zoneId}
+            roomId={room.id}
+            canEdit={canEdit}
+            onChanged={summary => onResetsChanged?.(room.id, summary)}
+            refreshKey={resetsRefreshKey ?? 0}
+          />
+        )}
+
         {viewMode === 'edit' && activeTab === 'advanced' && (
           <div className='space-y-4'>
             <h4
@@ -1719,6 +1746,14 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                 </div>
               </div>
             </div>
+
+            <RoomFlagsSection room={room} onChange={onRoomChange} />
+
+            <RoomExtraDescriptionsEditor
+              zoneId={room.zoneId}
+              roomId={room.id}
+              canEdit={canEdit}
+            />
 
             {/* Active Properties Summary */}
             {(() => {

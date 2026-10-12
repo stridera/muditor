@@ -10,6 +10,8 @@ import { ObjectNode } from './ObjectNode';
 // Reuse lightweight palette types
 export interface Mob {
   id: number;
+  /** Zone the mob belongs to (defaults to the zone being edited) */
+  zoneId?: number;
   name: string;
   level: number;
   race?: string;
@@ -53,6 +55,8 @@ export interface Mob {
 
 export interface GameObject {
   id: number;
+  /** Zone the object belongs to (defaults to the zone being edited) */
+  zoneId?: number;
   name: string;
   type: string;
   keywords?: string[];
@@ -77,6 +81,11 @@ interface EntityPanelProps {
   onClearSelection: () => void;
   onMobDragStart: (mob: Mob) => void;
   onObjectDragStart: (object: GameObject) => void;
+  /** Place an entity in the selected room (omitted when nothing can be placed) */
+  onPlaceEntity?: (
+    kind: 'mob' | 'object',
+    entity: { id: number; zoneId?: number; name: string }
+  ) => void;
   viewMode: 'edit' | 'view';
   panelWidth: number; // width provided by parent for responsive layout
 }
@@ -90,6 +99,7 @@ export const EntityPanel: React.FC<EntityPanelProps> = ({
   onClearSelection,
   onMobDragStart,
   onObjectDragStart,
+  onPlaceEntity,
   viewMode,
   panelWidth,
 }) => {
@@ -397,6 +407,18 @@ export const EntityPanel: React.FC<EntityPanelProps> = ({
                         xPos={0}
                         yPos={0}
                       />
+                      {onPlaceEntity ? (
+                        <button
+                          type='button'
+                          onClick={e => {
+                            e.stopPropagation();
+                            onPlaceEntity('mob', mob);
+                          }}
+                          className='mt-1 text-xs text-blue-600 hover:text-blue-800'
+                        >
+                          Place {mob.name} in selected room
+                        </button>
+                      ) : null}
                     </div>
                   ))
                 )}
@@ -446,6 +468,18 @@ export const EntityPanel: React.FC<EntityPanelProps> = ({
                         xPos={0}
                         yPos={0}
                       />
+                      {onPlaceEntity ? (
+                        <button
+                          type='button'
+                          onClick={e => {
+                            e.stopPropagation();
+                            onPlaceEntity('object', obj);
+                          }}
+                          className='mt-1 text-xs text-blue-600 hover:text-blue-800'
+                        >
+                          Place {obj.name} in selected room
+                        </button>
+                      ) : null}
                     </div>
                   ))
                 )}

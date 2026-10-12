@@ -16,6 +16,7 @@ import {
 } from './object-effects.dto';
 import { ObjectsService } from './objects.service';
 import {
+  assertValidCombatColumns,
   assertValidObjectValues,
   defaultRoomDescription,
 } from './object-values';
@@ -128,6 +129,7 @@ export class ObjectsResolver {
   ): Promise<ObjectDto> {
     const { zoneId, values, roomDescription, ...objectData } = data;
     assertValidObjectValues(values);
+    assertValidCombatColumns(objectData);
     await this.objectsService.assertIdFree(zoneId, objectData.id);
     const valuesInput =
       values === null ? Prisma.JsonNull : (values ?? undefined);
@@ -154,6 +156,7 @@ export class ObjectsResolver {
     // payload must never move the object, so it is dropped here.
     const { values, zoneId: _payloadZoneId, ...rest } = data;
     assertValidObjectValues(values);
+    assertValidCombatColumns(rest);
     const valuesInput =
       values === null ? Prisma.JsonNull : (values ?? undefined);
     const updateData: Prisma.ObjectsUpdateInput = {

@@ -15,6 +15,7 @@ import {
   UpdateConsumableEffectsDocument,
   type WearFlag,
 } from '@/generated/graphql';
+import { ObjectCombatFields } from '@/components/objects/ObjectCombatFields';
 import {
   TypeValueInput,
   type TypeValue,
@@ -22,8 +23,12 @@ import {
 import { parseEntityId } from '@/lib/entityId';
 import { keywordsToInput, parseKeywords } from '@/lib/keywords';
 import {
+  ARMOR_TYPES,
+  EMPTY_COMBAT_COLUMNS,
   normalizeObjectValues,
   TYPE_VALUE_FIELDS,
+  WEAPON_TYPES,
+  type CombatColumns,
 } from '@/lib/objectTypeValues';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
@@ -56,6 +61,11 @@ const GET_OBJECT = gql`
       level
       concealment
       values
+      weaponDiceNum
+      weaponDiceSize
+      weaponDiceBonus
+      weaponDamageType
+      armorPct
       zoneId
       flags
       wearFlags
@@ -150,6 +160,12 @@ interface ObjectFormData {
   concealment: number;
   values: Record<string, unknown>;
   zoneId: number;
+  // Typed combat columns (weapon dice and damage type, armor value)
+  weaponDiceNum: number;
+  weaponDiceSize: number;
+  weaponDiceBonus: number;
+  weaponDamageType: string;
+  armorPct: number;
 }
 
 // Helper function to safely get typed values from formData.values
@@ -336,6 +352,7 @@ function ObjectEditorContent() {
     concealment: 0,
     values: {},
     zoneId: newEntityZone(zoneIdParam, 511),
+    ...EMPTY_COMBAT_COLUMNS,
   });
 
   // Initialize real-time validation
@@ -489,6 +506,11 @@ function ObjectEditorContent() {
         // Fold legacy camelCase keys into the game's keys; keep everything else
         values: normalizeObjectValues(object.values, object.type),
         zoneId: object.zoneId ?? 511,
+        weaponDiceNum: object.weaponDiceNum ?? 0,
+        weaponDiceSize: object.weaponDiceSize ?? 0,
+        weaponDiceBonus: object.weaponDiceBonus ?? 0,
+        weaponDamageType: object.weaponDamageType ?? '',
+        armorPct: object.armorPct ?? 0,
       });
       setSelectedFlags(object.flags || []);
       setSelectedWearFlags(object.wearFlags || []);
@@ -567,6 +589,10 @@ function ObjectEditorContent() {
     }));
   };
 
+  const handleCombatChange = (patch: Partial<CombatColumns>) => {
+    setFormData(prev => ({ ...prev, ...patch }));
+  };
+
   const handleFlagToggle = (flag: string, flagType: 'object' | 'wear') => {
     if (flagType === 'object') {
       setSelectedFlags(prev =>
@@ -595,9 +621,16 @@ function ObjectEditorContent() {
 
     try {
       // zoneId is the record key, never part of an update payload.
-      const { zoneId: formZoneId, keywords, ...fields } = formData;
+      const {
+        zoneId: formZoneId,
+        keywords,
+        weaponDamageType,
+        ...fields
+      } = formData;
       const saveData = {
         ...fields,
+        // '' = no damage type; null clears it on update
+        weaponDamageType: weaponDamageType || null,
         keywords: parseKeywords(keywords),
         flags: selectedFlags,
         wearFlags: selectedWearFlags,
@@ -2055,6 +2088,11 @@ function ObjectEditorContent() {
 
               {/* Type-specific value editors: keys are the game's own (loader.rs) */}
               <div className='space-y-4'>
+                <ObjectCombatFields
+                  type={formData.type}
+                  value={formData}
+                  onChange={handleCombatChange}
+                />
                 {TYPE_VALUE_FIELDS[formData.type] ? (
                   <div className='grid grid-cols-2 gap-4'>
                     {TYPE_VALUE_FIELDS[formData.type]!.map(field => (
@@ -2066,19 +2104,21 @@ function ObjectEditorContent() {
                       />
                     ))}
                   </div>
-                ) : (
+                ) : !WEAPON_TYPES.includes(formData.type) &&
+                  !ARMOR_TYPES.includes(formData.type) ? (
                   <p className='text-sm text-muted-foreground'>
                     No editable type-specific values for {formData.type}. Any
                     existing values are kept as they are.
                   </p>
-                )}
+                ) : null}
 
                 <div className='mt-6 p-4 bg-muted border border-border rounded-lg'>
                   <p className='text-sm text-muted-foreground'>
                     <strong>Note:</strong> Type-specific values are stored as
-                    JSON using the game's own keys. Weapon dice and armor are
-                    typed columns and are not edited here; values this tab does
-                    not show are preserved when you save.
+                    JSON using the game's own keys. Weapon dice, damage type and
+                    armor value are separate columns, shown above for weapons
+                    and armor. Values this tab does not show are preserved when
+                    you save.
                   </p>
                 </div>
               </div>
