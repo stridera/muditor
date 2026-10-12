@@ -240,6 +240,7 @@ export class MobsResolver {
     // columns: translate them rather than passing them through to Prisma.
     const {
       race,
+      classId,
       hpDice,
       damageDice,
       wealth,
@@ -251,6 +252,13 @@ export class MobsResolver {
       ...rest
     } = data;
     const updateData: Prisma.MobsUpdateInput = { ...rest };
+    // classId is a scalar FK; MobsUpdateInput takes the relation. Explicit
+    // null clears the class, undefined leaves it untouched.
+    if (classId === null) {
+      updateData.characterClass = { disconnect: true };
+    } else if (classId !== undefined) {
+      updateData.characterClass = { connect: { id: classId } };
+    }
     if (race) {
       updateData.race = race as Race;
     }

@@ -202,6 +202,32 @@ describe('MobsResolver', () => {
     });
   });
 
+  describe('mob class on update', () => {
+    const run = async (data: Record<string, unknown>) => {
+      const update = jest
+        .spyOn(service, 'update')
+        .mockResolvedValue({ id: 1, zoneId: 30 } as never);
+      await resolver.updateMob(30, 1, data as never).catch(() => undefined); // the mapper is not under test
+      return update.mock.calls[0]![2] as Record<string, unknown>;
+    };
+
+    it('connects the class relation instead of passing the scalar FK', async () => {
+      const updateData = await run({ classId: 4 });
+      expect(updateData.characterClass).toEqual({ connect: { id: 4 } });
+      expect(updateData).not.toHaveProperty('classId');
+    });
+
+    it('disconnects the class when classId is null', async () => {
+      const updateData = await run({ classId: null });
+      expect(updateData.characterClass).toEqual({ disconnect: true });
+    });
+
+    it('leaves the class alone when classId is omitted', async () => {
+      const updateData = await run({ name: 'x' });
+      expect(updateData).not.toHaveProperty('characterClass');
+    });
+  });
+
   describe('mob creation', () => {
     it('should preserve all stat values during creation', async () => {
       const createData = {

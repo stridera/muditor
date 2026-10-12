@@ -24,6 +24,10 @@ jest.mock('@/components/auth/permission-guard', () => ({
   PermissionGuard: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+jest.mock('@/hooks/use-permissions', () => ({
+  usePermissions: () => ({ canEditZone: () => true }),
+}));
+
 jest.mock('@/components/zones/edit-zone-modal', () => ({
   EditZoneModal: () => null,
 }));

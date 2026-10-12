@@ -333,6 +333,27 @@ describe('RoomsService', () => {
       });
     });
 
+    it('createExit and updateExit reject an exit back to the same room', async () => {
+      await expect(
+        service.createExit({
+          roomZoneId: 30,
+          roomId: 5,
+          direction: 'NORTH',
+          toZoneId: 30,
+          toRoomId: 5,
+        } as never)
+      ).rejects.toThrow('same room');
+      await expect(
+        service.updateExit({
+          roomZoneId: 30,
+          roomId: 5,
+          direction: 'NORTH',
+          toZoneId: 30,
+          toRoomId: 5,
+        } as never)
+      ).rejects.toThrow('same room');
+    });
+
     it('updateExit updates in place by composite key, never deleting', async () => {
       exitDb().update!.mockResolvedValue({ id: 1 });
       await service.updateExit({

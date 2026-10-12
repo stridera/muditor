@@ -581,12 +581,27 @@ export class RoomsService {
     return this.mapRoom(room);
   }
 
+  /** A room linked to itself is never useful and breaks the map editor. */
+  private assertNotSelfExit(
+    roomZoneId: number,
+    roomId: number,
+    toZoneId: number | null,
+    toRoomId: number | null
+  ): void {
+    if (toZoneId === roomZoneId && toRoomId === roomId) {
+      throw new BadRequestException(
+        'An exit cannot lead back to the same room.'
+      );
+    }
+  }
+
   async createExit(data: CreateRoomExitInput): Promise<RoomExitResult> {
     const keywords = (data.keywords || []).filter(
       k => !!k && k.trim().length > 0
     );
     const toZoneId = data.toZoneId ?? null;
     const toRoomId = data.toRoomId ?? null;
+    this.assertNotSelfExit(data.roomZoneId, data.roomId, toZoneId, toRoomId);
     const exit = await this.db.roomExit.create({
       data: {
         roomZoneId: data.roomZoneId,
@@ -624,6 +639,14 @@ export class RoomsService {
     if (data.keyId !== undefined) patch.keyId = data.keyId;
     if (data.toZoneId !== undefined) patch.toZoneId = data.toZoneId;
     if (data.toRoomId !== undefined) patch.toRoomId = data.toRoomId;
+    if (data.toZoneId !== undefined && data.toRoomId !== undefined) {
+      this.assertNotSelfExit(
+        data.roomZoneId,
+        data.roomId,
+        data.toZoneId,
+        data.toRoomId
+      );
+    }
     if (data.defaultState !== undefined) {
       patch.defaultState = data.defaultState ?? ('OPEN' as ExitState);
     }

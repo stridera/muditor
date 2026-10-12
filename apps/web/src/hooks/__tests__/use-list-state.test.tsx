@@ -58,6 +58,14 @@ describe('useListState', () => {
     });
   });
 
+  it('a malformed ?zone= beats the remembered zone (shows all zones)', () => {
+    window.localStorage.setItem(LAST_ZONE_KEY, '530');
+    mockSearch = 'zone=abc';
+    const { result } = renderHook(() => useListState());
+    expect(result.current.zone).toBeNull();
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
   it('does nothing without a URL zone or remembered zone', () => {
     const { result } = renderHook(() => useListState());
     expect(result.current.zone).toBeNull();

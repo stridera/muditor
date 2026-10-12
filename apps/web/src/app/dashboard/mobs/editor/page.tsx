@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
+import { friendlyGraphQLMessage } from '@/lib/error-utils';
 import { newEntityZone } from '@/lib/zone-nav';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { TagInput } from '@/components/ui/tag-input';
@@ -315,7 +316,7 @@ function MobEditorContent() {
 
       setFormData({
         keywords: mob.keywords.join(', '),
-        mobClass: '', // Not in schema - will be removed later
+        mobClass: mob.classId != null ? String(mob.classId) : '',
         name: mob.name,
         roomDescription: mob.roomDescription,
         examineDescription: mob.examineDescription,
@@ -398,7 +399,9 @@ function MobEditorContent() {
       [field]: value,
     };
 
-    setFormData(updatedFormData);
+    // Functional update: "Apply" in the stat generator calls this once per
+    // field in the same tick, and each call must build on the previous one.
+    setFormData(prev => ({ ...prev, [field]: value }));
 
     // Clear general error when user makes changes
     if (generalError) {
@@ -478,6 +481,8 @@ function MobEditorContent() {
         movementMode: formData.movementMode as MovementMode,
         defaultMovementMode: formData.defaultMovementMode as MovementMode,
         defaultPosition: formData.defaultPosition as Position,
+        // null clears the class on update; undefined leaves it unset on create
+        classId: formData.mobClass ? parseInt(formData.mobClass, 10) : null,
         // Cleared fields are sent as null so they actually clear on update
         riderPresenceMessage: formData.riderPresenceMessage || null,
         aggressionFormula: formData.aggressionFormula || null,
@@ -527,12 +532,17 @@ function MobEditorContent() {
     );
   };
 
+  const selectedClassName = (() => {
+    const cls = classes.find(c => c.id === formData.mobClass);
+    return cls ? cls.plainName || stripMarkup(cls.name) : '';
+  })();
+
   const handleGenerateStats = () => {
     // Generate stats based on current level and role
     const generatedStats = generateMobStats(
       formData.level,
       formData.role as any, // Type assertion for role
-      formData.mobClass.toUpperCase() as any, // Type assertion for class
+      selectedClassName.toUpperCase() as any, // Type assertion for class
       formData.race,
       formData.lifeForce as any // Type assertion for lifeforce
     );
@@ -549,7 +559,7 @@ function MobEditorContent() {
     console.error('GraphQL Error:', error);
     return (
       <div className='p-4 text-destructive'>
-        Error loading mob: {error.message}
+        Error loading mob: {friendlyGraphQLMessage(error.message)}
       </div>
     );
   }
@@ -692,17 +702,13 @@ function MobEditorContent() {
                   >
                     <option value=''>N/A (No Class)</option>
                     {classes.map(cls => (
-                      <option
-                        key={cls.id}
-                        value={cls.plainName || stripMarkup(cls.name)}
-                      >
+                      <option key={cls.id} value={cls.id}>
                         {cls.plainName ? cls.plainName : stripMarkup(cls.name)}
                       </option>
                     ))}
                   </select>
                   <p className='text-xs text-muted-foreground mt-1'>
-                    Only used by the stat generator; the mob&apos;s class is not
-                    saved.
+                    Saved with the mob; also drives the stat generator.
                   </p>
                 </div>
               </div>

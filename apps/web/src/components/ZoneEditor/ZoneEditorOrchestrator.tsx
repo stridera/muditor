@@ -16,6 +16,7 @@ import React, {
 import {
   Handle,
   Position,
+  type Connection,
   type Edge,
   type Node,
   type NodeProps,
@@ -85,6 +86,24 @@ import { GoToHint, HelpModal, useHelpModal } from '@/components/HelpModal';
 const ROOM_SIZE = 180; // Room dimensions (rooms are 180x180px)
 const PORTAL_SIZE = 80; // Portal dimensions (minWidth: 80px, roughly square)
 const PORTAL_OFFSET = 150; // Distance from room center to portal center (increased for padding/content)
+
+/** Source-handle id on a room node -> exit direction. */
+const HANDLE_DIRECTIONS: Record<string, string> = {
+  top: 'NORTH',
+  bottom: 'SOUTH',
+  left: 'WEST',
+  right: 'EAST',
+  up: 'UP',
+  down: 'DOWN',
+};
+const OPPOSITE_DIRECTIONS: Record<string, string> = {
+  NORTH: 'SOUTH',
+  SOUTH: 'NORTH',
+  EAST: 'WEST',
+  WEST: 'EAST',
+  UP: 'DOWN',
+  DOWN: 'UP',
+};
 
 // Direction unit vectors for positioning portal centers relative to room center
 // Diagonal vectors are normalized (divided by √2) to ensure uniform distance in all directions
@@ -2679,6 +2698,109 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     [selectedRoom, authenticatedFetch]
   );
 
+  // Drag from a side handle of one room to another room to link them. The
+  // side picked on the source room is the direction; the return exit is added
+  // too when the target room has nothing in the opposite direction.
+  const handleConnect = useCallback(
+    async (connection: Connection) => {
+      if (!isEditing) return;
+      const direction = connection.sourceHandle
+        ? HANDLE_DIRECTIONS[connection.sourceHandle]
+        : undefined;
+      const fromId = parseInt(connection.source ?? '', 10);
+      const toId = parseInt(connection.target ?? '', 10);
+      if (!direction || isNaN(fromId) || isNaN(toId) || activeZoneId == null) {
+        return;
+      }
+      if (fromId === toId) {
+        toast.error('An exit cannot lead back to the same room.');
+        return;
+      }
+      const from = rooms.find(r => r.id === fromId);
+      const to = rooms.find(r => r.id === toId);
+      if (!from || !to) return;
+      if ((from.exits ?? []).some(e => e.direction === direction)) {
+        toast.error(
+          `Room ${from.id} already has a ${direction.toLowerCase()} exit. Edit or delete it first.`
+        );
+        return;
+      }
+      const reverse = OPPOSITE_DIRECTIONS[direction]!;
+      const addReverse = !(to.exits ?? []).some(e => e.direction === reverse);
+
+      const send = async (
+        source: typeof from,
+        dir: string,
+        dest: typeof from
+      ) => {
+        const response = await authenticatedFetch('/graphql', {
+          method: 'POST',
+          body: graphqlRequestBody(ZoneEditorCreateRoomExitDocument, {
+            data: {
+              roomId: source.id,
+              roomZoneId: source.zoneId,
+              direction: dir,
+              toZoneId: dest.zoneId,
+              toRoomId: dest.id,
+            },
+          }),
+        });
+        const json = await response.json();
+        if (!response.ok || json.errors) {
+          throw new Error(
+            friendlyGraphQLMessage(
+              json.errors?.[0]?.message ?? 'Failed to create exit'
+            )
+          );
+        }
+        const created = json.data.createRoomExit;
+        setRooms(rs =>
+          rs.map(r =>
+            r.id === source.id
+              ? {
+                  ...r,
+                  exits: [
+                    ...(r.exits || []),
+                    {
+                      id: created.id,
+                      direction: created.direction,
+                      toZoneId: created.toZoneId ?? null,
+                      toRoomId: created.toRoomId ?? null,
+                      description: created.description ?? null,
+                      flags: created.flags || [],
+                      defaultState: created.defaultState ?? 'OPEN',
+                      hitPoints: created.hitPoints ?? null,
+                      keywords: created.keywords || [],
+                      keyZoneId: created.keyZoneId ?? null,
+                      keyId: created.keyId ?? null,
+                    },
+                  ],
+                }
+              : r
+          )
+        );
+      };
+
+      setManagingExits(true);
+      try {
+        await send(from, direction, to);
+        if (addReverse) await send(to, reverse, from);
+        toast.success(
+          addReverse
+            ? `Linked room ${from.id} ${direction.toLowerCase()} to room ${to.id} (and ${reverse.toLowerCase()} back).`
+            : `Linked room ${from.id} ${direction.toLowerCase()} to room ${to.id}.`
+        );
+      } catch (err) {
+        toast.error(
+          err instanceof Error ? err.message : 'Failed to create exit'
+        );
+      } finally {
+        setManagingExits(false);
+      }
+    },
+    [isEditing, rooms, activeZoneId, authenticatedFetch]
+  );
+
   const handleDeleteExit = useCallback(
     async (exitId: string) => {
       if (!selectedRoom) return;
@@ -2915,7 +3037,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           maxZoom={viewMode === 'world-map' ? 6 : 2}
           onMove={(_, vp) => updateViewportThrottled(vp)}
           elementsSelectable={viewMode === 'zone' && isFullyInteractive}
-          nodesConnectable={false}
+          nodesConnectable={isEditing && isFullyInteractive}
+          onConnect={handleConnect}
           nodesFocusable={isFullyInteractive}
           onNodeClick={(_, node) => {
             if (viewMode === 'world-map') {

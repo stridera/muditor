@@ -9,6 +9,8 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { LAST_ZONE_KEY } from '@/hooks/use-list-state';
 import { useRememberZone } from '@/hooks/use-remember-zone';
 import { useZoneContext } from '@/hooks/use-zone-context';
+import { GetZonesForSelectorDocument } from '@/generated/graphql';
+import { useQuery } from '@apollo/client/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
@@ -43,12 +45,13 @@ function ZoneEditorContent() {
     }
   }, []);
 
-  // Priority: URL param > localStorage > null (world map)
+  // Priority: URL param > localStorage > null (world map). A malformed
+  // ?zone= (e.g. "abc") is an explicit choice, so it shows the world map
+  // instead of silently opening the remembered zone.
   // Use useMemo to ensure recalculation when searchParams changes
   const zoneId = useMemo(() => {
     if (zoneIdParam != null) {
-      const parsed = parseInt(zoneIdParam);
-      if (!isNaN(parsed)) return parsed;
+      return /^\d+$/.test(zoneIdParam) ? Number(zoneIdParam) : null;
     }
     return localStorageZone;
   }, [zoneIdParam, localStorageZone]);
@@ -67,8 +70,16 @@ function ZoneEditorContent() {
     return !isValidZoneId(zoneId);
   }, [zoneId]);
 
+  // A zone id that does not exist would open an empty editor with "+ Room"
+  // enabled; check it against the zone list once that has loaded.
+  const { data: zonesData } = useQuery(GetZonesForSelectorDocument);
+  const zoneMissing =
+    !worldMapMode &&
+    zonesData != null &&
+    !zonesData.zones.some(z => z.id === zoneId);
+
   // Opening a zone in the editor makes it the remembered zone for the sidebar
-  useRememberZone(worldMapMode ? null : zoneId);
+  useRememberZone(worldMapMode || zoneMissing ? null : zoneId);
 
   const handleZoneClick = (clickedZoneId: number) => {
     console.log('handleZoneClick called with zoneId:', clickedZoneId);
@@ -102,7 +113,7 @@ function ZoneEditorContent() {
             </h1>
           </div>
           <ZoneEditorHeaderActions
-            zoneId={worldMapMode ? null : zoneId}
+            zoneId={worldMapMode || zoneMissing ? null : zoneId}
             onAddRoom={() => setAddRoomRequest(n => n + 1)}
           />
         </div>
@@ -154,6 +165,24 @@ function ZoneEditorContent() {
               options={mapOptions}
             />
           </>
+        ) : zoneMissing ? (
+          <div className='p-6 text-foreground'>
+            <p className='text-lg font-medium'>Zone {zoneId} not found</p>
+            <p className='text-sm text-muted-foreground mt-1'>
+              There is no zone with that id.{' '}
+              <Link
+                href='/dashboard/zones/editor'
+                className='text-primary underline'
+              >
+                Open the world map
+              </Link>{' '}
+              or{' '}
+              <Link href='/dashboard/zones' className='text-primary underline'>
+                pick a zone from the list
+              </Link>
+              .
+            </p>
+          </div>
         ) : (
           <ZoneEditorOrchestrator
             zoneId={zoneId ?? undefined}

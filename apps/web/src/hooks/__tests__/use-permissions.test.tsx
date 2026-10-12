@@ -9,30 +9,38 @@ import { USER_ROLES, roleAtLeast, type UserRole } from '@/lib/roles';
 import { usePermissions } from '../use-permissions';
 
 let mockRole: UserRole = 'PLAYER';
+let mockGrants: Array<{
+  zoneId: string;
+  permissions: string[];
+  expiresAt?: string | null;
+}> = [];
 
 jest.mock('@/contexts/auth-context', () => ({
   useAuth: () => ({ user: { id: 'u1', role: mockRole } }),
 }));
 
 jest.mock('@apollo/client/react', () => ({
-  useQuery: () => ({
+  useQuery: (doc: { definitions: Array<{ name?: { value: string } }> }) => ({
     loading: false,
     error: undefined,
     refetch: jest.fn(),
-    data: {
-      myPermissions: {
-        isPlayer: false,
-        isImmortal: false,
-        isBuilder: false,
-        isCoder: false,
-        isImplementor: false,
-        canAccessDashboard: false,
-        canManageUsers: false,
-        canViewValidation: false,
-        maxCharacterLevel: 1,
-        role: mockRole,
-      },
-    },
+    data:
+      doc.definitions[0]?.name?.value === 'MyZoneGrants'
+        ? { myZoneGrants: mockGrants }
+        : {
+            myPermissions: {
+              isPlayer: false,
+              isImmortal: false,
+              isBuilder: false,
+              isCoder: false,
+              isImplementor: false,
+              canAccessDashboard: false,
+              canManageUsers: false,
+              canViewValidation: false,
+              maxCharacterLevel: 1,
+              role: mockRole,
+            },
+          },
   }),
 }));
 
@@ -48,7 +56,10 @@ describe('usePermissions role flags', () => {
     );
     expect(result.current.isCoder).toBe(roleAtLeast(role, 'CODER'));
     expect(result.current.isImplementor).toBe(role === 'IMPLEMENTOR');
-    expect(result.current.canEditZone(1)).toBe(roleAtLeast(role, 'BUILDER'));
+    // A BUILDER needs a grant (none here); HEAD_BUILDER+ bypass grants.
+    expect(result.current.canEditZone(1)).toBe(
+      roleAtLeast(role, 'HEAD_BUILDER')
+    );
   });
 
   it('BUILDER explicitly: immortal+builder, not coder', () => {
@@ -60,6 +71,35 @@ describe('usePermissions role flags', () => {
       isHeadBuilder: false,
       isCoder: false,
       isImplementor: false,
+    });
+  });
+
+  describe('canEditZone for a BUILDER', () => {
+    const future = new Date(Date.now() + 86_400_000).toISOString();
+    const past = new Date(Date.now() - 86_400_000).toISOString();
+    const can = (zone: number) => {
+      mockRole = 'BUILDER';
+      const { result } = renderHook(() => usePermissions());
+      return result.current.canEditZone(zone);
+    };
+
+    it('is false without a grant', () => {
+      mockGrants = [];
+      expect(can(990)).toBe(false);
+    });
+
+    it('is true with a WRITE or ADMIN grant on that zone only', () => {
+      mockGrants = [
+        { zoneId: '30', permissions: ['READ', 'WRITE'] },
+        { zoneId: '31', permissions: ['ADMIN'], expiresAt: future },
+        { zoneId: '32', permissions: ['READ'] },
+        { zoneId: '33', permissions: ['WRITE'], expiresAt: past },
+      ];
+      expect(can(30)).toBe(true);
+      expect(can(31)).toBe(true);
+      expect(can(32)).toBe(false);
+      expect(can(33)).toBe(false);
+      expect(can(990)).toBe(false);
     });
   });
 });

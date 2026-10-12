@@ -22,6 +22,27 @@ export const MY_PERMISSIONS_QUERY = gql`
   }
 `;
 
+/** The builder's own zone grants (BUILDER+; HEAD_BUILDER+ bypass grants). */
+export const MY_ZONE_GRANTS_QUERY = gql`
+  query MyZoneGrants {
+    myZoneGrants {
+      zoneId
+      permissions
+      expiresAt
+    }
+  }
+`;
+
+interface MyZoneGrant {
+  zoneId: string | number;
+  permissions: string[];
+  expiresAt?: string | null;
+}
+
+interface MyZoneGrantsQueryResult {
+  myZoneGrants: MyZoneGrant[];
+}
+
 export interface UserPermissions {
   isPlayer: boolean;
   isImmortal: boolean;
@@ -78,9 +99,29 @@ export function usePermissions(): UsePermissionsResult {
   const isCoder = roleAtLeast(role, 'CODER');
   const isImplementor = roleAtLeast(role, 'IMPLEMENTOR');
 
-  const canEditZone = (_zoneId?: number): boolean => {
+  // Mirrors the API's ZonePermissionGuard: HEAD_BUILDER+ bypass grants, a
+  // BUILDER needs a live WRITE (or ADMIN) grant on the zone. Fails closed
+  // while the grants are still loading.
+  const { data: grantsData } = useQuery<MyZoneGrantsQueryResult>(
+    MY_ZONE_GRANTS_QUERY,
+    {
+      skip: !user || !isBuilder || isHeadBuilder,
+      errorPolicy: 'all',
+    }
+  );
+  const zoneGrants = grantsData?.myZoneGrants;
+
+  const canEditZone = (zoneId?: number): boolean => {
     if (!permissions) return false;
-    return isBuilder;
+    if (isHeadBuilder) return true;
+    if (!isBuilder || zoneId === undefined || zoneId === null) return false;
+    const now = Date.now();
+    return (zoneGrants ?? []).some(
+      g =>
+        Number(g.zoneId) === zoneId &&
+        (!g.expiresAt || new Date(g.expiresAt).getTime() > now) &&
+        (g.permissions.includes('WRITE') || g.permissions.includes('ADMIN'))
+    );
   };
 
   const canManageCharacters = (characterOwnerId?: string): boolean => {

@@ -41,7 +41,7 @@ interface ShopFormData {
   zoneId: number;
 }
 
-import { extractErrorMessage } from '@/lib/error-utils';
+import { extractErrorMessage, friendlyGraphQLMessage } from '@/lib/error-utils';
 import type { ShopItem, ShopQueryResult } from '@/lib/shopMapping';
 import { mapShopItems } from '@/lib/shopMapping';
 import { buildShopSavePayload, type ShopKeeperRef } from '@/lib/shopPayload';
@@ -622,7 +622,11 @@ function ShopEditorContent() {
   if (loading) return <div className='p-4'>Loading shop data...</div>;
   if (error) {
     const msg = (error as { message?: string })?.message || 'Unknown error';
-    return <div className='p-4 text-destructive'>Error: {msg}</div>;
+    return (
+      <div className='p-4 text-destructive'>
+        Error: {friendlyGraphQLMessage(msg)}
+      </div>
+    );
   }
 
   const tabs = [

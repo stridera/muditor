@@ -7,6 +7,7 @@ mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
     roomDescription
     examineDescription
     level
+    classId
     alignment
     hpDice
     damageDice
@@ -45,6 +46,7 @@ mutation CreateMob($data: CreateMobInput!) {
     roomDescription
     examineDescription
     level
+    classId
     alignment
     hpDice
     damageDice

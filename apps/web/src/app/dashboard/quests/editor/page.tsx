@@ -63,7 +63,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useListReturnHref } from '@/hooks/use-list-state';
-import { extractErrorMessage } from '@/lib/error-utils';
+import { extractErrorMessage, friendlyGraphQLMessage } from '@/lib/error-utils';
 import { stripMarkup } from '@/utils/xmlLiteParser';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -715,7 +715,7 @@ function QuestEditorContent() {
     console.error('GraphQL Error:', error);
     return (
       <div className='p-4 text-destructive'>
-        Error loading quest: {error.message}
+        Error loading quest: {friendlyGraphQLMessage(error.message)}
       </div>
     );
   }

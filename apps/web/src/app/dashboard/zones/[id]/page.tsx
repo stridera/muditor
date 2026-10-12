@@ -13,6 +13,7 @@ import {
   type Hemisphere,
   type ResetMode,
 } from '@/generated/graphql';
+import { usePermissions } from '@/hooks/use-permissions';
 import { useRememberZone } from '@/hooks/use-remember-zone';
 import { parseIntParam } from '@/lib/route-params';
 import Link from 'next/link';
@@ -50,6 +51,7 @@ function ZoneDetailContent() {
   const zoneId = parseIntParam(params.id);
   // Opening a zone makes it the remembered zone, so the sidebar links carry it
   useRememberZone(zoneId);
+  const { canEditZone } = usePermissions();
   const [zone, setZone] = useState<ZoneDetail | null>(null);
   const [loading, setLoading] = useState(zoneId !== null);
   const [error, setError] = useState<string | null>(null);
@@ -164,12 +166,21 @@ function ZoneDetailContent() {
                   ? 'Moderate'
                   : 'Needs Attention'}
             </span>
-            <button
-              onClick={() => setIsEditModalOpen(true)}
-              className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm'
-            >
-              ✏️ Edit Zone
-            </button>
+            {canEditZone(zone.id) ? (
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm'
+              >
+                ✏️ Edit Zone
+              </button>
+            ) : (
+              <span
+                className='text-sm text-muted-foreground'
+                title={`You have no write access to zone ${zone.id}`}
+              >
+                No write access to zone {zone.id}
+              </span>
+            )}
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
+import { friendlyGraphQLMessage } from '@/lib/error-utils';
 import { newEntityZone } from '@/lib/zone-nav';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { TagInput } from '@/components/ui/tag-input';
@@ -674,7 +675,11 @@ function ObjectEditorContent() {
 
   if (loading) return <div className='p-4'>Loading object data...</div>;
   if (error)
-    return <div className='p-4 text-destructive'>Error: {error.message}</div>;
+    return (
+      <div className='p-4 text-destructive'>
+        Error: {friendlyGraphQLMessage(error.message)}
+      </div>
+    );
 
   const tabs = [
     { id: 'basic', label: 'Basic Info' },

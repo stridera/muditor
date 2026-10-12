@@ -10,9 +10,9 @@ export const LAST_ZONE_KEY = 'muditor:lastZone';
 export const LIST_QUERY_KEY_PREFIX = 'muditor:listQuery:';
 
 function parseZone(value: string | null | undefined): number | null {
-  if (!value) return null;
-  const n = parseInt(value, 10);
-  return Number.isNaN(n) ? null : n;
+  if (!value || !/^\d+$/.test(value)) return null;
+  const n = Number(value);
+  return Number.isSafeInteger(n) ? n : null;
 }
 
 function readLastZone(): number | null {
@@ -98,6 +98,9 @@ export function useListState(): ListState {
   const search = searchParams.toString();
 
   const urlZone = parseZone(searchParams.get('zone'));
+  // An explicit but malformed ?zone= (e.g. "abc") wins over the remembered zone:
+  // show all zones rather than silently filtering by a stale one.
+  const urlZoneInvalid = urlZone == null && searchParams.get('zone') !== null;
   // The query string we have asked the router for but may not have rendered yet,
   // so several set() calls in one tick compose instead of overwriting.
   const pendingRef = useRef(search);
@@ -121,14 +124,14 @@ export function useListState(): ListState {
   // the last zone (replace, no history entry). Clearing the zone forgets it, so
   // an explicit "all zones" is not undone.
   useEffect(() => {
-    if (urlZone != null) return;
+    if (urlZone != null || urlZoneInvalid) return;
     const stored = readLastZone();
     if (stored != null) {
       const params = new URLSearchParams(pendingRef.current);
       params.set('zone', String(stored));
       navigate(params);
     }
-  }, [urlZone, navigate]);
+  }, [urlZone, urlZoneInvalid, navigate]);
 
   // Remember the URL zone and this list's query string (for "back to list" links).
   useEffect(() => {
@@ -143,7 +146,7 @@ export function useListState(): ListState {
   }, [urlZone, pathname, search]);
 
   // Read synchronously so the first query already uses the remembered zone.
-  const zone = urlZone ?? readLastZone();
+  const zone = urlZone ?? (urlZoneInvalid ? null : readLastZone());
 
   const set = useCallback<ListState['set']>(
     updates => {
