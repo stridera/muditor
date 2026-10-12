@@ -13,6 +13,7 @@ import {
   type Hemisphere,
   type ResetMode,
 } from '@/generated/graphql';
+import { useRememberZone } from '@/hooks/use-remember-zone';
 import { parseIntParam } from '@/lib/route-params';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -46,6 +47,8 @@ function ZoneDetailContent() {
   const params = useParams();
   // null for non-numeric segments (e.g. "new"): never query with a null id
   const zoneId = parseIntParam(params.id);
+  // Opening a zone makes it the remembered zone, so the sidebar links carry it
+  useRememberZone(zoneId);
   const [zone, setZone] = useState<ZoneDetail | null>(null);
   const [loading, setLoading] = useState(zoneId !== null);
   const [error, setError] = useState<string | null>(null);

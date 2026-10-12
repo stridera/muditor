@@ -37,6 +37,7 @@ import {
 } from './editor-constants';
 import { EditorToolbar, type EditorMode } from './EditorToolbar';
 import { useUndoRedo } from './hooks/useUndoRedo';
+import { findFreeGridSlot } from './layoutUtils';
 import { useRoomOverlaps } from './hooks/useRoomOverlaps';
 import { PortalNode } from './PortalNode';
 import { OverlapPanel } from './OverlapPanel';
@@ -193,6 +194,8 @@ interface ZoneEditorOrchestratorProps {
   zoneId?: number | null | undefined; // allow undefined under exactOptionalPropertyTypes
   initialRoomId?: number | null | undefined;
   worldMapMode?: boolean; // retained for pages but not implemented here yet
+  /** Bump to open the new-room dialog (the page header's + Room button). */
+  addRoomRequest?: number;
 }
 
 type WorldMapRoom = {
@@ -397,6 +400,7 @@ const ZoneBoundaryNode: React.FC<
 const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   zoneId,
   initialRoomId,
+  addRoomRequest = 0,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -422,6 +426,12 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   >({});
   const [editorMode, setEditorMode] = useState<EditorMode>('view');
   const [createRoomOpen, setCreateRoomOpen] = useState(false);
+  const lastAddRoomRequestRef = useRef(addRoomRequest);
+  useEffect(() => {
+    if (addRoomRequest === lastAddRoomRequestRef.current) return;
+    lastAddRoomRequestRef.current = addRoomRequest;
+    setCreateRoomOpen(true);
+  }, [addRoomRequest]);
   // Pending room edits state
   const [pendingRoomEdits, setPendingRoomEdits] = useState<
     Partial<PropertyPanelRoom>
@@ -1939,25 +1949,28 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     ]
   );
 
-  // Toolbar "Add room": the dialog creates the room, then we place it on the
-  // canvas at the first free cell to the right of the current floor's rooms.
+  // "Add room" (toolbar or page header): the dialog creates the room, then we
+  // place it on the canvas in the first free cell next to the selected room
+  // (never on top of another room), and select it.
   const handleRoomCreatedFromDialog = useCallback(
     async (created: CreatedRoom) => {
-      const floorRooms = rooms.filter(
-        r =>
-          r.zoneId === created.zoneId &&
-          r.layoutX != null &&
-          (r.layoutZ ?? 0) === currentZLevel
+      const anchorRoom = rooms.find(
+        r => r.zoneId === created.zoneId && r.id === selectedRoomId
       );
-      let targetX = 0;
-      let targetY = 0;
-      if (floorRooms.length > 0) {
-        const eastmost = floorRooms.reduce((a, b) =>
-          (b.layoutX ?? 0) > (a.layoutX ?? 0) ? b : a
-        );
-        targetX = Math.round(eastmost.layoutX ?? 0) + 1;
-        targetY = Math.round(eastmost.layoutY ?? 0);
-      }
+      const targetZ = anchorRoom ? (anchorRoom.layoutZ ?? 0) : currentZLevel;
+      const slot = findFreeGridSlot(
+        rooms.filter(
+          r =>
+            r.zoneId === created.zoneId &&
+            !(r.id === created.id && r.zoneId === created.zoneId)
+        ),
+        anchorRoom
+          ? { x: anchorRoom.layoutX ?? 0, y: anchorRoom.layoutY ?? 0 }
+          : null,
+        targetZ
+      );
+      const targetX = slot.x;
+      const targetY = slot.y;
       const newRoom: Room = {
         id: created.id,
         zoneId: created.zoneId,
@@ -1966,7 +1979,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         roomDescription: created.description,
         layoutX: targetX,
         layoutY: targetY,
-        layoutZ: currentZLevel,
+        layoutZ: targetZ,
         exits: [],
         mobs: [],
         objects: [],
@@ -1978,6 +1991,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         newRoom,
       ]);
       setSelectedRoomId(created.id);
+      setCurrentZLevel(targetZ);
       try {
         const response = await authenticatedFetch('/graphql', {
           method: 'POST',
@@ -1987,7 +2001,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             position: {
               layoutX: targetX,
               layoutY: targetY,
-              layoutZ: currentZLevel,
+              layoutZ: targetZ,
             },
           }),
         });
@@ -2003,7 +2017,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         );
       }
     },
-    [rooms, currentZLevel, authenticatedFetch, setRooms, setSelectedRoomId]
+    [
+      rooms,
+      selectedRoomId,
+      currentZLevel,
+      authenticatedFetch,
+      setRooms,
+      setSelectedRoomId,
+    ]
   );
 
   // Keyboard shortcuts for undo/redo and navigation

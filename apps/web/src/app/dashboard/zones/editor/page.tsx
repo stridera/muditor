@@ -7,6 +7,7 @@ import { ZoneEditorOrchestrator } from '@/components/ZoneEditor/ZoneEditorOrches
 import { WorldMapCanvas } from '@/components/WorldMap/WorldMapCanvas';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { LAST_ZONE_KEY } from '@/hooks/use-list-state';
+import { useRememberZone } from '@/hooks/use-remember-zone';
 import { useZoneContext } from '@/hooks/use-zone-context';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,6 +22,7 @@ function ZoneEditorContent() {
   const { zoneId: contextZoneId } = useZoneContext();
   const [localStorageZone, setLocalStorageZone] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [addRoomRequest, setAddRoomRequest] = useState(0);
   const [mapOptions, setMapOptions] = useState({
     zoneGlow: true,
     zoneOutline: true,
@@ -65,6 +67,9 @@ function ZoneEditorContent() {
     return !isValidZoneId(zoneId);
   }, [zoneId]);
 
+  // Opening a zone in the editor makes it the remembered zone for the sidebar
+  useRememberZone(worldMapMode ? null : zoneId);
+
   const handleZoneClick = (clickedZoneId: number) => {
     console.log('handleZoneClick called with zoneId:', clickedZoneId);
     const url = `/dashboard/zones/editor?zone=${clickedZoneId}`;
@@ -96,7 +101,10 @@ function ZoneEditorContent() {
               {worldMapMode ? 'World Map' : `Zone ${zoneId} Editor`}
             </h1>
           </div>
-          <ZoneEditorHeaderActions zoneId={worldMapMode ? null : zoneId} />
+          <ZoneEditorHeaderActions
+            zoneId={worldMapMode ? null : zoneId}
+            onAddRoom={() => setAddRoomRequest(n => n + 1)}
+          />
         </div>
       </div>
 
@@ -151,6 +159,7 @@ function ZoneEditorContent() {
             zoneId={zoneId ?? undefined}
             initialRoomId={initialRoomId}
             worldMapMode={false}
+            addRoomRequest={addRoomRequest}
           />
         )}
       </div>

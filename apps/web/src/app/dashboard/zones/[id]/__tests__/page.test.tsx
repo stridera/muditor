@@ -12,6 +12,14 @@ jest.mock('next/navigation', () => ({
   useParams: () => mockParams,
 }));
 
+const mockSetSelectedZone = jest.fn();
+jest.mock('@/contexts/zone-context', () => ({
+  useZone: () => ({
+    selectedZone: null,
+    setSelectedZone: mockSetSelectedZone,
+  }),
+}));
+
 jest.mock('@/components/auth/permission-guard', () => ({
   PermissionGuard: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -23,6 +31,7 @@ jest.mock('@/components/zones/edit-zone-modal', () => ({
 describe('ZoneDetailPage with a bad id', () => {
   beforeEach(() => {
     (global.fetch as jest.Mock).mockReset();
+    mockSetSelectedZone.mockReset();
   });
 
   it.each(['new', 'abc', '12abc'])(
@@ -36,4 +45,17 @@ describe('ZoneDetailPage with a bad id', () => {
       expect(global.fetch).not.toHaveBeenCalled();
     }
   );
+
+  it('does not remember a zone for a bad id', () => {
+    mockParams = { id: 'new' };
+    render(<ZoneDetailPage />);
+    expect(mockSetSelectedZone).not.toHaveBeenCalled();
+  });
+
+  it('remembers the zone it opens so the sidebar links carry it', () => {
+    mockParams = { id: '30' };
+    (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
+    render(<ZoneDetailPage />);
+    expect(mockSetSelectedZone).toHaveBeenCalledWith(30);
+  });
 });

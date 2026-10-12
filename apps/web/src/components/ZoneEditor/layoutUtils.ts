@@ -132,3 +132,60 @@ export function resolveOverlaps(
   });
   return resolved;
 }
+
+interface SlotRoom {
+  layoutX: number | null;
+  layoutY: number | null;
+  layoutZ: number | null;
+}
+
+/** Neighbour cells tried first, in order: east, west, north, south, diagonals. */
+const NEIGHBOUR_OFFSETS: ReadonlyArray<readonly [number, number]> = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+  [1, 1],
+  [-1, 1],
+  [1, -1],
+  [-1, -1],
+];
+
+/**
+ * First free grid cell on floor `z` for a newly created room. Prefers a cell
+ * next to `anchor` (the selected room), else spirals outward from it (or from
+ * the origin). Rooms without a layout count as sitting at 0,0 like the editor
+ * renders them, so a new room never lands on top of another one.
+ */
+export function findFreeGridSlot(
+  rooms: ReadonlyArray<SlotRoom>,
+  anchor: { x: number; y: number } | null,
+  z: number
+): { x: number; y: number } {
+  const taken = new Set<string>();
+  for (const r of rooms) {
+    if ((r.layoutZ ?? 0) !== z) continue;
+    taken.add(`${Math.round(r.layoutX ?? 0)}:${Math.round(r.layoutY ?? 0)}`);
+  }
+  const ax = Math.round(anchor?.x ?? 0);
+  const ay = Math.round(anchor?.y ?? 0);
+  const isFree = (x: number, y: number) => !taken.has(`${x}:${y}`);
+
+  if (anchor) {
+    for (const [dx, dy] of NEIGHBOUR_OFFSETS) {
+      if (isFree(ax + dx, ay + dy)) return { x: ax + dx, y: ay + dy };
+    }
+  } else if (isFree(0, 0)) {
+    return { x: 0, y: 0 };
+  }
+  // Expanding square rings around the anchor; always terminates because each
+  // ring has more cells than there are rooms once the ring is large enough.
+  for (let radius = 2; ; radius++) {
+    for (let dy = -radius; dy <= radius; dy++) {
+      for (let dx = -radius; dx <= radius; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== radius) continue;
+        if (isFree(ax + dx, ay + dy)) return { x: ax + dx, y: ay + dy };
+      }
+    }
+  }
+}

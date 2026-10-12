@@ -1,10 +1,7 @@
 'use client';
 
-import { CreateRoomDialog } from '@/components/rooms/CreateRoomDialog';
 import { usePermissions } from '@/hooks/use-permissions';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 const linkClass =
   'text-sm px-3 py-1 rounded transition-colors text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600';
@@ -21,6 +18,11 @@ export const CREATE_ENTITY_LINKS = [
 interface ZoneEditorHeaderActionsProps {
   /** Selected zone, or null on the world map. */
   zoneId: number | null;
+  /**
+   * Open the new-room dialog. The editor owns the dialog so it can place the
+   * new room on the canvas and select it.
+   */
+  onAddRoom: () => void;
 }
 
 /**
@@ -29,10 +31,9 @@ interface ZoneEditorHeaderActionsProps {
  */
 export function ZoneEditorHeaderActions({
   zoneId,
+  onAddRoom,
 }: ZoneEditorHeaderActionsProps) {
-  const router = useRouter();
   const { canEditZone } = usePermissions();
-  const [createRoomOpen, setCreateRoomOpen] = useState(false);
   const canCreate = zoneId != null && canEditZone(zoneId);
 
   return (
@@ -55,11 +56,7 @@ export function ZoneEditorHeaderActions({
           <span className='text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400'>
             Create
           </span>
-          <button
-            type='button'
-            className={createClass}
-            onClick={() => setCreateRoomOpen(true)}
-          >
+          <button type='button' className={createClass} onClick={onAddRoom}>
             + Room
           </button>
           {CREATE_ENTITY_LINKS.map(link => (
@@ -76,19 +73,6 @@ export function ZoneEditorHeaderActions({
       <Link href='/dashboard/zones' className={linkClass}>
         📋 All Zones
       </Link>
-      {zoneId != null && (
-        <CreateRoomDialog
-          open={createRoomOpen}
-          onOpenChange={setCreateRoomOpen}
-          zoneId={zoneId}
-          lockZone
-          onCreated={room =>
-            router.push(
-              `/dashboard/zones/editor?zone=${room.zoneId}&room=${room.id}`
-            )
-          }
-        />
-      )}
     </div>
   );
 }
