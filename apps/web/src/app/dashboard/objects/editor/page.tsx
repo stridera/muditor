@@ -30,6 +30,8 @@ import {
   isSpellItemType,
   rowsFromAbilities,
   SPELL_MIRROR_KEYS,
+  spellSavePlan,
+  stripSpellMirrorKeys,
   type SpellRow,
 } from '@/lib/objectSpells';
 import { keywordsToInput, parseKeywords } from '@/lib/keywords';
@@ -462,6 +464,9 @@ function ObjectEditorContent() {
   // Spell slots (ObjectAbilities) of potions / scrolls / wands / staves
   const [itemSpells, setItemSpells] = useState<SpellRow[]>([]);
   const [itemSpellsDirty, setItemSpellsDirty] = useState(false);
+  // Type and spell-row count as loaded, to see what a type change leaves behind
+  const [loadedType, setLoadedType] = useState<string | undefined>();
+  const [loadedSpellCount, setLoadedSpellCount] = useState(0);
   const [setObjectAbilities] = useMutation(SetObjectAbilitiesDocument);
   const { data: abilitiesData } = useQuery(GetObjectAbilitiesDocument, {
     variables: {
@@ -475,6 +480,7 @@ function ObjectEditorContent() {
     if (abilitiesData?.objectAbilities) {
       setItemSpells(rowsFromAbilities(abilitiesData.objectAbilities));
       setItemSpellsDirty(false);
+      setLoadedSpellCount(abilitiesData.objectAbilities.length);
     }
   }, [abilitiesData]);
 
@@ -523,6 +529,7 @@ function ObjectEditorContent() {
       | undefined;
     if (typedData?.object) {
       const object = typedData.object;
+      setLoadedType(object.type);
       setFormData({
         type: object.type || 'NOTHING',
         // The API returns a string[]; the TagInput edits a comma-joined string
@@ -654,6 +661,25 @@ function ObjectEditorContent() {
       return;
     }
 
+    const spellPlan = spellSavePlan({
+      isNew,
+      loadedType,
+      type: formData.type,
+      dirty: itemSpellsDirty,
+      rowCount: itemSpells.length,
+      loadedRowCount: loadedSpellCount,
+    });
+    if (
+      spellPlan === 'clear' &&
+      !window.confirm(
+        `Changing the type to ${formData.type} removes the ${loadedSpellCount} spell${
+          loadedSpellCount === 1 ? '' : 's'
+        } this object carries. Continue?`
+      )
+    ) {
+      return;
+    }
+
     try {
       // zoneId is the record key, never part of an update payload.
       const {
@@ -661,10 +687,17 @@ function ObjectEditorContent() {
         keywords,
         weaponDamageType,
         weaponElement,
+        values: formValues,
         ...fields
       } = formData;
       const saveData = {
         ...fields,
+        // The spell editor owns the spell mirror keys; never write back the
+        // copy this form loaded earlier.
+        values:
+          isSpellItemType(formData.type) || isSpellItemType(loadedType)
+            ? stripSpellMirrorKeys(formValues)
+            : formValues,
         // '' = no damage type; null clears it on update
         weaponDamageType: weaponDamageType || null,
         weaponElement: weaponElement || null,
@@ -701,23 +734,26 @@ function ObjectEditorContent() {
 
       // Spell slots are their own rows; written after the object exists and
       // has its final type (the API also refreshes the mirrored value keys).
-      if (
-        isSpellItemType(formData.type) &&
-        (itemSpellsDirty || (isNew && itemSpells.length > 0))
-      ) {
+      if (spellPlan !== 'none') {
         try {
           await setObjectAbilities({
             variables: {
               zoneId: isNew ? formZoneId : parseInt(zoneIdParam!),
               id: isNew ? createId! : parseInt(objectId!),
-              abilities: abilitiesInput(itemSpells, formData.type),
+              // 'clear': the type is no longer a spell type, drop the rows
+              abilities:
+                spellPlan === 'clear'
+                  ? []
+                  : abilitiesInput(itemSpells, formData.type),
             },
           });
         } catch (err) {
           const reason =
             err instanceof Error && err.message ? ` ${err.message}` : '';
           setGeneralError(
-            `The object was saved, but its spells were not.${reason}${
+            `The object was saved, but its spells were not ${
+              spellPlan === 'clear' ? 'removed' : 'saved'
+            }.${reason}${
               isNew
                 ? ' Reopen the object from the list and add them again.'
                 : ''

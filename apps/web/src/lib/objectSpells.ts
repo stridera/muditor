@@ -72,3 +72,43 @@ export function moveRow<T>(rows: readonly T[], from: number, to: number): T[] {
   next.splice(to, 0, row as T);
   return next;
 }
+
+/**
+ * A copy of `values` without the keys the spell editor owns. The generic
+ * object save sends this so a mirror loaded earlier can never overwrite what
+ * the spell list wrote (the API keeps the stored mirror of spell items).
+ */
+export function stripSpellMirrorKeys(
+  values: Record<string, unknown>
+): Record<string, unknown> {
+  const out = { ...values };
+  for (const key of SPELL_MIRROR_KEYS) delete out[key];
+  return out;
+}
+
+export type SpellSavePlan = 'none' | 'write' | 'clear';
+
+/**
+ * What a save must do to the object's ObjectAbilities rows:
+ * - `clear`: the type moved away from POTION/SCROLL/WAND/STAFF and rows exist.
+ * - `write`: the list was edited, a new spell item has spells, or the type
+ *   moved between spell types (the mirror and charges differ per type).
+ */
+export function spellSavePlan(args: {
+  isNew: boolean;
+  loadedType: string | undefined;
+  type: string;
+  dirty: boolean;
+  rowCount: number;
+  loadedRowCount: number;
+}): SpellSavePlan {
+  const { isNew, loadedType, type, dirty, rowCount, loadedRowCount } = args;
+  if (!isSpellItemType(type)) {
+    return !isNew && loadedRowCount > 0 ? 'clear' : 'none';
+  }
+  if (dirty || (isNew && rowCount > 0)) return 'write';
+  if (!isNew && isSpellItemType(loadedType) && loadedType !== type) {
+    return 'write';
+  }
+  return 'none';
+}

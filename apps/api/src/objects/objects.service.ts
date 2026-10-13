@@ -12,6 +12,10 @@ import {
   rethrowAsInUse,
 } from '../common/proto-references';
 import { DatabaseService } from '../database/database.service';
+import {
+  SPELL_ITEM_TYPES,
+  SPELL_MIRROR_KEYS,
+} from './object-abilities.service';
 
 @Injectable()
 export class ObjectsService {
@@ -224,10 +228,41 @@ export class ObjectsService {
     id: number,
     data: Prisma.ObjectsUpdateInput
   ): Promise<Objects> {
-    return this.database.objects.update({
-      where: { zoneId_id: { zoneId, id } },
-      data,
+    const where = { zoneId_id: { zoneId, id } };
+    const incoming = data.values;
+    const isPlain =
+      !!incoming &&
+      typeof incoming === 'object' &&
+      Object.getPrototypeOf(incoming) === Object.prototype;
+    if (!isPlain) return this.database.objects.update({ where, data });
+
+    // The spell list (ObjectAbilities) owns the mirror keys of potions,
+    // scrolls, wands and staves. A form that loaded the object earlier may
+    // carry a stale mirror, so a generic save keeps the stored one instead.
+    const existing = await this.database.objects.findUnique({
+      where,
+      select: { type: true, values: true },
     });
+    const nextType = typeof data.type === 'string' ? data.type : existing?.type;
+    if (
+      !existing ||
+      !nextType ||
+      !(SPELL_ITEM_TYPES as readonly string[]).includes(nextType)
+    ) {
+      return this.database.objects.update({ where, data });
+    }
+    const stored = (existing.values ?? {}) as Record<string, unknown>;
+    const values = { ...(incoming as Record<string, Prisma.InputJsonValue>) };
+    for (const key of SPELL_MIRROR_KEYS) {
+      delete values[key];
+      if (
+        key in stored &&
+        (SPELL_ITEM_TYPES as readonly string[]).includes(existing.type)
+      ) {
+        values[key] = stored[key] as Prisma.InputJsonValue;
+      }
+    }
+    return this.database.objects.update({ where, data: { ...data, values } });
   }
 
   async delete(zoneId: number, id: number): Promise<Objects> {

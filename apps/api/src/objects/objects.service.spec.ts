@@ -87,3 +87,58 @@ describe('ObjectsService.deleteMany', () => {
     expect(objects.deleteMany).not.toHaveBeenCalled();
   });
 });
+
+describe('ObjectsService.update spell mirror keys', () => {
+  let service: ObjectsService;
+  const objects = { update: jest.fn(), findUnique: jest.fn() };
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    objects.update.mockResolvedValue({});
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ObjectsService,
+        { provide: DatabaseService, useValue: { objects } },
+      ],
+    }).compile();
+    service = module.get(ObjectsService);
+  });
+
+  const sent = () =>
+    (objects.update.mock.calls[0] as [{ data: { values?: unknown } }])[0].data
+      .values;
+
+  it('keeps the stored mirror of a spell item over a stale form copy', async () => {
+    objects.findUnique.mockResolvedValue({
+      type: 'WAND',
+      values: { Spell: 'AB_2', Level: 30, Max_Charges: 4, Other: 1 },
+    });
+    await service.update(30, 5, {
+      type: 'WAND',
+      values: { Spell: 'AB_1', Level: 5, Max_Charges: 9, Other: 2 },
+    });
+    expect(sent()).toEqual({
+      Spell: 'AB_2',
+      Level: 30,
+      Max_Charges: 4,
+      Other: 2,
+    });
+  });
+
+  it('does not resurrect mirror keys the spell editor cleared', async () => {
+    objects.findUnique.mockResolvedValue({ type: 'POTION', values: {} });
+    await service.update(30, 5, {
+      values: { Spells: ['AB_1'], Level: 5, Other: 2 },
+    });
+    expect(sent()).toEqual({ Other: 2 });
+  });
+
+  it('leaves non-spell objects and value-less updates alone', async () => {
+    objects.findUnique.mockResolvedValue({ type: 'ARMOR', values: {} });
+    await service.update(30, 5, { values: { Level: 5 } });
+    expect(sent()).toEqual({ Level: 5 });
+    objects.update.mockClear();
+    await service.update(30, 5, { name: 'x' });
+    expect(objects.findUnique).toHaveBeenCalledTimes(1);
+  });
+});

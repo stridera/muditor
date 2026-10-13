@@ -103,7 +103,51 @@ describe('ObjectAbilitiesService.replace', () => {
     const update = tx.objects.update.mock.calls[0] as unknown as [
       { data: { values: Record<string, unknown> } },
     ];
-    expect(update[0].data.values).toEqual({ Level: 3 });
+    // Every mirror key goes with the rows, not just the one this type uses
+    expect(update[0].data.values).toEqual({});
+  });
+
+  it('an emptied list drops all stale mirror keys and keeps the rest', async () => {
+    const { service, tx } = make({
+      type: 'POTION',
+      values: {
+        Spells: ['A'],
+        Spell: 'A',
+        Level: 9,
+        Max_Charges: 2,
+        Charges_Left: 2,
+        Other: 'kept',
+      },
+    });
+    await service.replace(30, 5, []);
+    const update = tx.objects.update.mock.calls[0] as unknown as [
+      { data: { values: Record<string, unknown> } },
+    ];
+    expect(update[0].data.values).toEqual({ Other: 'kept' });
+  });
+
+  it('turning a potion into a wand does not keep the potion Spells key', async () => {
+    const { service, tx } = make({
+      type: 'WAND',
+      values: { Spells: ['OLD'], Level: 3 },
+    });
+    await service.replace(30, 5, [{ abilityId: 7, level: 12, charges: 2 }]);
+    const update = tx.objects.update.mock.calls[0] as unknown as [
+      { data: { values: Record<string, unknown> } },
+    ];
+    expect(update[0].data.values).toEqual({
+      Spell: 'AB_7',
+      Level: 12,
+      Max_Charges: 2,
+      Charges_Left: 2,
+    });
+  });
+
+  it('emptying the list of a non-spell object only deletes the rows', async () => {
+    const { service, tx } = make({ type: 'ARMOR', values: { Level: 3 } });
+    expect(await service.replace(30, 5, [])).toEqual([]);
+    expect(tx.objectAbilities.deleteMany).toHaveBeenCalled();
+    expect(tx.objects.update).not.toHaveBeenCalled();
   });
 
   it('rejects unknown abilities, other object types and missing objects', async () => {
@@ -113,7 +157,9 @@ describe('ObjectAbilitiesService.replace', () => {
       ])
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(
-      make({ type: 'ARMOR', values: {} }).service.replace(30, 5, [])
+      make({ type: 'ARMOR', values: {} }).service.replace(30, 5, [
+        { abilityId: 7, level: 1 },
+      ])
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(make(null).service.replace(30, 5, [])).rejects.toBeInstanceOf(
       NotFoundException

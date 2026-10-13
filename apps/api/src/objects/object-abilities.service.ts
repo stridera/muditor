@@ -13,6 +13,18 @@ export const SPELL_ITEM_TYPES = ['POTION', 'SCROLL', 'WAND', 'STAFF'] as const;
 /** Types that carry a per-slot charge count. */
 const CHARGED_TYPES = ['WAND', 'STAFF'];
 export const MAX_ITEM_SPELLS = 20;
+/**
+ * `Objects.values` keys the spell list owns (the importer's mirror of
+ * ObjectAbilities). A generic object save must never write them; this
+ * service rewrites them whenever the list changes.
+ */
+export const SPELL_MIRROR_KEYS = [
+  'Spells',
+  'Spell',
+  'Level',
+  'Max_Charges',
+  'Charges_Left',
+] as const;
 
 @Injectable()
 export class ObjectAbilitiesService {
@@ -51,7 +63,13 @@ export class ObjectAbilitiesService {
     if (!object) {
       throw new NotFoundException(`Object ${zoneId}:${id} does not exist`);
     }
-    if (!(SPELL_ITEM_TYPES as readonly string[]).includes(object.type)) {
+    const spellType = (SPELL_ITEM_TYPES as readonly string[]).includes(
+      object.type
+    );
+    // Emptying the list is always allowed (an object changed away from a
+    // spell type must be able to drop its leftover rows); anything else
+    // needs a spell type.
+    if (!spellType && inputs.length > 0) {
       throw new BadRequestException(
         `Only ${SPELL_ITEM_TYPES.join(', ')} objects carry spells (this one is ${object.type})`
       );
@@ -114,19 +132,25 @@ export class ObjectAbilitiesService {
         });
       }
 
+      // Not a spell type any more: the rows are gone, and the generic save
+      // already owns `values`, so leave them alone.
+      if (!spellType) return this.read(tx, zoneId, id);
+
       const values: Record<string, unknown> = {
         ...((object.values as Record<string, unknown> | null) ?? {}),
       };
+      // Drop every mirror key first so an emptied list (or a potion turned
+      // wand) never leaves stale Level / charges / Spell(s) behind.
+      for (const key of SPELL_MIRROR_KEYS) delete values[key];
       const names = inputs.map(i => plainById.get(i.abilityId)!);
       if (charged) {
         if (names.length > 0) values['Spell'] = names[0];
-        else delete values['Spell'];
         const charges = inputs[0]?.charges;
         if (charges !== undefined && charges !== null) {
           values['Max_Charges'] = charges;
           values['Charges_Left'] = charges;
         }
-      } else {
+      } else if (names.length > 0) {
         values['Spells'] = names;
       }
       if (inputs[0]) values['Level'] = inputs[0].level;
