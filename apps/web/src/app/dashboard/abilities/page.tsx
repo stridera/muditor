@@ -1186,23 +1186,7 @@ export default function AbilitiesPage() {
                   ) : abilityDetailsData.ability.effects &&
                     abilityDetailsData.ability.effects.length > 0 ? (
                     <EffectEditor
-                      initialEffects={abilityDetailsData.ability.effects
-                        .sort((a, b) => a.order - b.order)
-                        .map(effect => ({
-                          effectId:
-                            typeof effect.effectId === 'string'
-                              ? parseInt(effect.effectId, 10)
-                              : effect.effectId,
-                          overrideParams:
-                            (effect.overrideParams as Record<
-                              string,
-                              unknown
-                            >) || {},
-                          order: effect.order,
-                          trigger: effect.trigger || undefined,
-                          chancePct: effect.chancePct,
-                          condition: effect.condition || undefined,
-                        }))}
+                      initialEffects={loadStoredEffects()}
                       readOnly={true}
                       height='400px'
                     />
