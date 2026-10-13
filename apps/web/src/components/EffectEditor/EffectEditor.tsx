@@ -160,6 +160,8 @@ export function EffectEditor({
     dark: unknown;
   } | null>(null);
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
+  // JSON of the effects most recently passed to onChange (see sync effect).
+  const lastEmittedJsonRef = useRef<string | null>(null);
 
   // Fetch dropdown options for blocks
   const { data: optionsData } = useQuery(GetEffectEditorOptionsDocument);
@@ -216,6 +218,11 @@ export function EffectEditor({
   // Use JSON comparison to avoid unnecessary updates from new array references
   const initialEffectsJson = JSON.stringify(initialEffects);
   useEffect(() => {
+    // The parent echoing back what this editor just emitted (onChange ->
+    // initialEffects) is not new data. Reloading the blocks then would wipe
+    // the block being edited and close its field editor after every keystroke.
+    if (initialEffectsJson === lastEmittedJsonRef.current) return;
+    lastEmittedJsonRef.current = null;
     const parsed = JSON.parse(initialEffectsJson) as AbilityEffectOutput[];
     setEffects(parsed);
     setJsonValue(
@@ -361,6 +368,7 @@ export function EffectEditor({
 
       try {
         const generatedEffects = generateJson(changed);
+        lastEmittedJsonRef.current = JSON.stringify(generatedEffects);
         setEffects(generatedEffects);
         setJsonValue(JSON.stringify(generatedEffects, null, 2));
         setError(null);
@@ -390,6 +398,7 @@ export function EffectEditor({
       setJsonValue(newJson);
       try {
         const parsed = JSON.parse(newJson) as AbilityEffectOutput[];
+        lastEmittedJsonRef.current = JSON.stringify(parsed);
         setEffects(parsed);
         setError(null);
         onChange?.(parsed);
