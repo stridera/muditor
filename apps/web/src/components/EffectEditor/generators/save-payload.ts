@@ -57,10 +57,18 @@ export function planEffectSave(
   const originalNormalised = original
     .filter(e => e.effectId != null)
     .map(normalise);
+  // The editor numbers effects from 0; a stored list numbered from 1 (or with
+  // gaps) is the same pipeline, so compare positions rather than raw numbers.
+  const byPosition = (list: AbilityEffectSaveInput[]) =>
+    [...list]
+      .sort((a, b) => a.order - b.order)
+      .map((e, i) => ({ ...e, order: i }));
   return {
     effects,
     gateCount,
     unchanged:
-      gateCount === 0 && canonical(effects) === canonical(originalNormalised),
+      gateCount === 0 &&
+      canonical(byPosition(effects)) ===
+        canonical(byPosition(originalNormalised)),
   };
 }

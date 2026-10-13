@@ -344,6 +344,16 @@ describe('planEffectSave', () => {
     expect(plan.effects).toHaveLength(2);
   });
 
+  it('treats a pipeline numbered from 1 as unchanged after a no-op round trip', () => {
+    const original = stored.map((e, i) => ({ ...e, order: i + 1 }));
+    expect(planEffectSave(stored, original).unchanged).toBe(true);
+    const swapped = [
+      { ...stored[1]!, order: 0 },
+      { ...stored[0]!, order: 1 },
+    ];
+    expect(planEffectSave(swapped, original).unchanged).toBe(false);
+  });
+
   it('keeps condition and detects param changes', () => {
     const edited = JSON.parse(JSON.stringify(stored)) as AbilityEffectOutput[];
     edited[0]!.overrideParams['multihit'] = 4;

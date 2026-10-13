@@ -81,6 +81,32 @@ function getFieldMappingsForBlockType(
   return mapping;
 }
 
+interface DropdownLike {
+  getOptions(useCache?: boolean): Array<[unknown, string]>;
+  setOptions(options: Array<[string, string]>): void;
+}
+
+/**
+ * Stored data uses values the dropdown menus do not list (modify target
+ * "accuracy", status flag "blur", ...). Blockly silently rejects those and
+ * would show the first option instead, so add the stored value as an option.
+ */
+function ensureDropdownOption(field: unknown, value: string): void {
+  const dropdown = field as Partial<DropdownLike>;
+  if (
+    typeof dropdown.getOptions !== 'function' ||
+    typeof dropdown.setOptions !== 'function'
+  ) {
+    return;
+  }
+  const options = dropdown.getOptions(false);
+  if (options.some(([, optionValue]) => optionValue === value)) return;
+  dropdown.setOptions([
+    ...options.map(([label, optionValue]) => [label, optionValue]),
+    [value, value],
+  ] as Array<[string, string]>);
+}
+
 /**
  * Set a field value on a block, handling type conversions
  */
@@ -91,6 +117,8 @@ function setBlockField(
 ): void {
   const field = block.getField(fieldName);
   if (!field) return;
+
+  if (typeof value === 'string') ensureDropdownOption(field, value);
 
   // Handle different value types
   if (typeof value === 'boolean') {
