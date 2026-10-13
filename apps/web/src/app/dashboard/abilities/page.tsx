@@ -96,6 +96,8 @@ import {
   Trash2,
   Zap,
 } from 'lucide-react';
+import { isInsideBlocklyWidget } from './blockly-widgets';
+import { EffectsEditActions } from './effects-edit-actions';
 import { planEffectSave } from '@/components/EffectEditor/generators/save-payload';
 import { useEffect, useState } from 'react';
 import {
@@ -163,6 +165,10 @@ export default function AbilitiesPage() {
     null
   );
   const [editingEffects, setEditingEffects] = useState(false);
+  // Set by the effect editor while its state must not be saved.
+  const [effectsBlockingError, setEffectsBlockingError] = useState<
+    string | null
+  >(null);
   const [editedEffects, setEditedEffects] = useState<AbilityEffectOutput[]>([]);
   const [editingMessages, setEditingMessages] = useState(false);
   const [editedMessages, setEditedMessages] = useState<{
@@ -346,15 +352,13 @@ export default function AbilitiesPage() {
   // tooltips) are outside the dialog DOM but must not dismiss it.
   const keepOpenForBlocklyWidgets = (event: Event) => {
     // Radix dispatches this custom event on the original target.
-    const target = event.target;
-    if (
-      target instanceof Element &&
-      target.closest(
-        '.blocklyWidgetDiv, .blocklyDropDownDiv, .blocklyTooltipDiv, .blocklyContextMenu'
-      )
-    ) {
-      event.preventDefault();
-    }
+    if (isInsideBlocklyWidget(event.target)) event.preventDefault();
+  };
+
+  // Escape inside a Blockly field editor or dropdown closes that widget, not
+  // the dialog.
+  const keepOpenForBlocklyEscape = (event: KeyboardEvent) => {
+    if (isInsideBlocklyWidget(event.target)) event.preventDefault();
   };
 
   const handleCreate = () => {
@@ -396,18 +400,25 @@ export default function AbilitiesPage() {
         condition: effect.condition || undefined,
       }));
 
+  const hasUnsavedEffectEdits = () =>
+    editingEffects &&
+    (effectsBlockingError !== null ||
+      !planEffectSave(editedEffects, loadStoredEffects()).unchanged);
+
   const handleEditEffects = () => {
+    setEffectsBlockingError(null);
     setEditedEffects(loadStoredEffects());
     setEditingEffects(true);
   };
 
   const handleCancelEditEffects = () => {
+    setEffectsBlockingError(null);
     setEditingEffects(false);
     setEditedEffects([]);
   };
 
   const handleSaveEffects = () => {
-    if (!viewingAbilityId) return;
+    if (!viewingAbilityId || effectsBlockingError) return;
     const plan = planEffectSave(editedEffects, loadStoredEffects());
     if (plan.gateCount > 0) {
       // Gates have no effectId and cannot be stored; never drop them silently.
@@ -959,6 +970,13 @@ export default function AbilitiesPage() {
         open={!!viewingAbilityId}
         onOpenChange={open => {
           if (!open) {
+            if (
+              hasUnsavedEffectEdits() &&
+              !window.confirm('Discard your unsaved effect changes?')
+            ) {
+              return;
+            }
+            setEffectsBlockingError(null);
             setViewingAbilityId(null);
             setEditingEffects(false);
             setEditedEffects([]);
@@ -971,6 +989,7 @@ export default function AbilitiesPage() {
           forceOverlay
           className='max-w-4xl max-h-[90vh] overflow-y-auto'
           onInteractOutside={keepOpenForBlocklyWidgets}
+          onEscapeKeyDown={keepOpenForBlocklyEscape}
         >
           {loadingDetails ? (
             <>
@@ -1152,34 +1171,19 @@ export default function AbilitiesPage() {
                       </Button>
                     )}
                     {editingEffects && (
-                      <div className='flex gap-2'>
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          onClick={handleCancelEditEffects}
-                          disabled={savingEffects}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          size='sm'
-                          onClick={handleSaveEffects}
-                          disabled={savingEffects}
-                        >
-                          {savingEffects ? (
-                            <Loader2 className='h-4 w-4 mr-2 animate-spin' />
-                          ) : (
-                            <CheckCircle className='h-4 w-4 mr-2' />
-                          )}
-                          Save Effects
-                        </Button>
-                      </div>
+                      <EffectsEditActions
+                        blockingError={effectsBlockingError}
+                        saving={savingEffects}
+                        onCancel={handleCancelEditEffects}
+                        onSave={handleSaveEffects}
+                      />
                     )}
                   </div>
                   {editingEffects ? (
                     <EffectEditor
                       initialEffects={editedEffects}
                       onChange={setEditedEffects}
+                      onValidityChange={setEffectsBlockingError}
                       readOnly={false}
                       height='500px'
                     />

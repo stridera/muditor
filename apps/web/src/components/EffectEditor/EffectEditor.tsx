@@ -44,6 +44,14 @@ export interface EffectEditorProps {
   initialEffects?: AbilityEffectOutput[];
   /** Called when effects change */
   onChange?: (effects: AbilityEffectOutput[]) => void;
+  /**
+   * Called whenever the editor's blocking error changes: a message while the
+   * editor holds state that must not be saved (the generator threw, the JSON
+   * is invalid, or the blocks failed to load), null when it is safe to save.
+   * While non-null, onChange does not fire and the last emitted effects are
+   * stale.
+   */
+  onValidityChange?: (blockingError: string | null) => void;
   /** Called when save is requested */
   onSave?: (effects: AbilityEffectOutput[]) => void;
   /** Read-only mode for viewing */
@@ -133,6 +141,7 @@ const darkWorkspaceConfig = {
 export function EffectEditor({
   initialEffects = [],
   onChange,
+  onValidityChange,
   onSave,
   readOnly = false,
   height = '500px',
@@ -147,6 +156,10 @@ export function EffectEditor({
   );
   const [effects, setEffects] = useState<AbilityEffectOutput[]>(initialEffects);
   const [error, setError] = useState<string | null>(null);
+  // Set while the editor holds state that must not be saved (see
+  // onValidityChange). Distinct from `error`, which also carries the
+  // non-blocking results of the Validate button.
+  const [blockingError, setBlockingError] = useState<string | null>(null);
   const [blocksRegistered, setBlocksRegistered] = useState(false);
   // The live Blockly workspace, and the workspace the current `effects` were
   // last loaded into. A workspace is replaced whenever the theme or read-only
@@ -162,6 +175,17 @@ export function EffectEditor({
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
   // JSON of the effects most recently passed to onChange (see sync effect).
   const lastEmittedJsonRef = useRef<string | null>(null);
+  // Set when loading the effects into a workspace threw partway: the
+  // workspace holds only some of the effects, so its changes are not emitted.
+  const loadFailedRef = useRef<Blockly.WorkspaceSvg | null>(null);
+  const onValidityChangeRef = useRef(onValidityChange);
+  onValidityChangeRef.current = onValidityChange;
+
+  useEffect(() => {
+    onValidityChangeRef.current?.(blockingError);
+  }, [blockingError]);
+  // The editor going away (e.g. leaving edit mode) leaves nothing to block.
+  useEffect(() => () => onValidityChangeRef.current?.(null), []);
 
   // Fetch dropdown options for blocks
   const { data: optionsData } = useQuery(GetEffectEditorOptionsDocument);
@@ -223,6 +247,11 @@ export function EffectEditor({
     // the block being edited and close its field editor after every keystroke.
     if (initialEffectsJson === lastEmittedJsonRef.current) return;
     lastEmittedJsonRef.current = null;
+    // New data replaces whatever was wrong with the old; the reload below
+    // reports a load failure again if there still is one.
+    loadFailedRef.current = null;
+    setBlockingError(null);
+    setError(null);
     const parsed = JSON.parse(initialEffectsJson) as AbilityEffectOutput[];
     setEffects(parsed);
     setJsonValue(
@@ -337,8 +366,21 @@ export function EffectEditor({
     ) {
       try {
         loadEffectsIntoWorkspace(workspace, effects);
+        if (loadFailedRef.current !== null) {
+          loadFailedRef.current = null;
+          setBlockingError(null);
+          setError(null);
+        }
       } catch (err) {
         console.error('Failed to load effects into workspace:', err);
+        // Part of the effects never made it into the workspace. Emitting its
+        // next change would hand the parent a truncated list.
+        loadFailedRef.current = workspace;
+        const message = `Failed to load effects into the editor: ${
+          err instanceof Error ? err.message : String(err)
+        }. Saving is disabled; edit the JSON view or reopen the ability.`;
+        setError(message);
+        setBlockingError(message);
       }
       setLoadedWorkspace(workspace);
     }
@@ -365,6 +407,9 @@ export function EffectEditor({
       if (loadedWorkspace !== changed) {
         return;
       }
+      if (loadFailedRef.current === changed) {
+        return;
+      }
 
       try {
         const generatedEffects = generateJson(changed);
@@ -372,12 +417,14 @@ export function EffectEditor({
         setEffects(generatedEffects);
         setJsonValue(JSON.stringify(generatedEffects, null, 2));
         setError(null);
+        setBlockingError(null);
         onChange?.(generatedEffects);
       } catch (err) {
         console.error('Error generating effects:', err);
-        setError(
-          err instanceof Error ? err.message : 'Failed to generate effects'
-        );
+        const message =
+          err instanceof Error ? err.message : 'Failed to generate effects';
+        setError(message);
+        setBlockingError(message);
       }
     },
     [onChange, loadedWorkspace]
@@ -398,12 +445,16 @@ export function EffectEditor({
       setJsonValue(newJson);
       try {
         const parsed = JSON.parse(newJson) as AbilityEffectOutput[];
+        if (!Array.isArray(parsed)) throw new Error('Effects must be an array');
         lastEmittedJsonRef.current = JSON.stringify(parsed);
         setEffects(parsed);
         setError(null);
+        loadFailedRef.current = null;
+        setBlockingError(null);
         onChange?.(parsed);
       } catch {
         setError('Invalid JSON format');
+        setBlockingError('Invalid JSON format');
       }
     },
     [onChange]
@@ -411,21 +462,22 @@ export function EffectEditor({
 
   // Handle save
   const handleSave = useCallback(() => {
+    if (blockingError) return;
     onSave?.(effects);
-  }, [effects, onSave]);
+  }, [blockingError, effects, onSave]);
 
   // Handle validation
   const handleValidate = useCallback(() => {
     const result = validate();
     if (result.valid) {
-      setError(null);
+      setError(blockingError);
       return true;
     } else {
       const errorMessages = formatValidationErrors(result.errors);
       setError(errorMessages.join('\n'));
       return false;
     }
-  }, [validate]);
+  }, [validate, blockingError]);
 
   if (!blocksRegistered || !toolbox) {
     return (
