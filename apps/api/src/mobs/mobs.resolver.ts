@@ -53,7 +53,9 @@ export class MobsResolver {
     @Args('levelMin', { type: () => Int, nullable: true }) levelMin?: number,
     @Args('levelMax', { type: () => Int, nullable: true }) levelMax?: number,
     @Args('sortBy', { type: () => String, nullable: true }) sortBy?: string,
-    @Args('sortDir', { type: () => String, nullable: true }) sortDir?: string
+    @Args('sortDir', { type: () => String, nullable: true }) sortDir?: string,
+    @Args('aggressive', { type: () => Boolean, nullable: true })
+    aggressive?: boolean
   ): Promise<MobDto[]> {
     const params: Parameters<MobsService['findAll']>[0] = {
       hideGodZones: hidesGodZones(user ?? null),
@@ -61,6 +63,7 @@ export class MobsResolver {
       search: search?.trim().slice(0, 200),
       levelMin,
       levelMax,
+      aggressive,
       sortBy,
       sortDir,
     };
@@ -107,7 +110,9 @@ export class MobsResolver {
     @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
     @Args('search', { type: () => String, nullable: true }) search?: string,
     @Args('levelMin', { type: () => Int, nullable: true }) levelMin?: number,
-    @Args('levelMax', { type: () => Int, nullable: true }) levelMax?: number
+    @Args('levelMax', { type: () => Int, nullable: true }) levelMax?: number,
+    @Args('aggressive', { type: () => Boolean, nullable: true })
+    aggressive?: boolean
   ): Promise<number> {
     return this.mobsService.countFiltered({
       hideGodZones: hidesGodZones(user ?? null),
@@ -115,6 +120,7 @@ export class MobsResolver {
       search: search?.trim().slice(0, 200),
       levelMin,
       levelMax,
+      aggressive,
     });
   }
 

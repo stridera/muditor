@@ -76,6 +76,7 @@ query MobsPage(
   $search: String
   $levelMin: Int
   $levelMax: Int
+  $aggressive: Boolean
   $sortBy: String
   $sortDir: String
   $skip: Int
@@ -86,6 +87,7 @@ query MobsPage(
     search: $search
     levelMin: $levelMin
     levelMax: $levelMax
+    aggressive: $aggressive
     sortBy: $sortBy
     sortDir: $sortDir
     skip: $skip
@@ -120,6 +122,7 @@ query MobsPage(
     search: $search
     levelMin: $levelMin
     levelMax: $levelMax
+    aggressive: $aggressive
   )
 }
 

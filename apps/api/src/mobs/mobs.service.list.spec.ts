@@ -44,6 +44,34 @@ describe('MobsService server-side list filtering', () => {
     expect(query.where.AND[1].OR).toContainEqual({ id: 45 });
   });
 
+  it('filters aggressive mobs by a real aggression formula, list and count alike', async () => {
+    const { service, db } = setup();
+    const yes = { aggressive: true, hideGodZones: false };
+    await service.findAll(yes);
+    await service.countFiltered(yes);
+    const where = db.mobs.findMany.mock.calls[0]![0].where;
+    expect(where.AND).toEqual([
+      {
+        aggressionFormula: { not: null },
+        NOT: { aggressionFormula: { in: ['', 'false'] } },
+      },
+    ]);
+    expect(db.mobs.count).toHaveBeenCalledWith({ where });
+
+    await service.findAll({ aggressive: false });
+    expect(db.mobs.findMany.mock.calls[1]![0].where.AND).toEqual([
+      {
+        OR: [
+          { aggressionFormula: null },
+          { aggressionFormula: { in: ['', 'false'] } },
+        ],
+      },
+    ]);
+
+    await service.findAll({ aggressive: null });
+    expect(db.mobs.findMany.mock.calls[2]![0].where).toEqual({});
+  });
+
   it('sorts by the colour-free name and ignores unknown columns', async () => {
     const { service, db } = setup();
     await service.findAll({ sortBy: 'name' });

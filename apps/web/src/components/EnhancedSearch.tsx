@@ -327,24 +327,63 @@ const EnhancedSearch = forwardRef<EnhancedSearchRef, EnhancedSearchProps>(
                     </select>
                   )}
 
-                  {option.type === 'boolean' && (
-                    <label className='flex items-center text-sm'>
-                      <input
-                        type='checkbox'
-                        checked={Boolean(filters.customFilters?.[option.key])}
-                        onChange={e =>
-                          updateFilters({
-                            customFilters: {
-                              ...filters.customFilters,
-                              [option.key]: e.target.checked || undefined,
-                            },
-                          })
-                        }
-                        className='mr-2 rounded border-border text-primary focus:ring-primary'
-                      />
-                      Enable {option.label}
-                    </label>
-                  )}
+                  {option.type === 'boolean' &&
+                    (() => {
+                      // Tri-state: unset -> on (true) -> off (false) -> unset.
+                      // "off" is an active filter, so it must not look unset.
+                      const raw = filters.customFilters?.[option.key];
+                      const state: 'on' | 'off' | 'unset' =
+                        raw === true || raw === 'true'
+                          ? 'on'
+                          : raw === false || raw === 'false'
+                            ? 'off'
+                            : 'unset';
+                      const next =
+                        state === 'unset'
+                          ? true
+                          : state === 'on'
+                            ? false
+                            : undefined;
+                      return (
+                        <button
+                          type='button'
+                          role='checkbox'
+                          aria-checked={
+                            state === 'on'
+                              ? 'true'
+                              : state === 'off'
+                                ? 'mixed'
+                                : 'false'
+                          }
+                          data-state={state}
+                          onClick={() =>
+                            updateFilters({
+                              customFilters: {
+                                ...filters.customFilters,
+                                [option.key]: next,
+                              },
+                            })
+                          }
+                          className='flex items-center text-sm'
+                        >
+                          <span
+                            aria-hidden='true'
+                            className={`mr-2 inline-flex h-4 w-4 items-center justify-center rounded border text-xs leading-none ${
+                              state === 'on'
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : state === 'off'
+                                  ? 'border-destructive bg-destructive/10 text-destructive'
+                                  : 'border-border'
+                            }`}
+                          >
+                            {state === 'on' ? '✓' : state === 'off' ? '✕' : ''}
+                          </span>
+                          {state === 'off'
+                            ? `${option.label}: No`
+                            : `Enable ${option.label}`}
+                        </button>
+                      );
+                    })()}
                 </div>
               ))}
             </div>

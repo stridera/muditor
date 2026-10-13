@@ -15,6 +15,11 @@ export interface MobListFilter {
   search?: string | null | undefined;
   levelMin?: number | null | undefined;
   levelMax?: number | null | undefined;
+  /**
+   * true = mobs that attack on sight (a non-empty aggression formula other than
+   * `false`, which is how the game decides); false = the rest; null = either.
+   */
+  aggressive?: boolean | null | undefined;
   /** Omit mobs in god zones (public readers below IMMORTAL). */
   hideGodZones?: boolean | undefined;
 }
@@ -42,6 +47,27 @@ function mobOrderBy(
   return order;
 }
 
+/** Formulas the game treats as "never aggressive" (see aggression.rs). */
+const NON_AGGRESSIVE_FORMULAS = ['', 'false'];
+
+/**
+ * Aggressive = the mob has an aggression_formula that is not blank/`false`.
+ * (There is no AGGRESSIVE behavior flag in the schema; the formula is the only source.)
+ */
+export function aggressiveWhere(aggressive: boolean): Prisma.MobsWhereInput {
+  return aggressive
+    ? {
+        aggressionFormula: { not: null },
+        NOT: { aggressionFormula: { in: NON_AGGRESSIVE_FORMULAS } },
+      }
+    : {
+        OR: [
+          { aggressionFormula: null },
+          { aggressionFormula: { in: NON_AGGRESSIVE_FORMULAS } },
+        ],
+      };
+}
+
 @Injectable()
 export class MobsService {
   constructor(private readonly database: DatabaseService) {}
@@ -67,6 +93,7 @@ export class MobsService {
         };
       }
     );
+    if (filter.aggressive != null) and.push(aggressiveWhere(filter.aggressive));
     const level = intRange(filter.levelMin, filter.levelMax);
     return {
       ...(filter.zoneId != null && { zoneId: filter.zoneId }),

@@ -11,6 +11,7 @@ import {
   type MobsPageQueryVariables,
 } from '@/generated/graphql';
 import {
+  boolFilter,
   mobFilterVars,
   DEFAULT_PAGE_SIZE,
   pageSizeFrom,
@@ -137,6 +138,7 @@ function MobsContent() {
       search: debouncedSearch,
       levelMin,
       levelMax,
+      aggressive: boolFilter(searchFilters, 'aggressive'),
       sortBy,
       sortDir: sortOrder,
       skip: (currentPage - 1) * itemsPerPage,
@@ -618,6 +620,11 @@ function MobsContent() {
         showLevelFilter={true}
         presets={createMobPresets()}
         customFilterOptions={[
+          {
+            key: 'aggressive',
+            label: 'Aggressive Mobs',
+            type: 'boolean',
+          },
           {
             key: 'isHighLevel',
             label: 'High Level Mobs',
