@@ -24,12 +24,14 @@ import {
 } from 'reactflow';
 import ReactFlow, {
   Background,
+  ConnectionMode,
   Controls,
   MiniMap,
   useEdgesState,
   useNodesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { exitFromConnection } from './exit-connection';
 import {
   gridToPixels,
   gridToPixelsY,
@@ -87,15 +89,6 @@ const ROOM_SIZE = 180; // Room dimensions (rooms are 180x180px)
 const PORTAL_SIZE = 80; // Portal dimensions (minWidth: 80px, roughly square)
 const PORTAL_OFFSET = 150; // Distance from room center to portal center (increased for padding/content)
 
-/** Source-handle id on a room node -> exit direction. */
-const HANDLE_DIRECTIONS: Record<string, string> = {
-  top: 'NORTH',
-  bottom: 'SOUTH',
-  left: 'WEST',
-  right: 'EAST',
-  up: 'UP',
-  down: 'DOWN',
-};
 const OPPOSITE_DIRECTIONS: Record<string, string> = {
   NORTH: 'SOUTH',
   SOUTH: 'NORTH',
@@ -2705,14 +2698,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   const handleConnect = useCallback(
     async (connection: Connection) => {
       if (!isEditing) return;
-      const direction = connection.sourceHandle
-        ? HANDLE_DIRECTIONS[connection.sourceHandle]
-        : undefined;
-      const fromId = parseInt(connection.source ?? '', 10);
-      const toId = parseInt(connection.target ?? '', 10);
-      if (!direction || isNaN(fromId) || isNaN(toId) || activeZoneId == null) {
-        return;
-      }
+      const requested = exitFromConnection(connection);
+      if (!requested || activeZoneId == null) return;
+      const { fromId, toId, direction } = requested;
       if (fromId === toId) {
         toast.error('An exit cannot lead back to the same room.');
         return;
@@ -3047,6 +3035,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           onMove={(_, vp) => updateViewportThrottled(vp)}
           elementsSelectable={viewMode === 'zone' && isFullyInteractive}
           nodesConnectable={isEditing && isFullyInteractive}
+          connectionMode={ConnectionMode.Loose}
           onConnect={handleConnect}
           nodesFocusable={isFullyInteractive}
           onNodeClick={(_, node) => {
