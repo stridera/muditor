@@ -35,4 +35,10 @@ describe('TriggersResolver guards', () => {
       expect.arrayContaining(['zoneId', 'mobZoneId', 'objectZoneId'])
     );
   });
+
+  it('lineCount counts non-blank script lines', () => {
+    const resolver = new TriggersResolver({} as never);
+    expect(resolver.lineCount({ commands: 'a\n\n  \nb\n' })).toBe(2);
+    expect(resolver.lineCount({ commands: '' })).toBe(0);
+  });
 });

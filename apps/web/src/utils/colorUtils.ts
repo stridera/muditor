@@ -163,8 +163,9 @@ const COLOR_MAP: Record<string, string> = {
   blue: 'text-blue-500',
   magenta: 'text-magenta-500',
   cyan: 'text-cyan-500',
-  white: 'text-white',
-  black: 'text-black',
+  // Pure black / white vanish on one of the two themes; flip with the theme
+  white: 'text-gray-700 dark:text-white',
+  black: 'text-black dark:text-gray-300',
   gray: 'text-gray-500',
 };
 

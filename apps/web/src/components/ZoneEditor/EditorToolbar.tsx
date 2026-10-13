@@ -51,7 +51,7 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
   onAddRoom,
 }) => {
   return (
-    <div className='flex items-center gap-2 p-2 border-b bg-gray-50 dark:bg-gray-900 dark:border-gray-700'>
+    <div className='flex flex-wrap items-center gap-2 p-2 border-b bg-gray-50 dark:bg-gray-900 dark:border-gray-700'>
       <div className='flex items-center rounded border border-gray-200 dark:border-gray-700 overflow-hidden'>
         <button
           className={`px-3 py-1 text-xs ${

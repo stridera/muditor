@@ -637,12 +637,12 @@ function MobEditorContent() {
 
       {/* Tabs */}
       <div className='mb-6'>
-        <nav className='flex space-x-8' aria-label='Tabs'>
+        <nav className='flex flex-wrap gap-x-6 gap-y-1' aria-label='Tabs'>
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'

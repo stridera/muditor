@@ -22,7 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { gql } from '@/generated/gql';
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useApolloClient, useQuery, useMutation } from '@apollo/client/react';
 import {
   AlertTriangle,
   ArrowDown,
@@ -50,7 +50,7 @@ const GET_TRIGGERS = gql(`
       attachType
       numArgs
       argList
-      commands
+      lineCount
       flags
       needsReview
       syntaxError
@@ -58,6 +58,29 @@ const GET_TRIGGERS = gql(`
       updatedAt
       createdBy
       updatedBy
+    }
+  }
+`);
+
+// The list only carries line counts: the Lua source of every trigger is
+// several MB. Source is fetched for one script when it is opened, and for
+// all of them only while a search term needs to look inside the scripts.
+const GET_TRIGGER_SOURCE = gql(`
+  query GetTriggerSourceForScriptsPage($zoneId: Int!, $id: Int!) {
+    trigger(zoneId: $zoneId, id: $id) {
+      id
+      zoneId
+      commands
+    }
+  }
+`);
+
+const GET_ALL_TRIGGER_SOURCES = gql(`
+  query GetAllTriggerSourcesForScriptsSearch {
+    triggers {
+      id
+      zoneId
+      commands
     }
   }
 `);
@@ -116,7 +139,9 @@ interface TriggerData {
   attachType: string;
   numArgs: number;
   argList: string[];
-  commands: string;
+  lineCount: number;
+  /** Only present on the script being edited. */
+  commands?: string;
   flags: string[];
   needsReview: boolean;
   syntaxError?: string | null;
@@ -144,17 +169,13 @@ const convertTriggerToScript = (trigger: TriggerData): Script => {
     attachType: trigger.attachType,
     numArgs: trigger.numArgs,
     argList: trigger.argList?.join(', '),
-    commands: trigger.commands,
+    commands: trigger.commands ?? '',
     variables: {},
     flags: trigger.flags,
   };
   if (trigger.zoneId != null) script.zoneId = trigger.zoneId;
   return script;
 };
-
-function getLineCount(commands: string): number {
-  return commands.split('\n').filter(l => l.trim().length > 0).length;
-}
 
 function getAttachmentLabel(trigger: TriggerData): string {
   return `Zone ${trigger.zoneId}`;
@@ -207,7 +228,20 @@ function ScriptsPageContent() {
   const [sortKey, setSortKey] = useState<SortKey>('id');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
+  const client = useApolloClient();
   const { data, loading, error, refetch } = useQuery(GET_TRIGGERS);
+  // Script source is only downloaded once a search needs to look inside it.
+  const searchingSource = searchTerm.trim().length >= 2;
+  const { data: sourceData } = useQuery(GET_ALL_TRIGGER_SOURCES, {
+    skip: !searchingSource,
+  });
+  const sourceByKey = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const t of sourceData?.triggers ?? []) {
+      map.set(`${t.zoneId}-${t.id}`, t.commands.toLowerCase());
+    }
+    return map;
+  }, [sourceData]);
   const [createTrigger] = useMutation(CREATE_TRIGGER);
   const [updateTrigger] = useMutation(UPDATE_TRIGGER);
   const [deleteTrigger] = useMutation(DELETE_TRIGGER);
@@ -219,7 +253,10 @@ function ScriptsPageContent() {
     return triggers.filter(trigger => {
       const matchesSearch =
         trigger.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        trigger.commands.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (sourceByKey
+          .get(`${trigger.zoneId}-${trigger.id}`)
+          ?.includes(searchTerm.toLowerCase()) ??
+          false) ||
         trigger.id.toString().includes(searchTerm) ||
         trigger.flags.some(f =>
           f.toLowerCase().includes(searchTerm.toLowerCase())
@@ -232,7 +269,7 @@ function ScriptsPageContent() {
         (filterReview === 'reviewed' && !trigger.needsReview);
       return matchesSearch && matchesType && matchesReview;
     });
-  }, [triggers, searchTerm, filterType, filterReview]);
+  }, [triggers, searchTerm, filterType, filterReview, sourceByKey]);
 
   const sortedTriggers = useMemo(() => {
     const sorted = [...filteredTriggers];
@@ -255,7 +292,7 @@ function ScriptsPageContent() {
             getAttachmentLabel(a).localeCompare(getAttachmentLabel(b)) * dir
           );
         case 'lines':
-          return (getLineCount(a.commands) - getLineCount(b.commands)) * dir;
+          return (a.lineCount - b.lineCount) * dir;
         case 'updatedAt':
           return (
             (new Date(a.updatedAt).getTime() -
@@ -301,10 +338,22 @@ function ScriptsPageContent() {
     setIsEditing(true);
   };
 
-  const handleEditScript = (trigger: TriggerData) => {
-    setSelectedTrigger(trigger);
-    setIsCreating(false);
-    setIsEditing(true);
+  const handleEditScript = async (trigger: TriggerData) => {
+    try {
+      const { data: source } = await client.query({
+        query: GET_TRIGGER_SOURCE,
+        variables: { zoneId: trigger.zoneId, id: trigger.id },
+        fetchPolicy: 'network-only',
+      });
+      setSelectedTrigger({
+        ...trigger,
+        commands: source?.trigger.commands ?? '',
+      });
+      setIsCreating(false);
+      setIsEditing(true);
+    } catch (err) {
+      toast.error(`Could not open the script: ${extractErrorMessage(err)}`);
+    }
   };
 
   const handleSaveScript = async (script: Partial<Script>) => {
@@ -659,7 +708,7 @@ function ScriptsPageContent() {
                     {getAttachmentLabel(trigger)}
                   </TableCell>
                   <TableCell className='text-xs text-muted-foreground tabular-nums'>
-                    {getLineCount(trigger.commands)}
+                    {trigger.lineCount}
                   </TableCell>
                   <TableCell className='text-xs text-muted-foreground'>
                     {new Date(trigger.updatedAt).toLocaleDateString()}

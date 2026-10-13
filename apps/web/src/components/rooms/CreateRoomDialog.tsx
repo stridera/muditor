@@ -83,6 +83,8 @@ export function CreateRoomDialog({
   const [idTouched, setIdTouched] = useState(false);
   const [serverIdError, setServerIdError] = useState<string | null>(null);
   const [name, setName] = useState('');
+  // Only nag about an empty name after the user has been in the field
+  const [nameTouched, setNameTouched] = useState(false);
   const [sector, setSector] = useState<Sector>('STRUCTURE');
   const [description, setDescription] = useState(DEFAULT_ROOM_DESCRIPTION);
 
@@ -94,6 +96,7 @@ export function CreateRoomDialog({
     setIdTouched(false);
     setServerIdError(null);
     setName('');
+    setNameTouched(false);
     setSector('STRUCTURE');
     setDescription(DEFAULT_ROOM_DESCRIPTION);
   }, [open, zoneId]);
@@ -233,12 +236,16 @@ export function CreateRoomDialog({
             <Input
               id='create-room-name'
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={e => {
+                setNameTouched(true);
+                setName(e.target.value);
+              }}
+              onBlur={() => setNameTouched(true)}
               placeholder='e.g. The Rusty Tankard'
               autoFocus
-              aria-invalid={trimmedName.length === 0}
+              aria-invalid={nameTouched && trimmedName.length === 0}
             />
-            {trimmedName.length === 0 && (
+            {nameTouched && trimmedName.length === 0 && (
               <p className='text-xs text-muted-foreground'>Name is required</p>
             )}
           </div>

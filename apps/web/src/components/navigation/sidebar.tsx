@@ -94,12 +94,26 @@ export function Sidebar() {
   const openReports = openReportsData?.reportOpenCount ?? 0;
 
   // Collapse state
-  const [collapsed, setCollapsed] = useState(() => {
+  const [userCollapsed, setCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('muditor-sidebar-collapsed') === 'true';
     }
     return false;
   });
+  // Tablet widths (md up to lg): the docked sidebar is icons only so the
+  // page keeps its width; the toggle returns at lg. Phones use the overlay.
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const query = window.matchMedia(
+      '(min-width: 768px) and (max-width: 1023px)'
+    );
+    const update = () => setNarrow(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  const collapsed = userCollapsed || narrow;
 
   // Mobile overlay - listen for external trigger
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -149,8 +163,8 @@ export function Sidebar() {
 
   // Persist collapse state
   useEffect(() => {
-    localStorage.setItem('muditor-sidebar-collapsed', String(collapsed));
-  }, [collapsed]);
+    localStorage.setItem('muditor-sidebar-collapsed', String(userCollapsed));
+  }, [userCollapsed]);
 
   // Sync viewMode to localStorage and dispatch event
   useEffect(() => {
@@ -484,10 +498,11 @@ export function Sidebar() {
         <Button
           variant='ghost'
           size='sm'
-          onClick={() => setCollapsed(!collapsed)}
-          className='h-8 w-8 p-0 hidden md:flex hover:bg-accent'
+          onClick={() => setCollapsed(!userCollapsed)}
+          aria-label={userCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className='h-8 w-8 p-0 hidden lg:flex hover:bg-accent'
         >
-          {collapsed ? (
+          {userCollapsed ? (
             <ChevronRight className='h-4 w-4' />
           ) : (
             <ChevronLeft className='h-4 w-4' />

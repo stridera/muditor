@@ -34,10 +34,16 @@ import {
   ColoredTextInline,
 } from '@/components/ColoredTextViewer';
 import { HelpCategorySelect } from './category-select';
+import { helpPlaceholders } from './placeholders';
 import { parseSeeAlso } from './see-also';
 import { usePermissions } from '@/hooks/use-permissions';
 import { gql } from '@apollo/client';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
+import {
+  useApolloClient,
+  useLazyQuery,
+  useMutation,
+  useQuery,
+} from '@apollo/client/react';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -57,7 +63,6 @@ const GET_HELP_ENTRIES = gql`
       id
       keywords
       title
-      content
       minLevel
       category
       usage
@@ -79,6 +84,24 @@ const SEARCH_HELP = gql`
       id
       keywords
       title
+      minLevel
+      category
+      usage
+      duration
+      sphere
+      classes
+      sourceFile
+    }
+  }
+`;
+
+// Lists leave the (long) body out; it is fetched when an entry is opened or edited.
+const GET_HELP_ENTRY = gql`
+  query GetHelpEntryPage($id: ID!) {
+    helpEntry(id: $id) {
+      id
+      keywords
+      title
       content
       minLevel
       category
@@ -87,6 +110,8 @@ const SEARCH_HELP = gql`
       sphere
       classes
       sourceFile
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -160,14 +185,17 @@ type HelpEntry = {
   updatedAt?: string;
 };
 
+/** A list row: everything but the body. */
+type HelpEntrySummary = Omit<HelpEntry, 'content'> & { content?: string };
+
 type HelpEntriesQueryResult = {
-  helpEntries: HelpEntry[];
+  helpEntries: HelpEntrySummary[];
   helpEntriesCount: number;
   helpCategories: string[];
 };
 
 type SearchHelpQueryResult = {
-  searchHelp: HelpEntry[];
+  searchHelp: HelpEntrySummary[];
 };
 
 type HelpFormData = {
@@ -262,6 +290,7 @@ export default function HelpPage() {
   const [formData, setFormData] = useState<HelpFormData>(defaultFormData);
   const [historyStack, setHistoryStack] = useState<HelpEntry[]>([]);
 
+  const apolloClient = useApolloClient();
   const { data, loading, error, refetch } = useQuery<HelpEntriesQueryResult>(
     GET_HELP_ENTRIES,
     {
@@ -332,23 +361,57 @@ export default function HelpPage() {
 
   const entries = useMemo(() => {
     if (searchQuery && searchData?.searchHelp) {
-      return searchData.searchHelp as HelpEntry[];
+      return searchData.searchHelp as HelpEntrySummary[];
     }
-    return (data?.helpEntries as HelpEntry[]) || [];
+    return (data?.helpEntries as HelpEntrySummary[]) || [];
   }, [data, searchData, searchQuery]);
 
   const categories = useMemo(() => {
     return (data?.helpCategories as string[]) || [];
   }, [data]);
 
-  const handleEntryClick = (entry: HelpEntry) => {
-    setHistoryStack([]); // Clear history when opening from list
-    setSelectedEntry(entry);
-    setIsDetailsOpen(true);
+  /** The row with its body; lists do not carry it. */
+  const withContent = async (entry: HelpEntrySummary): Promise<HelpEntry> => {
+    if (entry.content !== undefined) return entry as HelpEntry;
+    const { data: full } = await apolloClient.query<{
+      helpEntry: HelpEntry;
+    }>({
+      query: GET_HELP_ENTRY,
+      variables: { id: entry.id },
+      fetchPolicy: 'network-only',
+    });
+    return full?.helpEntry ?? { ...entry, content: '' };
   };
 
-  const handleEditClick = (entry: HelpEntry, e: React.MouseEvent) => {
+  const reportLoadFailure = (err: unknown) => {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    setErrorMessage(`Could not load the help entry: ${message}`);
+    setTimeout(() => setErrorMessage(''), 5000);
+  };
+
+  const handleEntryClick = async (entry: HelpEntrySummary) => {
+    try {
+      const full = await withContent(entry);
+      setHistoryStack([]); // Clear history when opening from list
+      setSelectedEntry(full);
+      setIsDetailsOpen(true);
+    } catch (err) {
+      reportLoadFailure(err);
+    }
+  };
+
+  const handleEditClick = async (
+    summary: HelpEntrySummary,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
+    let entry: HelpEntry;
+    try {
+      entry = await withContent(summary);
+    } catch (err) {
+      reportLoadFailure(err);
+      return;
+    }
     setEditingEntry(entry);
     setFormData({
       keywords: entry.keywords.join(', '),
@@ -363,9 +426,9 @@ export default function HelpPage() {
     setIsEditOpen(true);
   };
 
-  const handleDeleteClick = (entry: HelpEntry, e: React.MouseEvent) => {
+  const handleDeleteClick = (entry: HelpEntrySummary, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedEntry(entry);
+    setSelectedEntry({ ...entry, content: entry.content ?? '' });
     setIsDeleteOpen(true);
   };
 
@@ -471,6 +534,7 @@ export default function HelpPage() {
 
   const canEdit = isBuilder || isCoder;
   const canDelete = isCoder;
+  const ph = helpPlaceholders(formData.category);
 
   if (loading) {
     return (
@@ -578,7 +642,7 @@ export default function HelpPage() {
           </TableHeader>
           <TableBody>
             {entries.length > 0 ? (
-              entries.map((entry: HelpEntry) => (
+              entries.map((entry: HelpEntrySummary) => (
                 <TableRow
                   key={entry.id}
                   className='cursor-pointer hover:bg-muted/50'
@@ -828,7 +892,7 @@ export default function HelpPage() {
                     onChange={e =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder='e.g., Fireball'
+                    placeholder={ph.title}
                     required
                   />
                 </div>
@@ -852,7 +916,7 @@ export default function HelpPage() {
                   onChange={e =>
                     setFormData({ ...formData, keywords: e.target.value })
                   }
-                  placeholder='e.g., fireball, fire ball, fire'
+                  placeholder={ph.keywords}
                   required
                 />
               </div>
@@ -881,7 +945,7 @@ export default function HelpPage() {
                     onChange={e =>
                       setFormData({ ...formData, sphere: e.target.value })
                     }
-                    placeholder='e.g., fire'
+                    placeholder={ph.sphere}
                   />
                 </div>
                 <div>
@@ -892,7 +956,7 @@ export default function HelpPage() {
                     onChange={e =>
                       setFormData({ ...formData, duration: e.target.value })
                     }
-                    placeholder='e.g., Instant'
+                    placeholder={ph.duration}
                   />
                 </div>
               </div>
@@ -905,7 +969,7 @@ export default function HelpPage() {
                   onChange={e =>
                     setFormData({ ...formData, usage: e.target.value })
                   }
-                  placeholder="e.g., cast 'fireball' <target>"
+                  placeholder={ph.usage}
                 />
               </div>
 

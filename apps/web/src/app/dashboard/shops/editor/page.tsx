@@ -685,12 +685,12 @@ function ShopEditorContent() {
 
       {/* Tabs */}
       <div className='mb-6'>
-        <nav className='flex space-x-8' aria-label='Tabs'>
+        <nav className='flex flex-wrap gap-x-6 gap-y-1' aria-label='Tabs'>
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-muted-foreground hover:border-input'
@@ -1122,12 +1122,22 @@ function ShopEditorContent() {
       {/* Add Item Modal */}
       {showAddItemModal && (
         <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
-          <div className='bg-card rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto'>
+          <div
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby='shop-add-item-title'
+            className='bg-card rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto'
+          >
             <div className='flex items-center justify-between mb-4'>
-              <h2 className='text-xl font-semibold text-foreground'>
+              <h2
+                id='shop-add-item-title'
+                className='text-xl font-semibold text-foreground'
+              >
                 Add Item to Inventory
               </h2>
               <button
+                type='button'
+                aria-label='Close'
                 onClick={closeAddItemModal}
                 className='text-muted-foreground hover:text-muted-foreground'
               >

@@ -4117,6 +4117,7 @@ type TriggerDto {
   createdBy: String
   flags: [String!]!
   id: Int!
+  lineCount: Int!
   name: String!
   needsReview: Boolean!
   numArgs: Int!

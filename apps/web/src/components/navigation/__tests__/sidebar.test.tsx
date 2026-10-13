@@ -69,3 +69,34 @@ describe('Sidebar zone persistence', () => {
     expect(link.querySelector('div')!.className).toContain('text-primary');
   });
 });
+
+describe('Sidebar at tablet widths', () => {
+  const original = window.matchMedia;
+  afterEach(() => {
+    window.matchMedia = original;
+  });
+
+  it('shows icons only (with titles) so the page keeps its width', () => {
+    window.matchMedia = ((query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    })) as unknown as typeof window.matchMedia;
+    render(<Sidebar />);
+    expect(screen.queryByText('Mobs')).toBeNull();
+    expect(screen.getByTitle('Mobs')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Collapse sidebar')).toBeInTheDocument();
+  });
+
+  it('keeps the labels on desktop widths', () => {
+    window.matchMedia = ((query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    })) as unknown as typeof window.matchMedia;
+    render(<Sidebar />);
+    expect(screen.getByText('Mobs')).toBeInTheDocument();
+  });
+});

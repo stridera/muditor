@@ -588,6 +588,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   const [rightPanelWidth, setRightPanelWidth] = useState(384);
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
+  // On a narrow window the two docked panels would squeeze the canvas to a
+  // sliver: start with the entity palette folded and a slimmer properties panel.
+  useEffect(() => {
+    if (window.innerWidth < 1100) {
+      setLeftCollapsed(true);
+      setRightPanelWidth(Math.max(280, Math.min(340, window.innerWidth - 400)));
+    }
+  }, []);
   const resizingRef = useRef<{
     side: 'left' | 'right' | null;
     startX: number;
@@ -3106,10 +3114,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               if (node.type === 'portal') return '#8b5cf6'; // Purple for portals
               return '#6b7280'; // Gray for regular rooms
             }}
-            maskColor='rgba(0, 0, 0, 0.6)'
+            maskColor='hsl(var(--background) / 0.6)'
             style={{
-              backgroundColor: 'rgba(17, 24, 39, 0.8)', // dark gray background
-              border: '1px solid rgba(75, 85, 99, 0.5)',
+              // background + border come from zone-editor.css (theme aware)
               cursor: 'pointer', // Show pointer cursor to indicate clickability
             }}
             pannable
@@ -3128,7 +3135,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       </div>
       {viewMode === 'zone' && selectedRoom && (
         <div
-          className='border-l bg-white dark:bg-gray-900 p-2 overflow-y-auto relative'
+          className='border-l bg-white dark:bg-gray-900 p-2 overflow-y-auto overflow-x-hidden relative flex-shrink-0'
           style={{
             width: rightCollapsed ? 44 : rightPanelWidth,
             transition: 'width 120ms linear',

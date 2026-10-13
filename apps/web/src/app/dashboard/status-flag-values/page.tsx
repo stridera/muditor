@@ -305,6 +305,8 @@ export default function StatusFlagValuesPage() {
                         variant='ghost'
                         size='sm'
                         onClick={() => openEdit(row)}
+                        aria-label={`Edit ${row.flag}`}
+                        title='Edit'
                       >
                         <Pencil className='h-4 w-4' />
                       </Button>
@@ -315,6 +317,8 @@ export default function StatusFlagValuesPage() {
                           setDeleting(row);
                           setIsDeleteOpen(true);
                         }}
+                        aria-label={`Delete ${row.flag}`}
+                        title='Delete'
                       >
                         <Trash2 className='h-4 w-4 text-red-500' />
                       </Button>

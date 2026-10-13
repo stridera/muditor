@@ -39,9 +39,9 @@
 }
 
 /* Theme-aware React Flow minimap */
-.dark .react-flow__minimap {
+.react-flow__minimap {
   background: hsl(var(--card));
-  border-color: hsl(var(--border));
+  border: 1px solid hsl(var(--border));
 }
 
 /* Theme-aware React Flow edges */

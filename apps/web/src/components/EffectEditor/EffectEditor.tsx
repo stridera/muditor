@@ -66,6 +66,10 @@ export interface EffectEditorProps {
 
 // Base Blockly workspace configuration (theme-independent options)
 const baseWorkspaceConfig = {
+  // Sprites (checkboxes, zoom/trash icons), cursors and sounds are served from
+  // public/blockly/media (copied from node_modules/blockly/media). Blockly's
+  // default is an external host that the CSP (img-src 'self' data:) blocks.
+  media: '/blockly/media/',
   zoom: {
     controls: true,
     wheel: true,

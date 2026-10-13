@@ -1,6 +1,14 @@
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { UseGuards } from '@nestjs/common';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import type { Users } from '@muditor/db';
 import { ScriptType } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -17,6 +25,17 @@ import { TriggersService } from './triggers.service';
 @Resolver(() => TriggerDto)
 export class TriggersResolver {
   constructor(private readonly triggersService: TriggersService) {}
+
+  /**
+   * Non-blank lines of the script. List pages ask for this instead of the full
+   * `commands` text (the whole trigger table is several MB of Lua).
+   */
+  @ResolveField(() => Int)
+  lineCount(@Parent() trigger: Pick<TriggerDto, 'commands'>): number {
+    return (trigger.commands ?? '')
+      .split('\n')
+      .filter(line => line.trim().length > 0).length;
+  }
 
   // Trigger reads are public; triggers in god zones are hidden from anonymous
   // callers and mortal accounts (IMMORTAL+ still see them).

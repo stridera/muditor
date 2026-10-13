@@ -286,7 +286,13 @@ export default function CommandsPage() {
                   }
                   placeholder='One line shown under the command name'
                 />
-                <p className='text-xs text-muted-foreground'>
+                <p
+                  className={
+                    formData.helpSummary.trim().length > SUMMARY_MAX
+                      ? 'text-xs text-destructive'
+                      : 'text-xs text-muted-foreground'
+                  }
+                >
                   Single line, up to {SUMMARY_MAX} characters (
                   {formData.helpSummary.trim().length} used).
                 </p>

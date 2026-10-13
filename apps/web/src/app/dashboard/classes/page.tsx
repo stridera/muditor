@@ -68,6 +68,7 @@ import {
 } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { ColoredText } from '@/components/ColoredText';
+import { stripXmlLiteColors } from '@/utils/colorUtils';
 import { ColoredTextEditor } from '@/components/ColoredTextEditor';
 
 // Helper function to ensure numeric IDs
@@ -699,7 +700,8 @@ export default function ClassesPage() {
                       <div>
                         <CardTitle>Class Skills</CardTitle>
                         <CardDescription>
-                          Skills available to the {selectedClass.name} class
+                          Skills available to the{' '}
+                          {stripXmlLiteColors(selectedClass.name)} class
                         </CardDescription>
                       </div>
                       {canEdit && !addingSkill && (
@@ -892,7 +894,8 @@ export default function ClassesPage() {
                       <div>
                         <CardTitle>Spell Circles</CardTitle>
                         <CardDescription>
-                          Spell progression for the {selectedClass.name} class
+                          Spell progression for the{' '}
+                          {stripXmlLiteColors(selectedClass.name)} class
                         </CardDescription>
                       </div>
                       {canEdit && !addingCircle && (

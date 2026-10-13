@@ -273,7 +273,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
   return (
     <div
-      className={`w-96 ${isDark ? 'bg-gray-800' : 'bg-white'} border-l ${isDark ? 'border-gray-700' : 'border-gray-200'} flex flex-col h-full`}
+      className={`w-full min-w-0 ${isDark ? 'bg-gray-800' : 'bg-white'} border-l ${isDark ? 'border-gray-700' : 'border-gray-200'} flex flex-col h-full`}
     >
       {/* Header */}
       <div
@@ -382,7 +382,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
         >
           <div
-            className={`flex space-x-1 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-1 rounded-lg`}
+            className={`grid grid-cols-6 gap-0.5 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-1 rounded-lg`}
           >
             {[
               { key: 'basic', label: 'Basic', icon: '⚙️' },
@@ -395,7 +395,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                className={`flex-1 px-2 py-2 text-xs font-medium rounded-md transition-colors ${
+                title={tab.label}
+                className={`min-w-0 flex flex-col items-center gap-0.5 px-0.5 py-1.5 text-[11px] leading-tight font-medium rounded-md transition-colors ${
                   activeTab === tab.key
                     ? isDark
                       ? 'bg-gray-600 text-blue-400 shadow-sm'
@@ -405,8 +406,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                       : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <span className='mr-1'>{tab.icon}</span>
-                {tab.label}
+                <span aria-hidden='true'>{tab.icon}</span>
+                <span className='max-w-full truncate'>{tab.label}</span>
               </button>
             ))}
           </div>

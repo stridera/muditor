@@ -778,12 +778,18 @@ export default function AbilitiesPage() {
                               )}
                             </div>
                           </TableCell>
-                          <TableCell className='max-w-md truncate'>
-                            {ability.notes || (
-                              <span className='text-muted-foreground italic'>
-                                No notes
-                              </span>
-                            )}
+                          <TableCell className='max-w-xs'>
+                            {/* td ignores text-overflow; the block inside shows the ellipsis */}
+                            <div
+                              className='truncate'
+                              title={ability.notes || undefined}
+                            >
+                              {ability.notes || (
+                                <span className='text-muted-foreground italic'>
+                                  No notes
+                                </span>
+                              )}
+                            </div>
                           </TableCell>
                           {canEdit && (
                             <TableCell className='text-right'>
