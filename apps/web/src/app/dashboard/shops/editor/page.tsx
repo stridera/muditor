@@ -207,7 +207,10 @@ function ShopEditorContent() {
   // Add Item Modal state
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [modalSelectedZoneId, setModalSelectedZoneId] = useState<number>(0);
-  const [modalSelectedObjectId, setModalSelectedObjectId] = useState<number>(0);
+  // null = nothing picked (object id 0 is a valid id).
+  const [modalSelectedObjectId, setModalSelectedObjectId] = useState<
+    number | null
+  >(null);
   const [modalAmount, setModalAmount] = useState<number>(0);
 
   // Initialize real-time validation
@@ -434,7 +437,7 @@ function ShopEditorContent() {
   const closeAddItemModal = () => {
     setShowAddItemModal(false);
     setModalSelectedZoneId(0);
-    setModalSelectedObjectId(0);
+    setModalSelectedObjectId(null);
     setModalAmount(0);
   };
 
@@ -442,7 +445,7 @@ function ShopEditorContent() {
   useEffect(() => {
     if (showAddItemModal) {
       setModalSelectedZoneId(effectiveZoneId);
-      setModalSelectedObjectId(0);
+      setModalSelectedObjectId(null);
       setModalAmount(0);
     }
   }, [showAddItemModal, effectiveZoneId]);
@@ -450,12 +453,12 @@ function ShopEditorContent() {
   // Reset object selection when zone changes in modal
   useEffect(() => {
     if (showAddItemModal) {
-      setModalSelectedObjectId(0);
+      setModalSelectedObjectId(null);
     }
   }, [modalSelectedZoneId, showAddItemModal]);
 
   const confirmAddItem = () => {
-    if (modalSelectedObjectId && modalSelectedZoneId) {
+    if (modalSelectedObjectId != null && modalSelectedZoneId) {
       setShopItems(prev => [
         ...prev,
         {
@@ -546,6 +549,7 @@ function ShopEditorContent() {
               },
               optimisticResponse: {
                 updateShopInventory: {
+                  zoneId: formData.zoneId,
                   id: newId,
                   items: shopItems.map((i, idx) => ({
                     id: String(idx),
@@ -596,6 +600,7 @@ function ShopEditorContent() {
           },
           optimisticResponse: {
             updateShopInventory: {
+              zoneId: recordZoneId,
               id: numericId,
               items: shopItems.map((i, idx) => ({
                 id: String(idx),
@@ -1160,13 +1165,17 @@ function ShopEditorContent() {
                       Select Object
                     </label>
                     <select
-                      value={modalSelectedObjectId}
+                      value={modalSelectedObjectId ?? ''}
                       onChange={e =>
-                        setModalSelectedObjectId(parseInt(e.target.value))
+                        setModalSelectedObjectId(
+                          e.target.value === ''
+                            ? null
+                            : parseInt(e.target.value)
+                        )
                       }
                       className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     >
-                      <option value={0}>Select an object</option>
+                      <option value=''>Select an object</option>
                       {modalObjectsData?.objectsByZone?.map(
                         (
                           obj: (typeof modalObjectsData.objectsByZone)[number]
@@ -1209,7 +1218,7 @@ function ShopEditorContent() {
               </button>
               <button
                 onClick={confirmAddItem}
-                disabled={!modalSelectedObjectId || !modalSelectedZoneId}
+                disabled={modalSelectedObjectId == null || !modalSelectedZoneId}
                 className='px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed'
               >
                 Add Item

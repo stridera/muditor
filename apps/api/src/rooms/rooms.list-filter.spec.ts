@@ -128,4 +128,36 @@ describe('RoomsResolver list auth + filters', () => {
       sector: Sector.CITY,
     });
   });
+
+  it('treats an explicit zoneId: null as all zones in list and count', async () => {
+    const { resolver, roomsService } = setup();
+    const admin = user(UserRole.IMPLEMENTOR);
+    await resolver.findAll(
+      0,
+      50,
+      null as unknown as undefined,
+      false,
+      admin,
+      undefined
+    );
+    await resolver.count(null as unknown as undefined, admin);
+    expect(roomsService.findAll.mock.calls[0]![0]).not.toHaveProperty('zoneId');
+    expect(roomsService.count.mock.calls[0]![0]).toBeUndefined();
+  });
+});
+
+describe('RoomsService zoneId: null', () => {
+  it('builds no zone clause for null (Prisma would filter zone_id IS NULL)', async () => {
+    const db = {
+      room: {
+        findMany: jest.fn().mockResolvedValue([]),
+        count: jest.fn().mockResolvedValue(0),
+      },
+    };
+    const service = new RoomsService(db as unknown as DatabaseService);
+    await service.findMany({ zoneId: null, take: 10 });
+    await service.count(null, false);
+    expect(db.room.findMany.mock.calls[0]![0].where).toBeUndefined();
+    expect(db.room.count).toHaveBeenCalledWith({ where: {} });
+  });
 });

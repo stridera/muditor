@@ -196,7 +196,8 @@ export class RoomsResolver {
         : MAX_BULK_PAGE_SIZE;
     if (skip !== undefined) params.skip = clampSkip(skip);
     params.take = clampTake(take, cap);
-    if (zoneId !== undefined) params.zoneId = zoneId;
+    // An explicit `zoneId: null` means "all zones", same as omitting it.
+    if (zoneId != null) params.zoneId = zoneId;
     if (search?.trim()) params.search = search.trim().slice(0, 100);
     if (sector) params.sector = sector;
     if (lightweight !== undefined) params.lightweight = lightweight;
@@ -252,10 +253,14 @@ export class RoomsResolver {
     @Args('search', { type: () => String, nullable: true }) search?: string,
     @Args('sector', { type: () => Sector, nullable: true }) sector?: Sector
   ): Promise<number> {
-    return this.roomsService.count(zoneId, hidesGodZones(user ?? null), {
-      ...(search?.trim() && { search: search.trim().slice(0, 100) }),
-      ...(sector && { sector }),
-    });
+    return this.roomsService.count(
+      zoneId ?? undefined,
+      hidesGodZones(user ?? null),
+      {
+        ...(search?.trim() && { search: search.trim().slice(0, 100) }),
+        ...(sector && { sector }),
+      }
+    );
   }
 
   @Mutation(() => RoomDto)

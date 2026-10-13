@@ -18,4 +18,19 @@ describe('GrantsResolver guards', () => {
   ])('%s requires HEAD_BUILDER', method => {
     expect(roleOf(method)).toBe(UserRole.HEAD_BUILDER);
   });
+
+  it('resolves display names from the included user relations, null when absent', () => {
+    const resolver = new GrantsResolver({} as never);
+    expect(
+      resolver.resolveDisplayName({ user: { displayName: 'BuilderChar' } })
+    ).toBe('BuilderChar');
+    expect(resolver.resolveDisplayName({ user: null })).toBeNull();
+    expect(resolver.resolveDisplayName({})).toBeNull();
+    expect(
+      resolver.resolveGrantedByDisplayName({
+        grantedByUser: { displayName: 'Admin' },
+      })
+    ).toBe('Admin');
+    expect(resolver.resolveGrantedByDisplayName({})).toBeNull();
+  });
 });

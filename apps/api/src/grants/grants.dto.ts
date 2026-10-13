@@ -41,11 +41,17 @@ export class UserGrantDto {
   @Field({ nullable: true })
   notes?: string;
 
-  @Field({ description: 'Display name of the person who granted access' })
-  grantedByDisplayName?: string;
+  @Field(() => String, {
+    nullable: true,
+    description: 'Display name of the person who granted access',
+  })
+  grantedByDisplayName?: string | null;
 
-  @Field({ description: 'Display name of the person who received the grant' })
-  displayName?: string;
+  @Field(() => String, {
+    nullable: true,
+    description: 'Display name of the person who received the grant',
+  })
+  displayName?: string | null;
 }
 
 @ObjectType({

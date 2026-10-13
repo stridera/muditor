@@ -1,15 +1,16 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
 import {
-  IsString,
-  MinLength,
-  MaxLength,
-  IsOptional,
   IsDateString,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 
 @InputType()
 export class BanUserInput {
   @Field(() => ID)
+  @IsString()
   userId: string;
 
   @Field()

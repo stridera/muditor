@@ -1,11 +1,12 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { GrantResourceType, GrantPermission } from '@muditor/db';
 import {
-  IsString,
+  IsArray,
+  IsDate,
+  IsEnum,
   IsNumber,
   IsOptional,
-  IsDate,
-  IsArray,
+  IsString,
 } from 'class-validator';
 
 @InputType()
@@ -15,6 +16,7 @@ export class CreateGrantInput {
   userId: string;
 
   @Field(() => GrantResourceType)
+  @IsEnum(GrantResourceType)
   resourceType: GrantResourceType;
 
   @Field()

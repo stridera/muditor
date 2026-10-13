@@ -271,7 +271,7 @@ export class RoomsService {
   async findMany(params?: {
     skip?: number;
     take?: number;
-    zoneId?: number;
+    zoneId?: number | null;
     lightweight?: boolean;
     hideGodZones?: boolean;
     /** Case-insensitive match on name, description or exact room id. */
@@ -288,7 +288,7 @@ export class RoomsService {
     const lightweight = !filtered && (params?.lightweight || plan?.lightweight);
     if (lightweight) {
       const clauses: string[] = [];
-      if (zoneId !== undefined) clauses.push(`r.zone_id = ${zoneId}`);
+      if (zoneId != null) clauses.push(`r.zone_id = ${Number(zoneId)}`);
       if (hideGodZones)
         clauses.push(
           `r.zone_id NOT IN (SELECT id FROM "Zones" WHERE is_god_zone)`
@@ -445,7 +445,7 @@ export class RoomsService {
   }
 
   async count(
-    zoneId?: number,
+    zoneId?: number | null,
     hideGodZones = false,
     filter: { search?: string; sector?: Sector } = {}
   ): Promise<number> {
@@ -456,7 +456,7 @@ export class RoomsService {
 
   /** Shared WHERE for the paged room list and its count. */
   private listWhere(opts: {
-    zoneId?: number | undefined;
+    zoneId?: number | null | undefined;
     hideGodZones?: boolean | undefined;
     search?: string | undefined;
     sector?: Sector | undefined;
@@ -471,7 +471,7 @@ export class RoomsService {
       if (/^\d{1,9}$/.test(term)) or.push({ id: Number(term) });
     }
     return {
-      ...(opts.zoneId !== undefined && { zoneId: opts.zoneId }),
+      ...(opts.zoneId != null && { zoneId: opts.zoneId }),
       ...(opts.hideGodZones && { zones: { isGodZone: false } }),
       ...(opts.sector !== undefined && { sector: opts.sector }),
       ...(or.length > 0 && { OR: or }),

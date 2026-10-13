@@ -1,5 +1,13 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import type { Users } from '@muditor/db';
 import { GrantResourceType, UserRole } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -19,6 +27,22 @@ import { GrantsService } from './grants.service';
 @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
 export class GrantsResolver {
   constructor(private readonly grantsService: GrantsService) {}
+
+  // The service includes user / grantedByUser relations; expose their names as
+  // the flat displayName fields the DTO advertises (null when the user is gone).
+  @ResolveField(() => String, { name: 'displayName', nullable: true })
+  resolveDisplayName(
+    @Parent() grant: { user?: { displayName?: string | null } | null }
+  ): string | null {
+    return grant.user?.displayName ?? null;
+  }
+
+  @ResolveField(() => String, { name: 'grantedByDisplayName', nullable: true })
+  resolveGrantedByDisplayName(
+    @Parent() grant: { grantedByUser?: { displayName?: string | null } | null }
+  ): string | null {
+    return grant.grantedByUser?.displayName ?? null;
+  }
 
   // Query all grants (HEAD_BUILDER+ can view all, BUILDER can view their own)
   @Query(() => [UserGrantDto], { name: 'grants' })

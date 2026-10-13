@@ -116,6 +116,7 @@ mutation UpdateObject($id: Int!, $zoneId: Int!, $data: UpdateObjectInput!) {
 
 mutation DeleteObject($id: Int!, $zoneId: Int!) {
   deleteObject(id: $id, zoneId: $zoneId) {
+    zoneId
     id
   }
 }

@@ -123,6 +123,7 @@ const UPDATE_OBJECT = gql`
     $data: UpdateObjectInput!
   ) {
     updateObject(id: $id, zoneId: $zoneId, data: $data) {
+      zoneId
       id
       keywords
       name
@@ -134,6 +135,7 @@ const UPDATE_OBJECT = gql`
 const CREATE_OBJECT = gql`
   mutation CreateObjectInline($data: CreateObjectInput!) {
     createObject(data: $data) {
+      zoneId
       id
       keywords
       name

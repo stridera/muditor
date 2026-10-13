@@ -1789,7 +1789,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
 
   // Save room changes via GraphQL
   const handleSaveRoom = useCallback(async () => {
-    if (!selectedRoomId || !activeZoneId) return;
+    // Room id 0 is valid: compare against null, not falsiness.
+    if (selectedRoomId == null || activeZoneId == null) return;
     if (Object.keys(pendingRoomEdits).length === 0) return;
 
     setSavingRoom(true);

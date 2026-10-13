@@ -188,7 +188,8 @@ function RoomsContent() {
     roomsCount: number;
   }>(ROOMS_PAGE_QUERY, {
     variables: {
-      zoneId: selectedZone ?? null,
+      // Omit (not null) when no zone is chosen: the list then spans all zones.
+      ...(selectedZone != null && { zoneId: selectedZone }),
       search: debouncedSearch.trim() || null,
       sector: selectedSector === 'all' ? null : selectedSector,
       skip: (page - 1) * ROOMS_PAGE_SIZE,

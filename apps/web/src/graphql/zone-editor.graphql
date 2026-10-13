@@ -55,17 +55,20 @@ query ZoneEditorGetRooms($zoneId: Int!, $lightweight: Boolean) {
       ...ZoneEditorExit
     }
     mobs {
+      zoneId
       id
       name
       level
       roomDescription
     }
     objects {
+      zoneId
       id
       name
       roomDescription
     }
     shops {
+      zoneId
       id
       buyProfit
       sellProfit
@@ -249,6 +252,7 @@ mutation EntityPanelUpdateMob(
   $data: UpdateMobInput!
 ) {
   updateMob(id: $id, zoneId: $zoneId, data: $data) {
+    zoneId
     id
     name
     level
@@ -263,6 +267,7 @@ mutation EntityPanelUpdateObject(
   $data: UpdateObjectInput!
 ) {
   updateObject(id: $id, zoneId: $zoneId, data: $data) {
+    zoneId
     id
     name
     level

@@ -1,13 +1,21 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 @InputType()
 export class RoomReferenceInput {
   @Field(() => Int)
+  @IsInt()
   zoneId: number;
 
   @Field(() => Int)
+  @IsInt()
   localId: number;
 }
 

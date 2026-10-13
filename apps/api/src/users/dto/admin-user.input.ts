@@ -1,6 +1,12 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { UserRole } from '@muditor/db';
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 @InputType()
 export class AdminSetUserRoleInput {
@@ -20,6 +26,7 @@ export class AdminSetUserDeletedInput {
   userId: string;
 
   @Field({ description: 'true = soft-delete, false = restore' })
+  @IsBoolean()
   deleted: boolean;
 
   @Field(() => String, {

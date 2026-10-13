@@ -4896,14 +4896,11 @@ type User {
 }
 
 type UserGrantDto {
-  """Display name of the person who received the grant"""
-  displayName: String!
+  displayName: String
   expiresAt: DateTime
   grantedAt: DateTime!
   grantedBy: String!
-
-  """Display name of the person who granted access"""
-  grantedByDisplayName: String!
+  grantedByDisplayName: String
   id: ID!
   notes: String
   permissions: [GrantPermission!]!

@@ -17,11 +17,16 @@ query GetQuests($filter: QuestFilterInput, $skip: Int, $take: Int) {
     createdAt
     updatedAt
     phases {
+      questZoneId
+      questId
       id
       name
       description
       order
       objectives {
+        questZoneId
+        questId
+        phaseId
         id
         objectiveType
         playerDescription
@@ -58,10 +63,15 @@ query GetQuestsByZone($zoneId: Int!) {
     createdAt
     updatedAt
     phases {
+      questZoneId
+      questId
       id
       name
       order
       objectives {
+        questZoneId
+        questId
+        phaseId
         id
         objectiveType
         playerDescription
@@ -290,6 +300,8 @@ mutation ReorderQuestPhases(
     questId: $questId
     phaseIds: $phaseIds
   ) {
+    questZoneId
+    questId
     id
     order
   }
@@ -297,6 +309,8 @@ mutation ReorderQuestPhases(
 
 mutation DeleteQuestPhase($questZoneId: Int!, $questId: Int!, $id: Int!) {
   deleteQuestPhase(questZoneId: $questZoneId, questId: $questId, id: $id) {
+    questZoneId
+    questId
     id
   }
 }
@@ -328,6 +342,9 @@ mutation UpdateQuestObjective(
     id: $id
     data: $data
   ) {
+    questZoneId
+    questId
+    phaseId
     id
     objectiveType
     scope
@@ -348,6 +365,9 @@ mutation DeleteQuestObjective(
     phaseId: $phaseId
     id: $id
   ) {
+    questZoneId
+    questId
+    phaseId
     id
   }
 }

@@ -48,6 +48,7 @@ mutation UpdateShop($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
 
 mutation DeleteShop($id: Int!, $zoneId: Int!) {
   deleteShop(id: $id, zoneId: $zoneId) {
+    zoneId
     id
   }
 }

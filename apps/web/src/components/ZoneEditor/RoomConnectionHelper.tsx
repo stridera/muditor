@@ -49,7 +49,8 @@ export function RoomConnectionHelper({
   const [selectedDirection, setSelectedDirection] = useState<string>('');
   const [createBidirectional, setCreateBidirectional] = useState(true);
 
-  if (!selectedRoomId) {
+  // Room id 0 is valid, so test for null rather than falsiness.
+  if (selectedRoomId == null) {
     return (
       <Card className='mt-4'>
         <CardHeader>
@@ -65,9 +66,8 @@ export function RoomConnectionHelper({
   }
 
   const selectedRoom = rooms.find(r => r.id === selectedRoomId);
-  const targetRoom = targetRoomId
-    ? rooms.find(r => r.id === targetRoomId)
-    : null;
+  const targetRoom =
+    targetRoomId != null ? rooms.find(r => r.id === targetRoomId) : null;
 
   if (!selectedRoom) return null;
 
@@ -77,7 +77,7 @@ export function RoomConnectionHelper({
   );
 
   const handleCreateConnection = () => {
-    if (!targetRoomId || !selectedDirection) return;
+    if (targetRoomId == null || !selectedDirection) return;
 
     onCreateConnection(selectedRoomId, targetRoomId, selectedDirection);
 
@@ -125,8 +125,12 @@ export function RoomConnectionHelper({
         <div>
           <label className='text-sm font-medium'>Connect to room:</label>
           <select
-            value={targetRoomId || ''}
-            onChange={e => setTargetRoomId(parseInt(e.target.value) || null)}
+            value={targetRoomId ?? ''}
+            onChange={e =>
+              setTargetRoomId(
+                e.target.value === '' ? null : parseInt(e.target.value)
+              )
+            }
             className='w-full mt-1 px-3 py-1 border border-gray-300 rounded text-sm'
           >
             <option value=''>Select a room...</option>

@@ -42,6 +42,7 @@ query GetShopEditor($id: Int!, $zoneId: Int!) {
 
 mutation UpdateShopEditor($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
   updateShop(id: $id, zoneId: $zoneId, data: $data) {
+    zoneId
     id
     buyProfit
     sellProfit
@@ -50,6 +51,7 @@ mutation UpdateShopEditor($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
 
 mutation CreateShopEditor($data: CreateShopInput!) {
   createShop(data: $data) {
+    zoneId
     id
     buyProfit
     sellProfit
@@ -63,6 +65,7 @@ mutation UpdateShopInventoryEditor(
   $items: [ShopItemInput!]!
 ) {
   updateShopInventory(zoneId: $zoneId, id: $id, data: { items: $items }) {
+    zoneId
     id
     items {
       id

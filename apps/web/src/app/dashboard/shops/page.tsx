@@ -104,6 +104,7 @@ const GET_SHOPS_BY_ZONE = gql`
 const DELETE_SHOP = gql`
   mutation DeleteShopInline($id: Int!, $zoneId: Int!) {
     deleteShop(id: $id, zoneId: $zoneId) {
+      zoneId
       id
     }
   }
