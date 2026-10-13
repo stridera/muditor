@@ -833,6 +833,9 @@ model CharacterItems {
 
   @@index([characterId])
   @@index([corpseId])
+  // FK container_id has ON DELETE SET NULL; without this index every deleted row
+  // seq-scans the whole table (a 77-item corpse delete took 1 s, 3k rows 45 s).
+  @@index([containerId])
 }
 
 // A dead player's corpse. The items live in CharacterItems rows with
