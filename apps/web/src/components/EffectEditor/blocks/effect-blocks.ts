@@ -124,6 +124,22 @@ const STATUS_FLAGS: MenuOption[] = [
 ];
 
 /**
+ * Units a duration can be expressed in (Effect default_params.durationUnit)
+ */
+const DURATION_UNITS: MenuOption[] = [
+  ['hours', 'hours'],
+  ['rounds', 'rounds'],
+  ['seconds', 'seconds'],
+];
+
+/** Duration unit dropdown that starts on the effect's usual unit. */
+function durationUnitField(defaultUnit: string): Blockly.FieldDropdown {
+  const field = new Blockly.FieldDropdown(DURATION_UNITS);
+  field.setValue(defaultUnit);
+  return field;
+}
+
+/**
  * Resources that can be healed or damaged
  */
 const RESOURCE_OPTIONS: MenuOption[] = [
@@ -340,7 +356,8 @@ export function registerEffectBlocks(): void {
         .appendField(new Blockly.FieldTextInput('4'), 'amount');
       this.appendDummyInput()
         .appendField('Duration')
-        .appendField(new Blockly.FieldTextInput('level'), 'duration');
+        .appendField(new Blockly.FieldTextInput('level'), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Trigger')
         .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
@@ -366,7 +383,8 @@ export function registerEffectBlocks(): void {
         .appendField(new Blockly.FieldDropdown(STATUS_FLAGS), 'flag');
       this.appendDummyInput()
         .appendField('Duration')
-        .appendField(new Blockly.FieldTextInput('level * 2'), 'duration');
+        .appendField(new Blockly.FieldTextInput('level * 2'), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       // Optional parameters for parameterized flags (resistance, vulnerability, reflect, elemental_hands, lifesteal)
       this.appendDummyInput()
         .appendField('Type (for resist/vuln/reflect/elemental)')
@@ -671,7 +689,8 @@ export function registerEffectBlocks(): void {
         .appendField(new Blockly.FieldDropdown(FORM_OPTIONS), 'form');
       this.appendDummyInput()
         .appendField('Duration')
-        .appendField(new Blockly.FieldTextInput('level * 2'), 'duration');
+        .appendField(new Blockly.FieldTextInput('level * 2'), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Hostile (unwanted)')
         .appendField(new Blockly.FieldCheckbox('FALSE'), 'hostile');
@@ -828,7 +847,8 @@ export function registerEffectBlocks(): void {
         .appendField('Max Count')
         .appendField(new Blockly.FieldNumber(1, 1, 10), 'maxCount')
         .appendField('Duration')
-        .appendField(new Blockly.FieldNumber(100, 0, 86400), 'duration');
+        .appendField(new Blockly.FieldNumber(100, 0, 86400), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Consumes Corpse')
         .appendField(new Blockly.FieldCheckbox('FALSE'), 'consumesCorpse');
@@ -907,7 +927,8 @@ export function registerEffectBlocks(): void {
         .appendField(new Blockly.FieldNumber(3, 1, 10), 'maxCircle');
       this.appendDummyInput()
         .appendField('Duration')
-        .appendField(new Blockly.FieldTextInput('level'), 'duration');
+        .appendField(new Blockly.FieldTextInput('level'), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Trigger')
         .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
@@ -936,7 +957,8 @@ export function registerEffectBlocks(): void {
         .appendField(new Blockly.FieldDropdown(ROOM_EFFECT_TYPES), 'type');
       this.appendDummyInput()
         .appendField('Duration')
-        .appendField(new Blockly.FieldNumber(60, 0, 86400), 'duration');
+        .appendField(new Blockly.FieldNumber(60, 0, 86400), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       // For barriers
       this.appendDummyInput()
         .appendField('Barrier HP')
@@ -992,6 +1014,32 @@ export function registerEffectBlocks(): void {
   };
 
   // ============================================
+  // GENERIC EFFECT BLOCK (any Effect row without a dedicated block)
+  // ============================================
+  Blockly.Blocks['effect_generic'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput()
+        .appendField('Effect')
+        .appendField(new Blockly.FieldDropdown(getEffectOptions), 'effectId');
+      this.appendDummyInput()
+        .appendField('Params (JSON)')
+        .appendField(new Blockly.FieldTextInput('{}'), 'params');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#757575');
+      this.setTooltip(
+        'Any effect without a dedicated block (e.g. alter_object). Edit its override params as a JSON object.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
   // 20. PORTAL BLOCK (bidirectional portal creation)
   // ============================================
   Blockly.Blocks['effect_portal'] = {
@@ -1033,7 +1081,8 @@ export function registerEffectBlocks(): void {
       this.appendDummyInput().appendField('Conceal Item');
       this.appendDummyInput()
         .appendField('Duration')
-        .appendField(new Blockly.FieldTextInput('level * 10'), 'duration');
+        .appendField(new Blockly.FieldTextInput('level * 10'), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Contested By')
         .appendField(new Blockly.FieldTextInput(''), 'contestedBy');
@@ -1084,7 +1133,8 @@ export function registerEffectBlocks(): void {
       this.appendDummyInput().appendField('Drag');
       this.appendDummyInput()
         .appendField('Duration (moves)')
-        .appendField(new Blockly.FieldNumber(1, 1, 10), 'duration');
+        .appendField(new Blockly.FieldNumber(1, 1, 10), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Resistable')
         .appendField(new Blockly.FieldCheckbox('TRUE'), 'resistable');
@@ -1158,7 +1208,8 @@ export function registerEffectBlocks(): void {
         );
       this.appendDummyInput()
         .appendField('Duration')
-        .appendField(new Blockly.FieldTextInput('level'), 'duration');
+        .appendField(new Blockly.FieldTextInput('level'), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Chance %')
         .appendField(new Blockly.FieldNumber(100, 0, 100), 'chance');
@@ -1188,7 +1239,8 @@ export function registerEffectBlocks(): void {
       this.appendDummyInput().appendField('Knockdown');
       this.appendDummyInput()
         .appendField('Duration (rounds)')
-        .appendField(new Blockly.FieldNumber(2, 1, 10), 'duration');
+        .appendField(new Blockly.FieldNumber(2, 1, 10), 'duration')
+        .appendField(durationUnitField('rounds'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Break On Damage')
         .appendField(new Blockly.FieldCheckbox('FALSE'), 'breakOnDamage');
@@ -1227,7 +1279,8 @@ export function registerEffectBlocks(): void {
         .appendField(new Blockly.FieldNumber(50, 1, 100), 'percent');
       this.appendDummyInput()
         .appendField('Duration')
-        .appendField(new Blockly.FieldTextInput('level'), 'duration');
+        .appendField(new Blockly.FieldTextInput('level'), 'duration')
+        .appendField(durationUnitField('hours'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Damage Type Filter')
         .appendField(
@@ -1260,7 +1313,8 @@ export function registerEffectBlocks(): void {
       this.appendDummyInput().appendField('Stun');
       this.appendDummyInput()
         .appendField('Duration (rounds)')
-        .appendField(new Blockly.FieldNumber(2, 1, 10), 'duration');
+        .appendField(new Blockly.FieldNumber(2, 1, 10), 'duration')
+        .appendField(durationUnitField('rounds'), 'durationUnit');
       this.appendDummyInput()
         .appendField('Break On Damage')
         .appendField(new Blockly.FieldCheckbox('FALSE'), 'breakOnDamage');

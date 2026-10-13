@@ -5,10 +5,12 @@ import {
   getEffectIdToTypeMap,
   hasEffectsLoaded,
   getFieldNamesForEffect,
+  GENERIC_EFFECT_BLOCK,
 } from '../blocks/data-registry';
 import {
   cloneJson,
   coerceLike,
+  listBlockFieldNames,
   readBlockData,
   stringifyFieldValue,
   type BlockRoundTripData,
@@ -132,8 +134,38 @@ function extractBlockParams(block: Blockly.Block): Record<string, unknown> {
     delete params['onFail'];
   }
 
-  // Get all field values from the block
-  const fieldNames = getFieldNamesForBlockType(blockType);
+  // Generic block: the whole params object is one JSON text field.
+  if (blockType === GENERIC_EFFECT_BLOCK) {
+    const raw = block.getFieldValue('params');
+    if (
+      raw !== null &&
+      raw !== undefined &&
+      !('params' in baseline && baseline['params'] === stringifyFieldValue(raw))
+    ) {
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(String(raw).trim() === '' ? '{}' : String(raw));
+      } catch {
+        throw new Error('Generic effect params must be valid JSON');
+      }
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Generic effect params must be a JSON object');
+      }
+      return parsed as Record<string, unknown>;
+    }
+    return params;
+  }
+
+  // Every field the block really has (default_params lists only a subset),
+  // plus schema/UI fields; trigger and chancePct are resolved separately.
+  const fieldNames = [
+    ...new Set([
+      ...getFieldNamesForBlockType(blockType),
+      ...listBlockFieldNames(
+        block as Parameters<typeof listBlockFieldNames>[0]
+      ),
+    ]),
+  ].filter(name => name !== 'trigger' && name !== 'chancePct');
 
   for (const fieldName of fieldNames) {
     const value = block.getFieldValue(fieldName);
@@ -293,6 +325,22 @@ export function getFieldNamesForBlockType(blockType: string): string[] {
 }
 
 /**
+ * Effect row a block stands for: the row it was loaded from, the chosen row of
+ * a generic block, or the row registered for its block type.
+ */
+function resolveEffectId(block: Blockly.Block): number | undefined {
+  if (block.type === GENERIC_EFFECT_BLOCK) {
+    const id = Number(block.getFieldValue('effectId'));
+    return Number.isFinite(id) && id > 0 ? id : undefined;
+  }
+  const stored = readBlockData(block)?.effectId;
+  if (stored !== undefined && getEffectIdToTypeMap()[stored] === block.type) {
+    return stored;
+  }
+  return getEffectIdForBlockType(block.type);
+}
+
+/**
  * Check if a block is an effect block (not a gate block)
  */
 function isEffectBlock(block: Blockly.Block): boolean {
@@ -318,7 +366,7 @@ function processBlockChain(
   let currentBlock = startBlock;
 
   while (currentBlock) {
-    const effectId = getEffectIdForBlockType(currentBlock.type);
+    const effectId = resolveEffectId(currentBlock);
     const gateType = GATE_BLOCK_TO_TYPE[currentBlock.type];
 
     if (effectId || gateType) {

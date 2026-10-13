@@ -12,6 +12,11 @@
  */
 
 export interface BlockRoundTripData {
+  /**
+   * Effect row this block was loaded from. Needed when several Effect rows
+   * share one block type (e.g. status and Refreshed both use the status block).
+   */
+  effectId?: number | undefined;
   /** Deep copy of the stored overrideParams as loaded from the API. */
   originalParams: Record<string, unknown>;
   /** Value of each editor field immediately after loading (stringified). */
@@ -82,4 +87,24 @@ export function coerceLike(original: unknown, value: unknown): unknown {
 
 export function stringifyFieldValue(value: unknown): string {
   return value === null || value === undefined ? '' : String(value);
+}
+
+interface FieldListCarrier {
+  inputList?: Array<{ fieldRow?: Array<{ name?: string | null }> }>;
+}
+
+/**
+ * Names of every named field actually present on a block, read from the block
+ * itself. The Effect table's default_params only lists a subset (status has
+ * `type`/`amount`/`breakOnDamage`... fields that default_params omits), so the
+ * block is the source of truth for what is editable.
+ */
+export function listBlockFieldNames(block: FieldListCarrier): string[] {
+  const names: string[] = [];
+  for (const input of block.inputList ?? []) {
+    for (const field of input.fieldRow ?? []) {
+      if (field.name && !names.includes(field.name)) names.push(field.name);
+    }
+  }
+  return names;
 }

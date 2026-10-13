@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { EffectEditorToolbar } from './EffectEditorToolbar';
+import { buildToolbox, type ToolboxDefinition } from './toolbox';
 import {
   generateJson,
   type AbilityEffectOutput,
@@ -129,111 +130,6 @@ const darkWorkspaceConfig = {
   renderer: 'zelos',
 };
 
-// Toolbox configuration - consolidated 18-effect schema
-// Effect details are defined in the Effect database table
-const toolboxCategories = {
-  kind: 'categoryToolbox',
-  contents: [
-    {
-      kind: 'category',
-      name: 'Damage & Healing',
-      colour: '#e53935',
-      contents: [
-        { kind: 'block', type: 'effect_damage' }, // Includes instant, DoT (interval), chain (maxJumps), lifesteal type
-        { kind: 'block', type: 'damage_component' }, // For multi-element damage (e.g., 50% fire + 50% cold)
-        { kind: 'block', type: 'effect_heal' },
-      ],
-    },
-    {
-      kind: 'category',
-      name: 'Status & Buffs',
-      colour: '#8e24aa',
-      contents: [
-        { kind: 'block', type: 'effect_status' }, // All flags: buffs, CC, stealth, detection, resistance, vulnerability, reflect
-        { kind: 'block', type: 'effect_modify' }, // Stats, saves, resources, size
-        { kind: 'block', type: 'effect_globe' }, // Spell immunity by circle
-      ],
-    },
-    {
-      kind: 'category',
-      name: 'Cleansing & Dispel',
-      colour: '#43a047',
-      contents: [
-        { kind: 'block', type: 'effect_cleanse' }, // Remove conditions (poison, curse, etc.)
-        { kind: 'block', type: 'effect_dispel' }, // Remove magical effects
-        { kind: 'block', type: 'effect_reveal' }, // Show hidden creatures/objects
-        { kind: 'block', type: 'effect_inspect' }, // Identify item properties
-      ],
-    },
-    {
-      kind: 'category',
-      name: 'Movement & Position',
-      colour: '#00897b',
-      contents: [
-        { kind: 'block', type: 'effect_teleport' }, // Move to location
-        { kind: 'block', type: 'effect_move' }, // Forced movement: knockback, pull, swap
-        { kind: 'block', type: 'effect_drag' }, // Force target to move with you
-        { kind: 'block', type: 'effect_extract' }, // Remove mob/object from game
-        { kind: 'block', type: 'effect_dismount' }, // Force off mount
-        { kind: 'block', type: 'effect_stop_combat' }, // End combat / disengage
-      ],
-    },
-    {
-      kind: 'category',
-      name: 'Combat',
-      colour: '#1e88e5',
-      contents: [
-        { kind: 'block', type: 'effect_interrupt' }, // Stop casting/channeling
-        { kind: 'block', type: 'effect_stun' }, // Daze, unable to act
-        { kind: 'block', type: 'effect_knockdown' }, // Knock to ground
-        { kind: 'block', type: 'effect_intercept' }, // Bodyguard / redirect attacks
-        { kind: 'block', type: 'effect_redirect' }, // Reflect damage
-        { kind: 'block', type: 'effect_transform' }, // Shapechange
-      ],
-    },
-    {
-      kind: 'category',
-      name: 'Creation & Summoning',
-      colour: '#5e35b1',
-      contents: [
-        { kind: 'block', type: 'effect_summon' }, // Create creature
-        { kind: 'block', type: 'effect_create' }, // Create object
-        { kind: 'block', type: 'effect_enchant' }, // Apply effect to object
-        { kind: 'block', type: 'effect_conceal_item' }, // Hide item from detection
-      ],
-    },
-    {
-      kind: 'category',
-      name: 'Room Effects',
-      colour: '#f4511e',
-      contents: [
-        { kind: 'block', type: 'effect_room' }, // Includes both room effects and barriers (subtype param)
-      ],
-    },
-    {
-      kind: 'category',
-      name: 'Special',
-      colour: '#6d4c41',
-      contents: [
-        { kind: 'block', type: 'effect_resurrect' },
-        { kind: 'block', type: 'effect_script' }, // Custom Lua scripts
-      ],
-    },
-    {
-      kind: 'category',
-      name: 'Gates (Conditions)',
-      colour: '#00acc1',
-      contents: [
-        { kind: 'block', type: 'gate_check' },
-        { kind: 'block', type: 'gate_chance' },
-        { kind: 'block', type: 'gate_saving_throw' },
-        { kind: 'block', type: 'gate_attack_roll' },
-        { kind: 'block', type: 'gate_contest' },
-      ],
-    },
-  ],
-};
-
 export function EffectEditor({
   initialEffects = [],
   onChange,
@@ -252,7 +148,13 @@ export function EffectEditor({
   const [effects, setEffects] = useState<AbilityEffectOutput[]>(initialEffects);
   const [error, setError] = useState<string | null>(null);
   const [blocksRegistered, setBlocksRegistered] = useState(false);
-  const [initialLoaded, setInitialLoaded] = useState(false);
+  // The live Blockly workspace, and the workspace the current `effects` were
+  // last loaded into. A workspace is replaced whenever the theme or read-only
+  // mode changes (see workspaceKey), so loading is tracked per workspace.
+  const [workspace, setWorkspace] = useState<Blockly.WorkspaceSvg | null>(null);
+  const [loadedWorkspace, setLoadedWorkspace] =
+    useState<Blockly.WorkspaceSvg | null>(null);
+  const [toolbox, setToolbox] = useState<ToolboxDefinition | null>(null);
   const [blocklyThemes, setBlocklyThemes] = useState<{
     light: unknown;
     dark: unknown;
@@ -321,8 +223,8 @@ export function EffectEditor({
         ? JSON.stringify(parsed, null, 2)
         : initialEffectsJson
     );
-    // Reset initialLoaded so blocks can be reloaded when initialEffects changes
-    setInitialLoaded(false);
+    // Force a reload of the blocks when initialEffects changes
+    setLoadedWorkspace(null);
   }, [initialEffectsJson]);
 
   // Handle hydration mismatch with next-themes
@@ -333,6 +235,8 @@ export function EffectEditor({
   // Determine if we're in dark mode (default to dark during SSR/unresolved)
   // This ensures Blockly matches the page when theme hasn't been resolved yet
   const isDark = !mounted || resolvedTheme !== 'light';
+
+  const workspaceKey = `${isDark ? 'dark' : 'light'}-${readOnly ? 'ro' : 'rw'}`;
 
   // Select workspace configuration based on theme
   const workspaceConfiguration = useMemo(() => {
@@ -383,6 +287,9 @@ export function EffectEditor({
         });
 
         setBlocklyThemes({ light: lightTheme, dark: darkTheme });
+        // Build the toolbox from registered blocks before any workspace is
+        // injected: Blockly cannot add a toolbox to a workspace later.
+        setToolbox(buildToolbox(type => type in BlocklyModule.Blocks));
         setBlocksRegistered(true);
       } catch (err) {
         console.error('Failed to register blocks:', err);
@@ -409,48 +316,26 @@ export function EffectEditor({
     return undefined;
   }, [optionsData]);
 
-  // Load initial effects into workspace when ready
-  // Must wait for registry data to be populated so the effect ID -> block type mapping is available
+  // Load the current effects into the live workspace whenever a workspace is
+  // (re)created: first mount, theme change, read-only <-> editing switch, or
+  // coming back from the JSON view. Must wait for registry data so the effect
+  // ID -> block type mapping is available.
   useEffect(() => {
     if (
       blocksRegistered &&
-      workspaceRef.current &&
-      initialEffects.length > 0 &&
-      !initialLoaded &&
+      workspace &&
+      loadedWorkspace !== workspace &&
       registryReady &&
       hasEffectsLoaded()
     ) {
       try {
-        loadEffectsIntoWorkspace(workspaceRef.current, initialEffects);
-        setInitialLoaded(true);
+        loadEffectsIntoWorkspace(workspace, effects);
       } catch (err) {
-        console.error('Failed to load initial effects:', err);
+        console.error('Failed to load effects into workspace:', err);
       }
+      setLoadedWorkspace(workspace);
     }
-  }, [blocksRegistered, initialEffects, initialLoaded, registryReady]);
-
-  // Track previous view mode to detect when switching to blocks view
-  const [prevViewMode, setPrevViewMode] = useState<'blocks' | 'json'>(viewMode);
-
-  // Reload blocks when switching from JSON view to blocks view
-  useEffect(() => {
-    if (
-      prevViewMode === 'json' &&
-      viewMode === 'blocks' &&
-      blocksRegistered &&
-      workspaceRef.current &&
-      registryReady &&
-      hasEffectsLoaded()
-    ) {
-      try {
-        // Reload the workspace with current effects state (which may have been edited in JSON view)
-        loadEffectsIntoWorkspace(workspaceRef.current, effects);
-      } catch (err) {
-        console.error('Failed to reload effects after view switch:', err);
-      }
-    }
-    setPrevViewMode(viewMode);
-  }, [viewMode, blocksRegistered, registryReady, effects, prevViewMode]);
+  }, [blocksRegistered, workspace, loadedWorkspace, registryReady, effects]);
 
   // Update workspace theme when theme changes
   useEffect(() => {
@@ -464,17 +349,18 @@ export function EffectEditor({
 
   // Handle workspace changes
   const handleWorkspaceChange = useCallback(
-    (workspace: Blockly.WorkspaceSvg) => {
-      workspaceRef.current = workspace;
+    (changed: Blockly.WorkspaceSvg) => {
+      workspaceRef.current = changed;
+      setWorkspace(prev => (prev === changed ? prev : changed));
 
-      // Skip state updates if we have initial effects but haven't loaded them yet
-      // This prevents the empty workspace from overwriting state before blocks are loaded
-      if (initialEffects.length > 0 && !initialLoaded) {
+      // Skip state updates until this workspace has its blocks loaded; the
+      // empty workspace must not overwrite the effects before they are loaded.
+      if (loadedWorkspace !== changed) {
         return;
       }
 
       try {
-        const generatedEffects = generateJson(workspace);
+        const generatedEffects = generateJson(changed);
         setEffects(generatedEffects);
         setJsonValue(JSON.stringify(generatedEffects, null, 2));
         setError(null);
@@ -486,7 +372,16 @@ export function EffectEditor({
         );
       }
     },
-    [onChange, initialEffects.length, initialLoaded]
+    [onChange, loadedWorkspace]
+  );
+
+  // The workspace is gone (disposed on re-inject or unmount).
+  const handleWorkspaceDispose = useCallback(
+    (disposed: Blockly.WorkspaceSvg) => {
+      if (workspaceRef.current === disposed) workspaceRef.current = null;
+      setWorkspace(prev => (prev === disposed ? null : prev));
+    },
+    []
   );
 
   // Handle JSON editing
@@ -523,7 +418,7 @@ export function EffectEditor({
     }
   }, [validate]);
 
-  if (!blocksRegistered) {
+  if (!blocksRegistered || !toolbox) {
     return (
       <Card>
         <CardContent className='flex items-center justify-center h-96'>
@@ -561,11 +456,16 @@ export function EffectEditor({
         {viewMode === 'blocks' ? (
           <div style={{ height }} className='border rounded-md overflow-hidden'>
             <BlocklyWorkspace
-              key={isDark ? 'dark' : 'light'} // Force re-render on theme change
+              // react-blockly only reads the workspace/toolbox configuration at
+              // inject time (a read-only workspace has no toolbox and cannot
+              // gain one later), so changing theme or read-only mode must
+              // inject a fresh workspace.
+              key={workspaceKey}
               className='w-full h-full'
-              toolboxConfiguration={toolboxCategories}
+              toolboxConfiguration={toolbox}
               workspaceConfiguration={workspaceConfiguration}
               onWorkspaceChange={handleWorkspaceChange}
+              onDispose={handleWorkspaceDispose}
             />
           </div>
         ) : (

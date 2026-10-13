@@ -22,6 +22,9 @@ class FakeBlock {
     for (const f of fieldNames) this.fields[f] = f === 'chancePct' ? '100' : '';
     this.fields['trigger'] = 'on_cast';
   }
+  get inputList() {
+    return [{ fieldRow: Object.keys(this.fields).map(name => ({ name })) }];
+  }
   getField(name: string) {
     if (!(name in this.fields)) return null;
     return {
@@ -193,6 +196,138 @@ describe('effect editor round trip', () => {
     const out = generateJson(ws as unknown as Blockly.WorkspaceSvg);
     expect(out.map(e => e.effectId)).toEqual([2, 1]);
     expect(out[1]!.overrideParams).toEqual(stored[0]!.overrideParams);
+  });
+});
+
+/**
+ * Stone Skin as stored: a status effect whose resistance type/amount are not in
+ * the Effect row's default_params but are real fields on the status block.
+ */
+const STONE_SKIN: AbilityEffectOutput = {
+  effectId: 4,
+  order: 0,
+  trigger: 'on_cast',
+  chancePct: 100,
+  overrideParams: {
+    flag: 'resistance',
+    type: 'physical',
+    amount: 25,
+    refresh: false,
+    duration: '2',
+    durationUnit: 'hours',
+  },
+};
+
+function statusWorkspace() {
+  setEffectEditorData({
+    effects: [
+      {
+        id: 4,
+        name: 'status',
+        effectType: 'status',
+        defaultParams: {
+          flag: 'bless',
+          duration: 'level * 2',
+          durationUnit: 'hours',
+        },
+      },
+      {
+        id: 29,
+        name: 'Refreshed',
+        effectType: 'status',
+        defaultParams: { duration: 1800, durationUnit: 'seconds' },
+      },
+      {
+        id: 30,
+        name: 'alter_object',
+        effectType: 'alter_object',
+        defaultParams: { mode: 'add' },
+      },
+    ],
+  });
+  return new FakeWorkspace({
+    // The block has more fields than default_params names.
+    effect_status: ['flag', 'duration', 'durationUnit', 'type', 'amount'],
+    effect_generic: ['effectId', 'params'],
+  });
+}
+
+describe('fields that default_params does not list (Stone Skin)', () => {
+  afterEach(() => clearEffectEditorData());
+
+  it('loads type and amount into the block and round-trips untouched', () => {
+    const ws = statusWorkspace();
+    loadEffectsIntoWorkspace(ws as unknown as Blockly.WorkspaceSvg, [
+      STONE_SKIN,
+    ]);
+    expect(ws.blocks[0]!.fields).toMatchObject({
+      flag: 'resistance',
+      type: 'physical',
+      amount: '25',
+      duration: '2',
+      durationUnit: 'hours',
+    });
+    const out = generateJson(ws as unknown as Blockly.WorkspaceSvg);
+    expect(out).toEqual([STONE_SKIN]);
+  });
+
+  it('saves an edited amount as a number and keeps the other keys', () => {
+    const ws = statusWorkspace();
+    loadEffectsIntoWorkspace(ws as unknown as Blockly.WorkspaceSvg, [
+      STONE_SKIN,
+    ]);
+    ws.blocks[0]!.fields['amount'] = '30';
+    const out = generateJson(ws as unknown as Blockly.WorkspaceSvg);
+    expect(out[0]!.overrideParams).toEqual({
+      ...STONE_SKIN.overrideParams,
+      amount: 30,
+    });
+  });
+});
+
+describe('effect rows without a dedicated block', () => {
+  afterEach(() => clearEffectEditorData());
+
+  it('keeps a status-type variant (Refreshed) on the status block with its own id', () => {
+    const ws = statusWorkspace();
+    const refreshed: AbilityEffectOutput = {
+      effectId: 29,
+      order: 0,
+      chancePct: 100,
+      overrideParams: { duration: 600, durationUnit: 'seconds' },
+    };
+    loadEffectsIntoWorkspace(ws as unknown as Blockly.WorkspaceSvg, [
+      refreshed,
+    ]);
+    expect(ws.blocks[0]!.type).toBe('effect_status');
+    expect(generateJson(ws as unknown as Blockly.WorkspaceSvg)).toEqual([
+      refreshed,
+    ]);
+  });
+
+  it('edits alter_object through the generic block without dropping it', () => {
+    const ws = statusWorkspace();
+    const alter: AbilityEffectOutput = {
+      effectId: 30,
+      order: 0,
+      chancePct: 100,
+      trigger: 'on_cast',
+      overrideParams: { mode: 'add', setFlags: ['NO_DROP'], amount: 2 },
+    };
+    loadEffectsIntoWorkspace(ws as unknown as Blockly.WorkspaceSvg, [alter]);
+    expect(ws.blocks[0]!.type).toBe('effect_generic');
+    expect(ws.blocks[0]!.fields['effectId']).toBe('30');
+    expect(generateJson(ws as unknown as Blockly.WorkspaceSvg)).toEqual([
+      alter,
+    ]);
+    ws.blocks[0]!.fields['params'] = '{"mode":"remove"}';
+    expect(
+      generateJson(ws as unknown as Blockly.WorkspaceSvg)[0]!.overrideParams
+    ).toEqual({ mode: 'remove' });
+    ws.blocks[0]!.fields['params'] = '{oops';
+    expect(() => generateJson(ws as unknown as Blockly.WorkspaceSvg)).toThrow(
+      /valid JSON/
+    );
   });
 });
 

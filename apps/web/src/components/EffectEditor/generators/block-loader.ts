@@ -1,11 +1,17 @@
 import type Blockly from 'blockly';
 import type { AbilityEffectOutput } from './json-generator';
 import { getFieldNamesForBlockType } from './json-generator';
-import { cloneJson, stringifyFieldValue, writeBlockData } from './block-data';
+import {
+  cloneJson,
+  listBlockFieldNames,
+  stringifyFieldValue,
+  writeBlockData,
+} from './block-data';
 import {
   formatZoneId,
   getBlockTypeForEffectId,
   getFieldNamesForEffect,
+  GENERIC_EFFECT_BLOCK,
 } from '../blocks/data-registry';
 
 /**
@@ -84,10 +90,7 @@ function setBlockField(
   value: unknown
 ): void {
   const field = block.getField(fieldName);
-  if (!field) {
-    console.warn(`Field "${fieldName}" not found on block "${block.type}"`);
-    return;
-  }
+  if (!field) return;
 
   // Handle different value types
   if (typeof value === 'boolean') {
@@ -134,12 +137,26 @@ function createBlockFromEffect(
   const block = workspace.newBlock(blockType);
 
   // Set override params
-  const fieldMapping = getFieldMappingsForBlockType(blockType);
+  const fieldMapping = { ...getFieldMappingsForBlockType(blockType) };
   const params = effect.overrideParams || {};
 
-  for (const [paramKey, fieldName] of Object.entries(fieldMapping)) {
-    if (paramKey in params) {
-      setBlockField(block, fieldName, params[paramKey]);
+  // default_params only names a subset of what a block can edit (the status
+  // block's type/amount, for instance), so also load every field the block
+  // really has. Param names double as field names.
+  for (const name of listBlockFieldNames(block)) {
+    if (name !== 'trigger' && name !== 'chancePct' && !(name in fieldMapping)) {
+      fieldMapping[name] = name;
+    }
+  }
+
+  if (blockType === GENERIC_EFFECT_BLOCK) {
+    setBlockField(block, 'effectId', effect.effectId);
+    setBlockField(block, 'params', JSON.stringify(params));
+  } else {
+    for (const [paramKey, fieldName] of Object.entries(fieldMapping)) {
+      if (paramKey in params) {
+        setBlockField(block, fieldName, params[paramKey]);
+      }
     }
   }
 
@@ -202,7 +219,10 @@ function createBlockFromEffect(
   }
   const baseline: Record<string, string> = {};
   for (const name of [
-    ...getFieldNamesForBlockType(blockType),
+    ...new Set([
+      ...getFieldNamesForBlockType(blockType),
+      ...listBlockFieldNames(block),
+    ]),
     'trigger',
     'chancePct',
   ]) {
@@ -211,6 +231,7 @@ function createBlockFromEffect(
     }
   }
   writeBlockData(block, {
+    effectId: effect.effectId,
     originalParams,
     baseline,
     trigger: effect.trigger,

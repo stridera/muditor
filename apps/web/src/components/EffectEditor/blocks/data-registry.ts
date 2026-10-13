@@ -309,30 +309,84 @@ export function formatZoneId(zoneId: number, id: number): string {
   return `${zoneId}:${id}`;
 }
 
+/** Block type used for effects that have no dedicated block (generic JSON editor). */
+export const GENERIC_EFFECT_BLOCK = 'effect_generic';
+
 /**
- * Build a mapping from block type (e.g., "effect_damage") to effect ID
- * This replaces the hardcoded EFFECT_TYPE_TO_ID constant
+ * Effect types that have a dedicated Blockly block (`effect_<type>`).
+ * Any Effect row whose name/effectType is not listed here is edited through
+ * the generic block, so no effect row can ever be dropped by the editor.
+ */
+export const DEDICATED_EFFECT_TYPES: ReadonlySet<string> = new Set([
+  'damage',
+  'heal',
+  'modify',
+  'status',
+  'cleanse',
+  'dispel',
+  'reveal',
+  'teleport',
+  'extract',
+  'move',
+  'interrupt',
+  'transform',
+  'resurrect',
+  'create',
+  'summon',
+  'enchant',
+  'globe',
+  'room',
+  'portal',
+  'conceal_item',
+  'dismount',
+  'drag',
+  'inspect',
+  'intercept',
+  'knockdown',
+  'redirect',
+  'stun',
+  'stop_combat',
+]);
+
+/**
+ * Block type that edits a given Effect row. Prefers the block named after the
+ * effect, then the block for its effectType (e.g. the "Refreshed" status
+ * variant uses the status block), then the generic JSON block.
+ */
+function blockTypeForEffect(effect: EffectOption): string {
+  const byName = effect.name.toLowerCase();
+  if (DEDICATED_EFFECT_TYPES.has(byName)) return `effect_${byName}`;
+  if (DEDICATED_EFFECT_TYPES.has(effect.effectType)) {
+    return `effect_${effect.effectType}`;
+  }
+  return GENERIC_EFFECT_BLOCK;
+}
+
+/**
+ * Build a mapping from block type (e.g., "effect_damage") to effect ID.
+ * When several Effect rows share a block type (status + Refreshed) the one
+ * named after the block wins; the generic block has no fixed effect.
  */
 export function getEffectTypeToIdMap(): Record<string, number> {
   const map: Record<string, number> = {};
   for (const effect of registryData.effects) {
-    // Block type is "effect_" + lowercase name (e.g., "effect_damage")
-    const blockType = `effect_${effect.name.toLowerCase()}`;
-    map[blockType] = effect.id;
+    const blockType = blockTypeForEffect(effect);
+    if (blockType === GENERIC_EFFECT_BLOCK) continue;
+    const canonical = blockType === `effect_${effect.name.toLowerCase()}`;
+    if (canonical || !(blockType in map)) {
+      map[blockType] = effect.id;
+    }
   }
   return map;
 }
 
 /**
- * Build a mapping from effect ID to block type (e.g., 1 -> "effect_damage")
- * This replaces the hardcoded EFFECT_ID_TO_TYPE constant
+ * Build a mapping from effect ID to the block type that edits it.
  */
 export function getEffectIdToTypeMap(): Record<number, string> {
   const map: Record<number, string> = {};
   for (const effect of registryData.effects) {
-    // Block type is "effect_" + lowercase name (e.g., "effect_damage")
-    const blockType = `effect_${effect.name.toLowerCase()}`;
-    map[effect.id] = blockType;
+    map[effect.id] = blockTypeForEffect(effect);
   }
   return map;
 }
