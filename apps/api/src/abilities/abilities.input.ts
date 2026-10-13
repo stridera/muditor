@@ -1,6 +1,17 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
-import { IsOptional, IsString, Matches } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 import {
   Position,
   Prisma,
@@ -203,30 +214,48 @@ export class CreateAbilityEffectInput {
   condition?: string;
 }
 
+// The global ValidationPipe whitelists with forbidNonWhitelisted, so every
+// property here needs a class-validator decorator or the whole mutation is
+// rejected with "property effects should not exist".
 @InputType()
 export class AbilityEffectItemInput {
   @Field(() => Int)
+  @IsInt()
   effectId: number;
 
   @Field(() => GraphQLJSON, { nullable: true })
+  @IsOptional()
+  @IsObject()
   overrideParams?: Prisma.InputJsonValue;
 
   @Field(() => Int)
+  @IsInt()
+  @Min(0)
   order: number;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
   trigger?: string;
 
   @Field(() => Int, { defaultValue: 100 })
+  @IsInt()
+  @Min(0)
+  @Max(100)
   chancePct: number;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
   condition?: string;
 }
 
 @InputType()
 export class UpdateAbilityEffectsInput {
   @Field(() => [AbilityEffectItemInput])
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AbilityEffectItemInput)
   effects: AbilityEffectItemInput[];
 }
 
