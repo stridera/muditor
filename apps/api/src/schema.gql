@@ -1061,6 +1061,7 @@ input CreateObjectInput {
   weaponDiceBonus: Int
   weaponDiceNum: Int
   weaponDiceSize: Int
+  weaponElement: DamageType
   wearFlags: [WearFlag!]! = []
   weight: Float! = 0
   zoneId: Int!
@@ -2657,6 +2658,11 @@ type ObjectDto {
 
   """WEAPON: sides per damage die"""
   weaponDiceSize: Int!
+
+  """
+  WEAPON: element the weapon deals (fire, cold, ...); the damage type keeps the physical family
+  """
+  weaponElement: DamageType
   wearFlags: [WearFlag!]!
   weight: Float!
   zoneId: Int!
@@ -4528,6 +4534,7 @@ input UpdateObjectInput {
   weaponDiceBonus: Int
   weaponDiceNum: Int
   weaponDiceSize: Int
+  weaponElement: DamageType
   wearFlags: [WearFlag!]
   weight: Float
   zoneId: Int

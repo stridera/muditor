@@ -160,6 +160,21 @@ describe('ObjectsResolver: weapon and armor columns', () => {
     });
   });
 
+  it('updateObject sets and clears the weapon element', async () => {
+    await resolver
+      .updateObject(23, 1, { weaponElement: DamageType.COLD } as never)
+      .catch(() => undefined);
+    expect(service.update.mock.calls[0]![2]).toMatchObject({
+      weaponElement: 'COLD',
+    });
+    await resolver
+      .updateObject(23, 1, { weaponElement: null } as never)
+      .catch(() => undefined);
+    expect(service.update.mock.calls[1]![2]).toMatchObject({
+      weaponElement: null,
+    });
+  });
+
   it('rejects nonsense dice before touching the database', async () => {
     await expect(
       resolver.updateObject(23, 1, {
@@ -214,12 +229,14 @@ describe('object DTO validation', () => {
   it('rejects an unknown damage type and fractional dice', async () => {
     const bad = plainToInstance(UpdateObjectInput, {
       weaponDamageType: 'LASER',
+      weaponElement: 'LASER',
       weaponDiceNum: 1.5,
     });
     const errors = await validate(bad, { whitelist: true });
     expect(errors.map(e => e.property).sort()).toEqual([
       'weaponDamageType',
       'weaponDiceNum',
+      'weaponElement',
     ]);
   });
 });
@@ -246,6 +263,7 @@ describe('mapObject: combat columns', () => {
       weaponDiceSize: 6,
       weaponDiceBonus: 3,
       weaponDamageType: DamageType.SLASH,
+      weaponElement: DamageType.COLD,
       armorPct: 0,
       flags: [],
       wearFlags: [],
@@ -257,6 +275,7 @@ describe('mapObject: combat columns', () => {
       weaponDiceSize: 6,
       weaponDiceBonus: 3,
       weaponDamageType: 'SLASH',
+      weaponElement: 'COLD',
       armorPct: 0,
     });
   });

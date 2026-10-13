@@ -61,6 +61,9 @@ export function mapObject(db: ObjectMapperSource): ObjectDto {
     ...(db.weaponDamageType != null && {
       weaponDamageType: db.weaponDamageType,
     }),
+    ...(db.weaponElement != null && {
+      weaponElement: db.weaponElement,
+    }),
     armorPct: db.armorPct,
     zoneId: db.zoneId,
     grantedEffects: (db.grantedEffects ?? []).map(ge => ({

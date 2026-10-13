@@ -1330,6 +1330,10 @@ model Objects {
   weaponDiceSize   Int         @default(0) @map("weapon_dice_size")
   weaponDiceBonus  Int         @default(0) @map("weapon_dice_bonus")
   weaponDamageType DamageType? @map("weapon_damage_type")
+  // Element an elemental weapon deals (FIRE/COLD/ACID/SHOCK/POISON/ALIGN), separate
+  // from the physical weaponDamageType that picks the weapon family (slashing /
+  // piercing / bludgeoning) and proficiency. NULL = deals its physical type.
+  weaponElement DamageType? @map("weapon_element")
 
   // Permanent fixture: If set, this object always exists in this room (no reset needed)
   // Use for fountains, signs, furniture, etc. that never move or despawn

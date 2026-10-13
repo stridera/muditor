@@ -44,6 +44,10 @@ describe('ObjectCombatFields', () => {
       target: { value: 'PIERCE' },
     });
     expect(onChange).toHaveBeenLastCalledWith({ weaponDamageType: 'PIERCE' });
+    fireEvent.change(screen.getByLabelText('Element'), {
+      target: { value: 'COLD' },
+    });
+    expect(onChange).toHaveBeenLastCalledWith({ weaponElement: 'COLD' });
   });
 
   it('offers None plus every damage type, and clears back to none', () => {

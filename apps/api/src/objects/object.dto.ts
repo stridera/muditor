@@ -146,6 +146,13 @@ export class ObjectDto {
   })
   weaponDamageType?: DamageType;
 
+  @Field(() => DamageType, {
+    nullable: true,
+    description:
+      'WEAPON: element the weapon deals (fire, cold, ...); the damage type keeps the physical family',
+  })
+  weaponElement?: DamageType;
+
   @Field(() => Int, {
     description: 'ARMOR: armor value (mitigation percent scale; higher = more)',
   })
@@ -326,6 +333,11 @@ export class CreateObjectInput {
   @IsEnum(DamageType)
   weaponDamageType?: DamageType | null;
 
+  @Field(() => DamageType, { nullable: true })
+  @IsOptional()
+  @IsEnum(DamageType)
+  weaponElement?: DamageType | null;
+
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
@@ -480,6 +492,11 @@ export class UpdateObjectInput {
   @IsOptional()
   @IsEnum(DamageType)
   weaponDamageType?: DamageType | null;
+
+  @Field(() => DamageType, { nullable: true })
+  @IsOptional()
+  @IsEnum(DamageType)
+  weaponElement?: DamageType | null;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

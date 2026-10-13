@@ -131,6 +131,28 @@ export function ObjectCombatFields({
             ))}
           </select>
         </div>
+        <div>
+          <label className='block text-sm font-medium text-muted-foreground mb-1'>
+            Element
+          </label>
+          <select
+            aria-label='Element'
+            value={value.weaponElement}
+            onChange={e => onChange({ weaponElement: e.target.value })}
+            className={INPUT_CLASS}
+          >
+            <option value=''>None</option>
+            {DAMAGE_TYPES.map(d => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+          <p className='text-xs text-muted-foreground mt-1'>
+            Elemental weapons deal this element (checked against resistances)
+            while the damage type above keeps the weapon family.
+          </p>
+        </div>
       </div>
       <p className='text-xs text-muted-foreground' data-testid='dice-summary'>
         {dice

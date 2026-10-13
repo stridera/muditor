@@ -106,6 +106,8 @@ export interface CombatColumns {
   weaponDiceBonus: number;
   /** '' = none */
   weaponDamageType: string;
+  /** '' = none; element the weapon deals, separate from its physical damage type */
+  weaponElement: string;
   armorPct: number;
 }
 
@@ -114,6 +116,7 @@ export const EMPTY_COMBAT_COLUMNS: CombatColumns = {
   weaponDiceSize: 0,
   weaponDiceBonus: 0,
   weaponDamageType: '',
+  weaponElement: '',
   armorPct: 0,
 };
 

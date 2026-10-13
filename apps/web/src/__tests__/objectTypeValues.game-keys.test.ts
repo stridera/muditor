@@ -56,6 +56,7 @@ describe('type value fields cover the keys the game reads', () => {
       weaponDiceSize: 0,
       weaponDiceBonus: 0,
       weaponDamageType: '',
+      weaponElement: '',
       armorPct: 0,
     });
   });

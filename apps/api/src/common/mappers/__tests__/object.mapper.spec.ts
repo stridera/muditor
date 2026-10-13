@@ -43,6 +43,7 @@ function base(): ObjectMapperSource {
     weaponDiceSize: 0,
     weaponDiceBonus: 0,
     weaponDamageType: null,
+    weaponElement: null,
     campKitTier: null,
     values: {}, // empty object satisfies JsonValue for test purposes
     zoneId: 5,

@@ -66,6 +66,7 @@ const GET_OBJECT = gql`
       weaponDiceSize
       weaponDiceBonus
       weaponDamageType
+      weaponElement
       armorPct
       zoneId
       flags
@@ -166,6 +167,7 @@ interface ObjectFormData {
   weaponDiceSize: number;
   weaponDiceBonus: number;
   weaponDamageType: string;
+  weaponElement: string;
   armorPct: number;
 }
 
@@ -511,6 +513,7 @@ function ObjectEditorContent() {
         weaponDiceSize: object.weaponDiceSize ?? 0,
         weaponDiceBonus: object.weaponDiceBonus ?? 0,
         weaponDamageType: object.weaponDamageType ?? '',
+        weaponElement: object.weaponElement ?? '',
         armorPct: object.armorPct ?? 0,
       });
       setSelectedFlags(object.flags || []);
@@ -626,12 +629,14 @@ function ObjectEditorContent() {
         zoneId: formZoneId,
         keywords,
         weaponDamageType,
+        weaponElement,
         ...fields
       } = formData;
       const saveData = {
         ...fields,
         // '' = no damage type; null clears it on update
         weaponDamageType: weaponDamageType || null,
+        weaponElement: weaponElement || null,
         keywords: parseKeywords(keywords),
         flags: selectedFlags,
         wearFlags: selectedWearFlags,
