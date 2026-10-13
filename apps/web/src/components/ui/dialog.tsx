@@ -29,12 +29,29 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+interface DialogContentProps extends React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Content
+> {
+  /**
+   * Draw the dim backdrop even though Radix omits it for `modal={false}`
+   * dialogs. Use both together for dialogs that host third-party widgets
+   * (e.g. Blockly) which render their popups outside the dialog.
+   */
+  forceOverlay?: boolean;
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DialogContentProps
+>(({ className, children, forceOverlay = false, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
+    {forceOverlay && (
+      <div
+        aria-hidden='true'
+        className='fixed inset-0 z-50 bg-background/80 backdrop-blur-sm'
+      />
+    )}
     <DialogPrimitive.Content
       ref={ref}
       className={cn(

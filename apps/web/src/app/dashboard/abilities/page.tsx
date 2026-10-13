@@ -342,6 +342,21 @@ export default function AbilitiesPage() {
     return matchesViolent && matchesArea;
   });
 
+  // Clicks inside Blockly's body-level popups (field editors, dropdowns,
+  // tooltips) are outside the dialog DOM but must not dismiss it.
+  const keepOpenForBlocklyWidgets = (event: Event) => {
+    // Radix dispatches this custom event on the original target.
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest(
+        '.blocklyWidgetDiv, .blocklyDropDownDiv, .blocklyTooltipDiv, .blocklyContextMenu'
+      )
+    ) {
+      event.preventDefault();
+    }
+  };
+
   const handleCreate = () => {
     setEditingAbilityId(null);
     setIsFormOpen(true);
@@ -935,7 +950,12 @@ export default function AbilitiesPage() {
       </AlertDialog>
 
       {/* Ability Details View Dialog */}
+      {/* Non-modal: the Blockly effect editor renders its field editors and
+          dropdowns into <body>, outside the dialog. A modal Radix dialog sets
+          pointer-events: none on the body and traps focus, which made every
+          block field unclickable and untypable. */}
       <Dialog
+        modal={false}
         open={!!viewingAbilityId}
         onOpenChange={open => {
           if (!open) {
@@ -947,7 +967,11 @@ export default function AbilitiesPage() {
           }
         }}
       >
-        <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
+        <DialogContent
+          forceOverlay
+          className='max-w-4xl max-h-[90vh] overflow-y-auto'
+          onInteractOutside={keepOpenForBlocklyWidgets}
+        >
           {loadingDetails ? (
             <>
               <DialogHeader>
