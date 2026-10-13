@@ -42,6 +42,17 @@ const isOn = (filters: SearchFilters, key: string) => {
   return v === true || v === 'true';
 };
 
+/** Tri-state boolean filter: true/false when set (including 'false'), else null. */
+export const boolFilter = (
+  filters: SearchFilters,
+  key: string
+): boolean | null => {
+  const v = filters.customFilters?.[key];
+  if (v === true || v === 'true') return true;
+  if (v === false || v === 'false') return false;
+  return null;
+};
+
 /** Search text sent to the server (blank becomes null). */
 export function searchText(filters: SearchFilters): string | null {
   return filters.searchTerm?.trim() || null;

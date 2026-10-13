@@ -141,6 +141,19 @@ describe('search filter <-> params', () => {
     }
     expect(searchFiltersFromParams(params)).toEqual(filters);
   });
+
+  it('keeps false boolean filters in the URL and restores them as false', () => {
+    const filters = {
+      searchTerm: '',
+      customFilters: { hasKeeper: false, isHighProfit: true },
+    };
+    const out = searchFiltersToParams(filters);
+    expect(out['f.hasKeeper']).toBe('false');
+    expect(out['f.isHighProfit']).toBe('true');
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(out)) if (v != null) params.set(k, v);
+    expect(searchFiltersFromParams(params)).toEqual(filters);
+  });
 });
 
 describe('useListReturnHref', () => {

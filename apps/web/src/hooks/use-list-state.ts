@@ -37,9 +37,7 @@ export function searchFiltersToParams(
   };
   for (const [key, value] of Object.entries(filters.customFilters ?? {})) {
     out[`f.${key}`] =
-      value === undefined || value === '' || value === false
-        ? null
-        : String(value);
+      value === undefined || value === '' ? null : String(value);
   }
   return out;
 }
@@ -58,7 +56,8 @@ export function searchFiltersFromParams(
   const custom: Record<string, string | boolean> = {};
   params.forEach((value, key) => {
     if (key.startsWith('f.')) {
-      custom[key.slice(2)] = value === 'true' ? true : value;
+      custom[key.slice(2)] =
+        value === 'true' ? true : value === 'false' ? false : value;
     }
   });
   if (Object.keys(custom).length) filters.customFilters = custom;

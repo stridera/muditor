@@ -1,4 +1,5 @@
 import {
+  boolFilter,
   DEFAULT_PAGE_SIZE,
   OBJECT_TYPES_ALL,
   mobFilterVars,
@@ -105,5 +106,20 @@ describe('paging helpers', () => {
       startItem: 0,
       endItem: 0,
     });
+  });
+});
+
+describe('boolFilter', () => {
+  it('is tri-state: true, false, or null when unset', () => {
+    const f = (v: boolean | string | undefined) => ({
+      searchTerm: '',
+      customFilters: { k: v },
+    });
+    expect(boolFilter(f(true), 'k')).toBe(true);
+    expect(boolFilter(f('true'), 'k')).toBe(true);
+    expect(boolFilter(f(false), 'k')).toBe(false);
+    expect(boolFilter(f('false'), 'k')).toBe(false);
+    expect(boolFilter(f(undefined), 'k')).toBeNull();
+    expect(boolFilter({ searchTerm: '' }, 'k')).toBeNull();
   });
 });

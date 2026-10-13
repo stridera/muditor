@@ -5,7 +5,7 @@ import { FlagBadge } from '@/components/ui/flag-badge';
 import { ListPager } from '@/components/ui/list-pager';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useListState } from '@/hooks/use-list-state';
-import { searchText } from '@/lib/list-query';
+import { boolFilter, searchText } from '@/lib/list-query';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ChevronDown, Edit, Plus, Trash2 } from 'lucide-react';
@@ -160,19 +160,18 @@ interface Shop {
   missingCash2?: string;
 }
 
+const shopKey = (shop: { zoneId: number; id: number }) =>
+  `${shop.zoneId}-${shop.id}`;
+
 function ShopsContent() {
   const list = useListState();
   const { zone: selectedZone, searchFilters, setSearchFilters } = list;
 
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [expandedShops, setExpandedShops] = useState<Set<number>>(new Set());
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [expandedShops, setExpandedShops] = useState<Set<string>>(new Set());
 
   const page = list.page;
   const debouncedSearch = useDebouncedValue(searchText(searchFilters), 300);
-  const customOn = (key: string) => {
-    const v = searchFilters.customFilters?.[key];
-    return v === true || v === 'true';
-  };
   const { loading, error, data, previousData, refetch } = useQuery<
     { shops: Shop[]; shopsCount: number },
     ShopsPageVariables
@@ -181,8 +180,8 @@ function ShopsContent() {
       // Omit (not null) when no zone is chosen: the list then spans all zones.
       ...(selectedZone != null && { zoneId: selectedZone }),
       search: debouncedSearch,
-      highProfit: customOn('isHighProfit') || null,
-      hasKeeper: customOn('hasKeeper') || null,
+      highProfit: boolFilter(searchFilters, 'isHighProfit'),
+      hasKeeper: boolFilter(searchFilters, 'hasKeeper'),
       skip: (page - 1) * SHOPS_PAGE_SIZE,
       take: SHOPS_PAGE_SIZE,
     },
@@ -194,11 +193,11 @@ function ShopsContent() {
 
   const [deleteShop] = useMutation(DELETE_SHOP);
 
-  const toggleShopExpanded = (shopId: number) => {
-    if (expandedShops.has(shopId)) {
-      setExpandedShops(new Set([...expandedShops].filter(id => id !== shopId)));
+  const toggleShopExpanded = (key: string) => {
+    if (expandedShops.has(key)) {
+      setExpandedShops(new Set([...expandedShops].filter(k => k !== key)));
     } else {
-      setExpandedShops(new Set(expandedShops).add(shopId));
+      setExpandedShops(new Set(expandedShops).add(key));
     }
   };
 
@@ -211,7 +210,7 @@ function ShopsContent() {
       return;
     }
 
-    setDeletingId(id);
+    setDeletingId(shopKey({ zoneId, id }));
     try {
       // Shop ids repeat across zones: the mutation needs the full (zoneId, id) key.
       await deleteShop({ variables: { id, zoneId } });
@@ -311,12 +310,12 @@ function ShopsContent() {
         <div className='grid gap-4'>
           {filteredShops.map((shop: Shop) => (
             <div
-              key={`${shop.zoneId}-${shop.id}`}
+              key={shopKey(shop)}
               className='bg-card border border-border rounded-lg hover:shadow-md transition-shadow'
             >
               <div
                 className='p-4 cursor-pointer'
-                onClick={() => toggleShopExpanded(shop.id)}
+                onClick={() => toggleShopExpanded(shopKey(shop))}
               >
                 <div className='flex items-start justify-between'>
                   <div className='flex-1'>
@@ -326,7 +325,7 @@ function ShopsContent() {
                       </h3>
                       <ChevronDown
                         className={`w-4 h-4 text-muted-foreground transition-transform ${
-                          expandedShops.has(shop.id) ? 'rotate-180' : ''
+                          expandedShops.has(shopKey(shop)) ? 'rotate-180' : ''
                         }`}
                       />
                     </div>
@@ -368,18 +367,18 @@ function ShopsContent() {
                         e.stopPropagation();
                         handleDelete(shop.id, shop.zoneId);
                       }}
-                      disabled={deletingId === shop.id}
+                      disabled={deletingId === shopKey(shop)}
                       className='inline-flex items-center text-destructive hover:text-destructive/80 px-3 py-1 text-sm disabled:opacity-50'
                     >
                       <Trash2 className='w-3 h-3 mr-1' />
-                      {deletingId === shop.id ? 'Deleting...' : 'Delete'}
+                      {deletingId === shopKey(shop) ? 'Deleting...' : 'Delete'}
                     </button>
                   </div>
                 </div>
               </div>
 
               {/* Expanded Details */}
-              {expandedShops.has(shop.id) && (
+              {expandedShops.has(shopKey(shop)) && (
                 <div className='border-t border-border p-4 bg-muted'>
                   <div className='space-y-4'>
                     {/* Keeper Details */}
