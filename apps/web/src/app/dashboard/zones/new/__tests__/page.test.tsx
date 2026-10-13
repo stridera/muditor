@@ -17,6 +17,11 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
+let mockIsHeadBuilder = true;
+jest.mock('@/hooks/use-permissions', () => ({
+  usePermissions: () => ({ isHeadBuilder: mockIsHeadBuilder }),
+}));
+
 jest.mock('@/components/auth/permission-guard', () => ({
   PermissionGuard: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -43,6 +48,7 @@ function fill(id: string, name: string) {
 describe('NewZonePage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsHeadBuilder = true;
     mockCreateZone.mockImplementation(async () => {
       const data = { createZone: { id: 9001, name: 'Test Zone' } };
       mutationOptions.onCompleted?.(data);
@@ -77,5 +83,12 @@ describe('NewZonePage', () => {
     fireEvent.click(submit);
     expect(mockCreateZone).not.toHaveBeenCalled();
     expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('shows builders an explanation instead of a form that would fail', () => {
+    mockIsHeadBuilder = false;
+    render(<NewZonePage />);
+    expect(screen.getByText(/created by a head builder/i)).toBeVisible();
+    expect(screen.queryByLabelText('Zone ID')).not.toBeInTheDocument();
   });
 });

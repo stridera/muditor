@@ -4,6 +4,7 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
 import { ClimateBadge } from '@/components/ui/climate-badge';
 import { LoadingError } from '@/components/ui/error-display';
+import { usePermissions } from '@/hooks/use-permissions';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
 import Link from 'next/link';
@@ -42,6 +43,8 @@ export default function ZonesPage() {
 
 function ZonesContent() {
   const router = useRouter();
+  // Creating a zone is HEAD_BUILDER+ (a new zone has no grant a BUILDER could hold)
+  const { isHeadBuilder } = usePermissions();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClimate, setSelectedClimate] = useState('all');
 
@@ -113,12 +116,14 @@ function ZonesContent() {
           >
             🗺️ World Map
           </Link>
-          <Link
-            href='/dashboard/zones/new'
-            className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/80 transition-colors'
-          >
-            Create Zone
-          </Link>
+          {isHeadBuilder && (
+            <Link
+              href='/dashboard/zones/new'
+              className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/80 transition-colors'
+            >
+              Create Zone
+            </Link>
+          )}
         </div>
       </div>
 

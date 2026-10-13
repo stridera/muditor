@@ -8,6 +8,7 @@ import {
   type Hemisphere,
   type ResetMode,
 } from '@/generated/graphql';
+import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -50,6 +51,7 @@ const MAX_ZONE_ID = 9999;
 
 function NewZoneForm() {
   const router = useRouter();
+  const { isHeadBuilder } = usePermissions();
   const { data: zonesData } = useQuery(GetZonesForSelectorDocument);
   const existingIds = new Set((zonesData?.zones ?? []).map(z => z.id));
 
@@ -98,6 +100,24 @@ function NewZoneForm() {
       // Surfaced through the mutation `error` state below
     }
   };
+
+  // Hooks above run for everyone; only the view differs.
+  if (!isHeadBuilder) {
+    return (
+      <div className='max-w-xl'>
+        <h1 className='text-3xl font-bold font-display text-foreground mb-6'>
+          Create Zone
+        </h1>
+        <p className='text-muted-foreground mb-4'>
+          Zones are created by a head builder or above. Ask one to create the
+          zone and grant you write access to it.
+        </p>
+        <Link href='/dashboard/zones' className='text-primary hover:underline'>
+          Back to zones
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className='max-w-xl'>
