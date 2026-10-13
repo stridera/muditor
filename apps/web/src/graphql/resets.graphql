@@ -147,7 +147,7 @@ mutation AddMobResetEquipment(
   $resetId: ID!
   $objectZoneId: Int!
   $objectId: Int!
-  $wearLocation: WearFlag
+  $wearLocation: String
   $maxInstances: Int
   $probability: Float
   $decorative: Boolean
@@ -167,7 +167,7 @@ mutation AddMobResetEquipment(
 
 mutation UpdateMobResetEquipment(
   $id: ID!
-  $wearLocation: WearFlag
+  $wearLocation: String
   $maxInstances: Int
   $probability: Float
   $decorative: Boolean

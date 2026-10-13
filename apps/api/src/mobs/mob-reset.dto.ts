@@ -1,17 +1,9 @@
-import {
-  Field,
-  Float,
-  ID,
-  InputType,
-  Int,
-  ObjectType,
-  registerEnumType,
-} from '@nestjs/graphql';
-import { Prisma, WearFlag } from '@muditor/db';
+import { Field, Float, ID, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Prisma } from '@muditor/db';
 import { Type } from 'class-transformer';
 import {
   IsArray,
-  IsEnum,
+  IsIn,
   IsInt,
   IsNumber,
   IsOptional,
@@ -21,11 +13,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import GraphQLJSON from 'graphql-type-json';
-
-// Register WearFlag enum for GraphQL
-registerEnumType(WearFlag, {
-  name: 'WearFlag',
-});
+import { MOB_GEAR_SLOT_LABELS, MOB_GEAR_SLOT_MESSAGE } from './mob-gear-slots';
 
 @ObjectType()
 export class ObjectAffectDto {
@@ -143,8 +131,9 @@ export class MobResetEquipmentDto {
   @Field(() => Int)
   objectId: number;
 
-  @Field(() => WearFlag, { nullable: true })
-  wearLocation?: WearFlag;
+  /** Free-text slot label (NULL = carried); tolerant of legacy labels. */
+  @Field(() => String, { nullable: true })
+  wearLocation?: string;
 
   @Field(() => Int)
   maxInstances: number;
@@ -218,10 +207,10 @@ export class CreateMobResetEquipmentInput {
   @IsInt()
   objectId: number;
 
-  @Field(() => WearFlag, { nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsEnum(WearFlag)
-  wearLocation?: WearFlag;
+  @IsIn(MOB_GEAR_SLOT_LABELS, { message: MOB_GEAR_SLOT_MESSAGE })
+  wearLocation?: string;
 
   @Field(() => Int, { defaultValue: 1 })
   @IsInt()
@@ -302,10 +291,10 @@ export class UpdateMobResetEquipmentInput {
   @IsInt()
   objectId?: number;
 
-  @Field(() => WearFlag, { nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsEnum(WearFlag)
-  wearLocation?: WearFlag;
+  @IsIn(MOB_GEAR_SLOT_LABELS, { message: MOB_GEAR_SLOT_MESSAGE })
+  wearLocation?: string;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

@@ -37,13 +37,13 @@ describe('reset inputs under the global validation pipe', () => {
         {
           objectZoneId: 30,
           objectId: 7,
-          wearLocation: 'MAINHAND',
+          wearLocation: 'WIELD',
           maxInstances: 1,
           probability: 1,
         },
       ],
     })) as CreateMobResetInput;
-    expect(out.equipment?.[0]).toMatchObject({ wearLocation: 'MAINHAND' });
+    expect(out.equipment?.[0]).toMatchObject({ wearLocation: 'WIELD' });
     expect(out.maxInstances).toBe(2);
   });
 
@@ -64,6 +64,11 @@ describe('reset inputs under the global validation pipe', () => {
       { probability: -0.1 },
       { mobId: 1.5 },
       { equipment: [{ objectZoneId: 1, objectId: 1, wearLocation: 'KNEES' }] },
+      { equipment: [{ objectZoneId: 1, objectId: 1, wearLocation: '' }] },
+      // Object wear flags are not mob gear slots: the game would just carry it.
+      {
+        equipment: [{ objectZoneId: 1, objectId: 1, wearLocation: 'MAINHAND' }],
+      },
       { surprise: true },
     ]) {
       await expect(

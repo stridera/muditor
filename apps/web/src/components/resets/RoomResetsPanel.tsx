@@ -23,7 +23,6 @@ import {
   type ObjectReset,
   type PickableEntity,
 } from '@/lib/reset-api';
-import type { WearFlag } from '@/generated/graphql';
 import { useCallback, useEffect, useState } from 'react';
 import { ContentTree } from './ContentTree';
 import { EntityPicker } from './EntityPicker';
@@ -31,31 +30,44 @@ import { EntityPicker } from './EntityPicker';
 const SMALL_INPUT =
   'w-16 rounded border border-input bg-background text-foreground px-1 py-0.5 text-xs';
 
-/** Where gear goes on the mob; "carried" is no wear location. */
-export const WEAR_LOCATIONS: readonly WearFlag[] = [
-  'MAINHAND',
-  'OFFHAND',
-  'TWOHAND',
+/**
+ * Where gear goes on the mob. These are the slot labels the game reads from
+ * `MobResetEquipment.wear_location`; "carried" is no wear location (NULL).
+ */
+export const WEAR_LOCATIONS: readonly string[] = [
+  'WIELD',
+  'HOLD',
+  'LIGHT',
   'HEAD',
   'FACE',
   'EYES',
-  'EAR',
+  'EAR_LEFT',
+  'EAR_RIGHT',
   'NECK',
+  'NECK_2',
   'BODY',
   'ABOUT',
   'ARMS',
-  'WRIST',
+  'WRIST_LEFT',
+  'WRIST_RIGHT',
   'HANDS',
-  'FINGER',
+  'FINGER_LEFT',
+  'FINGER_RIGHT',
   'WAIST',
   'BELT',
   'LEGS',
   'FEET',
-  'TAIL',
   'BADGE',
   'HOVER',
-  'DISGUISE',
 ];
+
+const slotLabel = (w: string) => w.toLowerCase().replace(/_/g, ' ');
+
+/** Slot options for a select, keeping a legacy label the row already holds. */
+const slotOptions = (current?: string | null): string[] =>
+  current && !WEAR_LOCATIONS.includes(current)
+    ? [current, ...WEAR_LOCATIONS]
+    : [...WEAR_LOCATIONS];
 
 export interface RoomResetsSummary {
   mobs: Array<{ id: number; zoneId: number; name: string }>;
@@ -273,7 +285,7 @@ export function RoomResetsPanel({
       addMobEquipment(resetId, {
         objectZoneId: e.zoneId,
         objectId: e.id,
-        wearLocation: slot ? (slot as WearFlag) : null,
+        wearLocation: slot || null,
         maxInstances: 1,
         probability: 1,
       })
@@ -290,18 +302,16 @@ export function RoomResetsPanel({
           onChange={ev =>
             act(() =>
               updateMobEquipment(eq.id, {
-                wearLocation: ev.target.value
-                  ? (ev.target.value as WearFlag)
-                  : null,
+                wearLocation: ev.target.value || null,
               })
             )
           }
           className='rounded border border-input bg-background text-foreground px-1 py-0.5'
         >
           <option value=''>carried</option>
-          {WEAR_LOCATIONS.map(w => (
+          {slotOptions(eq.wearLocation).map(w => (
             <option key={w} value={w}>
-              {w.toLowerCase()}
+              {slotLabel(w)}
             </option>
           ))}
         </select>
@@ -429,7 +439,7 @@ export function RoomResetsPanel({
                   <option value=''>carried</option>
                   {WEAR_LOCATIONS.map(w => (
                     <option key={w} value={w}>
-                      {w.toLowerCase()}
+                      {slotLabel(w)}
                     </option>
                   ))}
                 </select>

@@ -6,7 +6,6 @@ import { hidesGodZones } from '../common/god-zone-visibility';
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { zoneLookups } from '../common/decorators/zone-lookups';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { WearFlag } from '@muditor/db';
 import {
   CreateMobResetInput,
   MobResetDto,
@@ -112,8 +111,8 @@ export class MobResetResolver {
     @Args('resetId', { type: () => ID }, ParseIntPipe) resetId: number,
     @Args('objectZoneId', { type: () => Int }) objectZoneId: number,
     @Args('objectId', { type: () => Int }) objectId: number,
-    @Args('wearLocation', { type: () => WearFlag, nullable: true })
-    wearLocation?: WearFlag,
+    @Args('wearLocation', { type: () => String, nullable: true })
+    wearLocation?: string | null,
     @Args('maxInstances', { type: () => Int, nullable: true })
     maxInstances?: number,
     @Args('probability', { type: () => Number, nullable: true })
@@ -124,7 +123,7 @@ export class MobResetResolver {
     const equipmentData: {
       objectZoneId: number;
       objectId: number;
-      wearLocation?: WearFlag;
+      wearLocation?: string | null;
       maxInstances?: number;
       probability?: number;
       decorative?: boolean;
@@ -143,8 +142,8 @@ export class MobResetResolver {
   @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipment('id') })
   async updateMobResetEquipment(
     @Args('id', { type: () => ID }, ParseIntPipe) id: number,
-    @Args('wearLocation', { type: () => WearFlag, nullable: true })
-    wearLocation?: WearFlag,
+    @Args('wearLocation', { type: () => String, nullable: true })
+    wearLocation?: string | null,
     @Args('maxInstances', { type: () => Int, nullable: true })
     maxInstances?: number,
     @Args('probability', { type: () => Number, nullable: true })
@@ -153,7 +152,7 @@ export class MobResetResolver {
     decorative?: boolean
   ): Promise<boolean> {
     const updates: {
-      wearLocation?: WearFlag;
+      wearLocation?: string | null;
       maxInstances?: number;
       probability?: number;
       decorative?: boolean;

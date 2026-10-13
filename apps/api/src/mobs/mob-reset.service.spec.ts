@@ -1,6 +1,5 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { WearFlag } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import { MobResetService } from './mob-reset.service';
 
@@ -9,7 +8,7 @@ interface MockMobResetEquipment {
   id: number;
   objectZoneId: number;
   objectId: number;
-  wearLocation: WearFlag | null;
+  wearLocation: string | null;
   maxInstances: number;
   probability: number;
   objects: { id: number; zoneId: number; name: string; type: string };
@@ -38,6 +37,7 @@ describe('MobResetService mapping', () => {
     const mockDb = {
       mobResets: {
         findMany: jest.fn(),
+        findFirst: jest.fn(),
         findUnique: jest.fn(),
         create: jest.fn(),
         update: jest.fn(),
@@ -102,6 +102,40 @@ describe('MobResetService mapping', () => {
     expect(dto.room?.name).toBe('Cavern');
   });
 
+  it('reads a blank legacy wearLocation as carried and keeps legacy labels', async () => {
+    const eq = (id: number, wearLocation: string | null) => ({
+      id,
+      objectZoneId: 5,
+      objectId: 201,
+      wearLocation,
+      maxInstances: 1,
+      probability: 1.0,
+      objects: { id: 201, zoneId: 5, name: 'Bow', type: 'WEAPON' },
+    });
+    (db.mobResets.findMany as jest.Mock).mockResolvedValue([
+      {
+        id: 12,
+        zoneId: 5,
+        mobZoneId: 5,
+        mobId: 23,
+        roomZoneId: 5,
+        roomId: 101,
+        maxInstances: 1,
+        probability: 1.0,
+        comment: null,
+        mobResetEquipment: [eq(1, ''), eq(2, 'NECK_1'), eq(3, null)],
+        mobs: null,
+        rooms: null,
+      },
+    ]);
+    const result = await service.findByMob(5, 23);
+    expect(result[0]!.equipment.map(e => e.wearLocation)).toEqual([
+      undefined,
+      'NECK_1',
+      undefined,
+    ]);
+  });
+
   it('retains wearLocation when present', async () => {
     const mockReset: MockMobReset = {
       id: 11,
@@ -118,7 +152,7 @@ describe('MobResetService mapping', () => {
           id: 100,
           objectZoneId: 5,
           objectId: 201,
-          wearLocation: WearFlag.MAINHAND,
+          wearLocation: 'WIELD',
           maxInstances: 1,
           probability: 1.0,
           objects: { id: 201, zoneId: 5, name: 'Short Bow', type: 'WEAPON' },
@@ -130,7 +164,33 @@ describe('MobResetService mapping', () => {
     (db.mobResets.findMany as jest.Mock).mockResolvedValue([mockReset]);
 
     const result = await service.findByMob(5, 23);
-    expect(result[0]!.equipment[0]!.wearLocation).toBe(WearFlag.MAINHAND);
+    expect(result[0]!.equipment[0]!.wearLocation).toBe('WIELD');
+  });
+
+  describe('equipment slot writes', () => {
+    it('stores NULL for carried and rejects a blank or non-game slot', async () => {
+      (db.mobResetEquipment.create as jest.Mock).mockResolvedValue({});
+      (db.mobResets.findFirst as jest.Mock).mockResolvedValue(null);
+      await service.addEquipment(1, {
+        objectZoneId: 5,
+        objectId: 2,
+        wearLocation: null,
+      });
+      expect(
+        (db.mobResetEquipment.create as jest.Mock).mock.calls[0][0].data
+          .wearLocation
+      ).toBeNull();
+      await expect(
+        service.addEquipment(1, {
+          objectZoneId: 5,
+          objectId: 2,
+          wearLocation: '',
+        })
+      ).rejects.toBeInstanceOf(BadRequestException);
+      await expect(
+        service.updateEquipment(1, { wearLocation: 'MAINHAND' })
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
   });
 
   it('keeps explicit 0 for probability and maxInstances on create (not 1)', async () => {

@@ -8,7 +8,6 @@ import {
   type MobResetEquipmentContents,
   type MobResets,
   Prisma,
-  WearFlag,
 } from '@muditor/db';
 import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
@@ -18,6 +17,7 @@ import {
   rethrowResetRowError,
   rethrowResetWriteError,
 } from '../common/reset-content.util';
+import { assertMobGearSlot } from './mob-gear-slots';
 import {
   CreateMobResetInput,
   MobResetDto,
@@ -267,7 +267,7 @@ export class MobResetService {
     equipment: {
       objectZoneId: number;
       objectId: number;
-      wearLocation?: WearFlag;
+      wearLocation?: string | null;
       maxInstances?: number;
       probability?: number;
       decorative?: boolean;
@@ -279,7 +279,7 @@ export class MobResetService {
           resetId,
           objectZoneId: equipment.objectZoneId,
           objectId: equipment.objectId,
-          wearLocation: equipment.wearLocation ?? null,
+          wearLocation: assertMobGearSlot(equipment.wearLocation) ?? null,
           maxInstances: equipment.maxInstances ?? 1,
           probability: equipment.probability ?? 1.0,
           decorative: equipment.decorative ?? false,
@@ -297,7 +297,7 @@ export class MobResetService {
   async updateEquipment(
     equipmentId: number,
     updates: {
-      wearLocation?: WearFlag;
+      wearLocation?: string | null;
       maxInstances?: number;
       probability?: number;
       decorative?: boolean;
@@ -306,7 +306,9 @@ export class MobResetService {
     try {
       const data: Prisma.MobResetEquipmentUncheckedUpdateInput = {};
       if (updates.wearLocation !== undefined)
-        data.wearLocation = { set: updates.wearLocation ?? null };
+        data.wearLocation = {
+          set: assertMobGearSlot(updates.wearLocation) ?? null,
+        };
       if (updates.maxInstances !== undefined)
         data.maxInstances = { set: updates.maxInstances };
       if (updates.probability !== undefined)
@@ -414,8 +416,8 @@ export class MobResetService {
         id: eq.id,
         objectZoneId: eq.objectZoneId,
         objectId: eq.objectId,
-        wearLocation:
-          eq.wearLocation === null ? undefined : (eq.wearLocation as WearFlag),
+        // NULL is carried; a stray blank label (legacy bad row) reads as carried too.
+        wearLocation: eq.wearLocation?.trim() ? eq.wearLocation : undefined,
         maxInstances: eq.maxInstances,
         probability: eq.probability,
         decorative: eq.decorative ?? false,

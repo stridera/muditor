@@ -24,7 +24,6 @@ import {
   UpdateRoomExtraDescriptionsDocument,
   type MobResetFullFragment,
   type ObjectResetFullFragment,
-  type WearFlag,
 } from '@/generated/graphql';
 import { authenticatedGraphQLFetch } from '@/lib/authenticated-fetch';
 
@@ -163,7 +162,7 @@ export async function addMobEquipment(
   input: {
     objectZoneId: number;
     objectId: number;
-    wearLocation?: WearFlag | null;
+    wearLocation?: string | null;
     maxInstances?: number;
     probability?: number;
     decorative?: boolean;
@@ -179,7 +178,7 @@ export async function addMobEquipment(
 export async function updateMobEquipment(
   id: string,
   patch: {
-    wearLocation?: WearFlag | null;
+    wearLocation?: string | null;
     maxInstances?: number;
     probability?: number;
     decorative?: boolean;

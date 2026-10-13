@@ -62,7 +62,7 @@ const goblinReset = {
       id: '11',
       objectZoneId: 30,
       objectId: 7,
-      wearLocation: 'MAINHAND',
+      wearLocation: 'WIELD',
       maxInstances: 1,
       probability: 0.5,
       decorative: false,
@@ -166,7 +166,7 @@ describe('RoomResetsPanel listing', () => {
       screen.getByLabelText('Max instances of a goblin guard')
     ).toHaveValue(2);
     expect(screen.getByLabelText('Wear location of a rusty sword')).toHaveValue(
-      'MAINHAND'
+      'WIELD'
     );
     expect(screen.getByLabelText('Chance of a rusty sword')).toHaveValue(50);
     // gear container contents
@@ -364,12 +364,12 @@ describe('RoomResetsPanel mob gear', () => {
     fireEvent.change(
       await screen.findByLabelText('Wear location of a rusty sword'),
       {
-        target: { value: 'OFFHAND' },
+        target: { value: 'HOLD' },
       }
     );
     await waitFor(() =>
       expect(m.updateMobEquipment).toHaveBeenCalledWith('11', {
-        wearLocation: 'OFFHAND',
+        wearLocation: 'HOLD',
       })
     );
     fireEvent.change(screen.getByLabelText('Wear location of a rusty sword'), {

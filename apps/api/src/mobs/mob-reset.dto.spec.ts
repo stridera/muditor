@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { WearFlag } from '@muditor/db';
 import {
   CreateMobResetEquipmentInput,
   CreateMobResetInput,
@@ -28,7 +27,7 @@ describe('mob reset input validation', () => {
         {
           objectZoneId: 30,
           objectId: 9,
-          wearLocation: WearFlag.HEAD,
+          wearLocation: 'HEAD',
           maxInstances: 1,
           probability: 1,
         },
