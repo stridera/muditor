@@ -379,7 +379,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
       </div>
       {viewMode === 'edit' && (
         <div
-          className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
+          className={`px-2 py-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
         >
           <div
             className={`grid grid-cols-6 gap-0.5 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-1 rounded-lg`}

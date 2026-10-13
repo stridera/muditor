@@ -3116,7 +3116,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             }}
             maskColor='hsl(var(--background) / 0.6)'
             style={{
-              // background + border come from zone-editor.css (theme aware)
+              backgroundColor: 'hsl(var(--card))',
+              border: '1px solid hsl(var(--border))',
               cursor: 'pointer', // Show pointer cursor to indicate clickability
             }}
             pannable
