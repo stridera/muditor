@@ -34,6 +34,9 @@ import { toast } from 'sonner';
 import { extractErrorMessage } from '@/lib/error-utils';
 import ScriptEditor, { type Script } from './ScriptEditor';
 
+/** Max rows rendered in the Attach Existing list; search narrows the rest. */
+const MAX_ATTACH_ROWS = 100;
+
 const GET_TRIGGERS = gql`
   query GetTriggersInline {
     triggers {
@@ -244,11 +247,17 @@ export default function TriggerManager({
   const availableForAttachment = allTriggers.filter(
     trigger =>
       trigger.attachType === entityType &&
-      !attachedTriggers.some(attached => attached.id === trigger.id) &&
+      !attachedTriggers.some(
+        attached =>
+          attached.id === trigger.id && attached.zoneId === trigger.zoneId
+      ) &&
       (searchTerm === '' ||
         trigger.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         trigger.commands.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Rendering ~300 rows at once is slow; the search box narrows the rest.
+  const visibleForAttachment = availableForAttachment.slice(0, MAX_ATTACH_ROWS);
 
   // Triggers attach to entities via junction rows, so create first, then attach.
   const createAndAttach = async (input: Record<string, unknown>) => {
@@ -362,6 +371,8 @@ export default function TriggerManager({
       refetchAttached();
       refetchAll();
       onTriggerChange?.();
+      setIsAttachDialogOpen(false);
+      setSearchTerm('');
     } catch (error) {
       console.error('Error attaching trigger:', error);
       toast.error(
@@ -494,7 +505,7 @@ export default function TriggerManager({
                 Attach Existing
               </Button>
             </DialogTrigger>
-            <DialogContent className='max-w-2xl'>
+            <DialogContent className='max-w-2xl max-h-[90vh] overflow-hidden'>
               <DialogHeader>
                 <DialogTitle>Attach Trigger</DialogTitle>
                 <DialogDescription>
@@ -503,25 +514,30 @@ export default function TriggerManager({
                 </DialogDescription>
               </DialogHeader>
 
-              <div className='space-y-4'>
+              <div className='min-w-0 space-y-4'>
                 <Input
                   placeholder='Search triggers...'
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                 />
 
-                <div className='max-h-96 overflow-y-auto space-y-2'>
+                <div className='max-h-[55vh] min-w-0 overflow-y-auto space-y-2'>
                   {availableForAttachment.length === 0 ? (
                     <div className='text-center text-gray-500 py-8'>
                       No {entityLabel} triggers available for attachment
                     </div>
                   ) : (
-                    availableForAttachment.map(trigger => (
-                      <Card key={trigger.id} className='hover:bg-gray-50'>
+                    visibleForAttachment.map(trigger => (
+                      <Card
+                        key={`${trigger.zoneId}:${trigger.id}`}
+                        className='hover:bg-gray-50'
+                      >
                         <CardContent className='p-4'>
-                          <div className='flex items-center justify-between'>
-                            <div className='flex-1'>
-                              <h4 className='font-medium'>{trigger.name}</h4>
+                          <div className='flex items-center justify-between gap-3'>
+                            <div className='min-w-0 flex-1'>
+                              <h4 className='font-medium break-words'>
+                                {trigger.name}
+                              </h4>
                               <p className='text-sm text-gray-600 truncate'>
                                 {trigger.commands.split('\n')[0]}
                               </p>
@@ -539,6 +555,7 @@ export default function TriggerManager({
                             <Button
                               onClick={() => handleAttachTrigger(trigger)}
                               size='sm'
+                              className='shrink-0'
                             >
                               Attach
                             </Button>
@@ -546,6 +563,13 @@ export default function TriggerManager({
                         </CardContent>
                       </Card>
                     ))
+                  )}
+                  {availableForAttachment.length > MAX_ATTACH_ROWS && (
+                    <p className='py-2 text-center text-xs text-gray-500'>
+                      Showing {MAX_ATTACH_ROWS} of{' '}
+                      {availableForAttachment.length}. Search to narrow the
+                      list.
+                    </p>
                   )}
                 </div>
               </div>
@@ -567,7 +591,7 @@ export default function TriggerManager({
         <div className='space-y-3'>
           {attachedTriggers.map(trigger => (
             <Card
-              key={trigger.id}
+              key={`${trigger.zoneId}:${trigger.id}`}
               className='hover:shadow-md transition-shadow'
             >
               <CardHeader className='pb-3'>
