@@ -61,6 +61,27 @@ export class ObjectAbilitiesService {
         `At most ${MAX_ITEM_SPELLS} spells per object`
       );
     }
+    // A list argument is not run through class-validator, so check here.
+    inputs.forEach((input, i) => {
+      const bad = (what: string) =>
+        new BadRequestException(`Spell ${i + 1}: ${what}`);
+      if (!Number.isInteger(input.abilityId))
+        throw bad('abilityId must be a whole number');
+      if (
+        !Number.isInteger(input.level) ||
+        input.level < 0 ||
+        input.level > 1000
+      )
+        throw bad('level must be a whole number from 0 to 1000');
+      if (
+        input.charges !== undefined &&
+        input.charges !== null &&
+        (!Number.isInteger(input.charges) ||
+          input.charges < 0 ||
+          input.charges > 10_000)
+      )
+        throw bad('charges must be a whole number from 0 to 10000');
+    });
     const charged = CHARGED_TYPES.includes(object.type);
 
     const abilityIds = [...new Set(inputs.map(i => i.abilityId))];

@@ -128,6 +128,19 @@ describe('ObjectAbilitiesService.replace', () => {
   });
 });
 
+describe('ObjectAbilitiesService.replace input checks', () => {
+  it.each([
+    [{ abilityId: 7, level: -1 }, /level must be/],
+    [{ abilityId: 7, level: 1001 }, /level must be/],
+    [{ abilityId: 7, level: 1.5 }, /level must be/],
+    [{ abilityId: 7, level: 5, charges: -2 }, /charges must be/],
+  ])('rejects %j', async (input, message) => {
+    await expect(
+      make({ type: 'WAND', values: {} }).service.replace(30, 5, [input])
+    ).rejects.toThrow(message);
+  });
+});
+
 describe('ObjectAbilitiesService.list', () => {
   it('returns [] for a hidden or missing object', async () => {
     expect(await make(null).service.list(30, 5)).toEqual([]);

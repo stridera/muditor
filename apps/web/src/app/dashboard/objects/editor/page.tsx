@@ -2166,7 +2166,10 @@ function ObjectEditorContent() {
                   <ItemSpellsEditor
                     type={formData.type}
                     rows={itemSpells}
-                    defaultLevel={itemSpells.at(-1)?.level ?? 1}
+                    defaultLevel={
+                      itemSpells.at(-1)?.level ??
+                      (Number(formData.values['Level']) || 1)
+                    }
                     onChange={rows => {
                       setItemSpells(rows);
                       setItemSpellsDirty(true);
