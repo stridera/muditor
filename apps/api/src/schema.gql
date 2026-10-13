@@ -1017,7 +1017,7 @@ input CreateMobResetEquipmentInput {
   objectId: Int!
   objectZoneId: Int!
   probability: Float! = 1
-  wearLocation: WearFlag
+  wearLocation: String
 }
 
 input CreateMobResetInput {
@@ -2147,7 +2147,7 @@ type MobResetEquipmentDto {
   objectId: Int!
   objectZoneId: Int!
   probability: Float!
-  wearLocation: WearFlag
+  wearLocation: String
 }
 
 enum MobRole {
@@ -2219,7 +2219,7 @@ enum MovementMode {
 }
 
 type Mutation {
-  addMobResetEquipment(decorative: Boolean, maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: WearFlag): MobResetDto!
+  addMobResetEquipment(decorative: Boolean, maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: String): MobResetDto!
   addMobResetEquipmentContent(data: ResetContentInput!, equipmentId: ID!): MobResetDto!
   addObjectResetContent(data: ResetContentInput!, resetId: ID!): ObjectResetDto!
 
@@ -2480,6 +2480,7 @@ type Mutation {
   Set the game password (Characters.passwordHash) for all your characters, or one when characterName is given. Must differ from the website password
   """
   setGamePassword(characterName: String, password: String!): Boolean!
+  setObjectAbilities(abilities: [ObjectAbilityInput!]!, id: Int!, zoneId: Int!): [ObjectAbilityDto!]!
 
   """
   Set the slot recovery time of a spell circle; null restores the built-in time
@@ -2544,7 +2545,7 @@ type Mutation {
   updateMob(data: UpdateMobInput!, id: Int!, zoneId: Int!): MobDto!
   updateMobDefaultEffects(effects: [MobDefaultEffectInput!]!, id: Int!, zoneId: Int!): MobDto!
   updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
-  updateMobResetEquipment(decorative: Boolean, id: ID!, maxInstances: Int, probability: Float, wearLocation: WearFlag): Boolean!
+  updateMobResetEquipment(decorative: Boolean, id: ID!, maxInstances: Int, probability: Float, wearLocation: String): Boolean!
   updateMobResetEquipmentContent(data: UpdateResetContentInput!, id: ID!): Boolean!
 
   """Edit the gates, mount mob or bonuses of a summon-mount tier"""
@@ -2603,6 +2604,21 @@ type Mutation {
   updateUser(input: UpdateUserInput!): User!
   updateUserPreferences(input: UpdatePreferencesInput!): User!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
+}
+
+type ObjectAbilityDto {
+  abilityId: Int!
+  abilityName: String!
+  abilityPlainName: String!
+  charges: Int
+  id: Int!
+  level: Int!
+}
+
+input ObjectAbilityInput {
+  abilityId: Int!
+  charges: Int
+  level: Int!
 }
 
 type ObjectAffectDto {
@@ -3071,6 +3087,7 @@ type Query {
   """
   nextObjectId(zoneId: Int!): Int!
   object(id: Int!, zoneId: Int!): ObjectDto!
+  objectAbilities(id: Int!, zoneId: Int!): [ObjectAbilityDto!]!
   objectReset(id: ID!): ObjectResetDto
   objectResetsByRoom(roomId: Int!, roomZoneId: Int!): [ObjectResetDto!]!
   objectResetsByZone(zoneId: Int!): [ObjectResetDto!]!
@@ -4481,7 +4498,7 @@ input UpdateMobResetEquipmentInput {
   objectId: Int
   objectZoneId: Int
   probability: Float
-  wearLocation: WearFlag
+  wearLocation: String
 }
 
 input UpdateMobResetInput {

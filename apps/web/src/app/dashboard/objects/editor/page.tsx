@@ -11,17 +11,27 @@ import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import {
   type ElementType,
   GetEffectsDocument,
+  GetObjectAbilitiesDocument,
+  SetObjectAbilitiesDocument,
   UpdateObjectEffectsDocument,
   UpdateObjectResistancesDocument,
   UpdateConsumableEffectsDocument,
   type WearFlag,
 } from '@/generated/graphql';
+import { ItemSpellsEditor } from '@/components/objects/ItemSpellsEditor';
 import { ObjectCombatFields } from '@/components/objects/ObjectCombatFields';
 import {
   TypeValueInput,
   type TypeValue,
 } from '@/components/objects/TypeValueInput';
 import { parseEntityId } from '@/lib/entityId';
+import {
+  abilitiesInput,
+  isSpellItemType,
+  rowsFromAbilities,
+  SPELL_MIRROR_KEYS,
+  type SpellRow,
+} from '@/lib/objectSpells';
 import { keywordsToInput, parseKeywords } from '@/lib/keywords';
 import {
   ARMOR_TYPES,
@@ -449,6 +459,25 @@ function ObjectEditorContent() {
   const [resistancesDirty, setResistancesDirty] = useState(false);
   const [consumablesDirty, setConsumablesDirty] = useState(false);
 
+  // Spell slots (ObjectAbilities) of potions / scrolls / wands / staves
+  const [itemSpells, setItemSpells] = useState<SpellRow[]>([]);
+  const [itemSpellsDirty, setItemSpellsDirty] = useState(false);
+  const [setObjectAbilities] = useMutation(SetObjectAbilitiesDocument);
+  const { data: abilitiesData } = useQuery(GetObjectAbilitiesDocument, {
+    variables: {
+      id: parseInt(objectId || '0'),
+      zoneId: parseInt(zoneIdParam || '0'),
+    },
+    skip: isNew,
+    fetchPolicy: 'network-only',
+  });
+  useEffect(() => {
+    if (abilitiesData?.objectAbilities) {
+      setItemSpells(rowsFromAbilities(abilitiesData.objectAbilities));
+      setItemSpellsDirty(false);
+    }
+  }, [abilitiesData]);
+
   // Fetch available effects for picker
   const { data: effectsData } = useQuery(GetEffectsDocument, {
     variables: { take: 500 },
@@ -668,6 +697,34 @@ function ObjectEditorContent() {
             data: saveData,
           },
         });
+      }
+
+      // Spell slots are their own rows; written after the object exists and
+      // has its final type (the API also refreshes the mirrored value keys).
+      if (
+        isSpellItemType(formData.type) &&
+        (itemSpellsDirty || (isNew && itemSpells.length > 0))
+      ) {
+        try {
+          await setObjectAbilities({
+            variables: {
+              zoneId: isNew ? formZoneId : parseInt(zoneIdParam!),
+              id: isNew ? createId! : parseInt(objectId!),
+              abilities: abilitiesInput(itemSpells, formData.type),
+            },
+          });
+        } catch (err) {
+          const reason =
+            err instanceof Error && err.message ? ` ${err.message}` : '';
+          setGeneralError(
+            `The object was saved, but its spells were not.${reason}${
+              isNew
+                ? ' Reopen the object from the list and add them again.'
+                : ''
+            }`
+          );
+          return;
+        }
       }
 
       // Redirect back to objects list
@@ -2105,9 +2162,24 @@ function ObjectEditorContent() {
                   value={formData}
                   onChange={handleCombatChange}
                 />
+                {isSpellItemType(formData.type) && (
+                  <ItemSpellsEditor
+                    type={formData.type}
+                    rows={itemSpells}
+                    defaultLevel={itemSpells.at(-1)?.level ?? 1}
+                    onChange={rows => {
+                      setItemSpells(rows);
+                      setItemSpellsDirty(true);
+                    }}
+                  />
+                )}
                 {TYPE_VALUE_FIELDS[formData.type] ? (
                   <div className='grid grid-cols-2 gap-4'>
-                    {TYPE_VALUE_FIELDS[formData.type]!.map(field => (
+                    {TYPE_VALUE_FIELDS[formData.type]!.filter(
+                      field =>
+                        !isSpellItemType(formData.type) ||
+                        !SPELL_MIRROR_KEYS.includes(field.key)
+                    ).map(field => (
                       <TypeValueInput
                         key={`${formData.type}:${field.key}`}
                         field={field}

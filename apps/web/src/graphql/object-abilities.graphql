@@ -1,0 +1,26 @@
+# Ordered spell slots of a potion / scroll / wand / staff (ObjectAbilities rows)
+query GetObjectAbilities($zoneId: Int!, $id: Int!) {
+  objectAbilities(zoneId: $zoneId, id: $id) {
+    id
+    abilityId
+    abilityName
+    abilityPlainName
+    level
+    charges
+  }
+}
+
+mutation SetObjectAbilities(
+  $zoneId: Int!
+  $id: Int!
+  $abilities: [ObjectAbilityInput!]!
+) {
+  setObjectAbilities(zoneId: $zoneId, id: $id, abilities: $abilities) {
+    id
+    abilityId
+    abilityName
+    abilityPlainName
+    level
+    charges
+  }
+}

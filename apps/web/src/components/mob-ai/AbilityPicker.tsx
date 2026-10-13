@@ -15,10 +15,17 @@ interface Props {
   value: PickedAbility | null;
   onChange: (ability: PickedAbility) => void;
   disabled?: boolean | undefined;
+  /** Hide the "Selected" line (for pickers that add to a list). */
+  hideSelected?: boolean | undefined;
 }
 
 /** Search-as-you-type ability picker (name search, 20 results). */
-export function AbilityPicker({ value, onChange, disabled }: Props) {
+export function AbilityPicker({
+  value,
+  onChange,
+  disabled,
+  hideSelected,
+}: Props) {
   const [text, setText] = useState('');
   const [search, setSearch] = useState('');
 
@@ -35,19 +42,21 @@ export function AbilityPicker({ value, onChange, disabled }: Props) {
 
   return (
     <div className='space-y-2'>
-      <div className='text-sm'>
-        Selected:{' '}
-        {value ? (
-          <span className='font-medium'>
-            {value.name}{' '}
-            <span className='text-xs text-muted-foreground'>
-              ({value.abilityType.toLowerCase()})
+      {!hideSelected && (
+        <div className='text-sm'>
+          Selected:{' '}
+          {value ? (
+            <span className='font-medium'>
+              {value.name}{' '}
+              <span className='text-xs text-muted-foreground'>
+                ({value.abilityType.toLowerCase()})
+              </span>
             </span>
-          </span>
-        ) : (
-          <span className='text-muted-foreground'>none</span>
-        )}
-      </div>
+          ) : (
+            <span className='text-muted-foreground'>none</span>
+          )}
+        </div>
+      )}
       {!disabled && (
         <>
           <Input
