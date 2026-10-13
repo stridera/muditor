@@ -396,7 +396,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
                 title={tab.label}
-                className={`min-w-0 flex flex-col items-center gap-0.5 px-0.5 py-1.5 text-[11px] leading-tight font-medium rounded-md transition-colors ${
+                className={`min-w-0 flex flex-col items-center gap-0.5 px-0.5 py-1.5 text-[10px] leading-tight font-medium rounded-md transition-colors ${
                   activeTab === tab.key
                     ? isDark
                       ? 'bg-gray-600 text-blue-400 shadow-sm'

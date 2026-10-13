@@ -4,9 +4,9 @@ import { usePermissions } from '@/hooks/use-permissions';
 import Link from 'next/link';
 
 const linkClass =
-  'text-sm px-3 py-1 rounded transition-colors text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600';
+  'text-sm px-3 py-1 rounded transition-colors whitespace-nowrap text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600';
 const createClass =
-  'text-sm px-3 py-1 rounded transition-colors text-white bg-green-600 hover:bg-green-700';
+  'text-sm px-3 py-1 rounded transition-colors whitespace-nowrap text-white bg-green-600 hover:bg-green-700';
 
 /** Zone-scoped create targets: the standalone editors pre-fill from `?zone=`. */
 export const CREATE_ENTITY_LINKS = [
@@ -37,11 +37,11 @@ export function ZoneEditorHeaderActions({
   const canCreate = zoneId != null && canEditZone(zoneId);
 
   return (
-    <div className='flex items-center gap-3'>
+    <div className='flex flex-wrap items-center gap-x-3 gap-y-2'>
       {zoneId != null && (
         <Link
           href={`/dashboard/zones/${zoneId}`}
-          className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm px-3 py-1 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded transition-colors'
+          className='whitespace-nowrap text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm px-3 py-1 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded transition-colors'
           title='Leave the visual editor and go back to the zone page'
         >
           ← Back to zone {zoneId}

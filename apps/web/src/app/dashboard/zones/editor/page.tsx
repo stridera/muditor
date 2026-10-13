@@ -89,11 +89,11 @@ function ZoneEditorContent() {
   };
 
   return (
-    <div className='fixed inset-0 z-40 bg-gray-50 dark:bg-gray-900'>
+    <div className='fixed inset-0 z-40 flex flex-col bg-gray-50 dark:bg-gray-900'>
       {/* Full-screen Header */}
-      <div className='bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4'>
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center space-x-4'>
+      <div className='shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-4'>
+        <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2'>
+          <div className='flex items-center space-x-4 whitespace-nowrap'>
             <Link
               href='/dashboard'
               className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm'
@@ -120,7 +120,7 @@ function ZoneEditorContent() {
       </div>
 
       {/* Full-screen Zone Editor or World Map */}
-      <div className='h-[calc(100vh-73px)]'>
+      <div className='relative flex-1 min-h-0'>
         {worldMapMode ? (
           <>
             {loading && (
