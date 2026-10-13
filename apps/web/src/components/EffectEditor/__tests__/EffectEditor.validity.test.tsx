@@ -165,4 +165,46 @@ describe('EffectEditor validity reporting', () => {
     const { onValidityChange } = await renderEditor();
     expect(lastValidity(onValidityChange)).toBeNull();
   });
+
+  it('Validate checks every field and a bad value blocks saving until fixed', async () => {
+    const { onValidityChange } = await renderEditor();
+    expect(lastValidity(onValidityChange)).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /json/i }));
+    const textarea = screen.getByPlaceholderText('[]');
+    fireEvent.change(textarea, {
+      target: {
+        value: JSON.stringify([
+          {
+            effectId: 1,
+            overrideParams: { durationUnit: 'parsecs', duration: -5 },
+            order: 0,
+            chancePct: 250,
+            trigger: 'on_nothing',
+          },
+        ]),
+      },
+    });
+    expect(lastValidity(onValidityChange)).toMatch(/4 problems in the effects/);
+
+    fireEvent.click(screen.getByRole('button', { name: /validate/i }));
+    const text = screen.getByRole('alert').textContent ?? '';
+    expect(text).toMatch(/durationUnit must be one of/);
+    expect(text).toMatch(/duration cannot be negative/);
+    expect(text).toMatch(/Unknown trigger "on_nothing"/);
+    expect(text).toMatch(/Chance must be between 0 and 100/);
+
+    fireEvent.change(textarea, {
+      target: {
+        value: JSON.stringify([
+          { effectId: 1, overrideParams: {}, order: 0, chancePct: 100 },
+        ]),
+      },
+    });
+    expect(lastValidity(onValidityChange)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /validate/i }));
+    expect(screen.getByRole('alert').textContent).toMatch(
+      /No problems found in 1 effect/
+    );
+  });
 });

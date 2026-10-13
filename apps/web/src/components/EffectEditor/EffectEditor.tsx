@@ -156,6 +156,8 @@ export function EffectEditor({
   );
   const [effects, setEffects] = useState<AbilityEffectOutput[]>(initialEffects);
   const [error, setError] = useState<string | null>(null);
+  // Result of the last Validate click when nothing blocks saving.
+  const [notice, setNotice] = useState<string | null>(null);
   // Set while the editor holds state that must not be saved (see
   // onValidityChange). Distinct from `error`, which also carries the
   // non-blocking results of the Validate button.
@@ -181,9 +183,13 @@ export function EffectEditor({
   const onValidityChangeRef = useRef(onValidityChange);
   onValidityChangeRef.current = onValidityChange;
 
+  // Blocking = structural problems (blockingError) or values that fail the
+  // Effect catalog check; both disable Save in the parent.
+  const [validationBlock, setValidationBlock] = useState<string | null>(null);
+  const reportedBlock = blockingError ?? validationBlock;
   useEffect(() => {
-    onValidityChangeRef.current?.(blockingError);
-  }, [blockingError]);
+    onValidityChangeRef.current?.(reportedBlock);
+  }, [reportedBlock]);
   // The editor going away (e.g. leaving edit mode) leaves nothing to block.
   useEffect(() => () => onValidityChangeRef.current?.(null), []);
 
@@ -235,8 +241,39 @@ export function EffectEditor({
     };
   }, [optionsData, zoneId]);
 
-  // Use validation hook
-  const { validate, errors: validationErrors } = useEffectValidation(effects);
+  // Effect rows the check validates against (Effect.default_params is the schema)
+  const effectCatalog = useMemo(
+    () =>
+      optionsData?.effects?.length
+        ? optionsData.effects.map(e => ({
+            id: Number(e.id),
+            name: e.name,
+            defaultParams: (e.defaultParams ?? null) as Record<
+              string,
+              unknown
+            > | null,
+          }))
+        : null,
+    [optionsData]
+  );
+  const { validate, errors: validationErrors } = useEffectValidation(
+    effects,
+    effectCatalog
+  );
+  // A Validate result describes the effects as they were; edits invalidate it.
+  useEffect(() => {
+    setNotice(null);
+  }, [effects]);
+  useEffect(() => {
+    if (validationErrors.length === 0) {
+      setValidationBlock(null);
+      return;
+    }
+    const first = formatValidationErrors(validationErrors.slice(0, 1))[0]!;
+    setValidationBlock(
+      `${validationErrors.length} problem${validationErrors.length === 1 ? '' : 's'} in the effects: ${first.replace(/^\[ERROR\] /, '')}`
+    );
+  }, [validationErrors]);
 
   // Sync state when initialEffects prop changes (e.g., when data loads after mount)
   // Use JSON comparison to avoid unnecessary updates from new array references
@@ -462,22 +499,35 @@ export function EffectEditor({
 
   // Handle save
   const handleSave = useCallback(() => {
-    if (blockingError) return;
+    if (reportedBlock) return;
     onSave?.(effects);
-  }, [blockingError, effects, onSave]);
+  }, [reportedBlock, effects, onSave]);
 
-  // Handle validation
+  // Handle validation: every effect, every field; the result stays visible.
   const handleValidate = useCallback(() => {
-    const result = validate();
-    if (result.valid) {
+    if (blockingError) {
+      setNotice(null);
       setError(blockingError);
-      return true;
-    } else {
-      const errorMessages = formatValidationErrors(result.errors);
-      setError(errorMessages.join('\n'));
       return false;
     }
-  }, [validate, blockingError]);
+    const result = validate();
+    if (!result.valid) {
+      setNotice(null);
+      setError(
+        formatValidationErrors([...result.errors, ...result.warnings]).join(
+          '\n'
+        )
+      );
+      return false;
+    }
+    setError(null);
+    setNotice(
+      result.warnings.length > 0
+        ? formatValidationErrors(result.warnings).join('\n')
+        : `No problems found in ${effects.length} effect${effects.length === 1 ? '' : 's'}.`
+    );
+    return true;
+  }, [validate, blockingError, effects.length]);
 
   if (!blocksRegistered || !toolbox) {
     return (
@@ -508,11 +558,28 @@ export function EffectEditor({
         </div>
       </CardHeader>
       <CardContent>
-        {error && (
+        {error ? (
           <Alert variant='destructive' className='mb-4'>
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription className='whitespace-pre-line'>
+              {error}
+            </AlertDescription>
           </Alert>
-        )}
+        ) : !readOnly && validationErrors.length > 0 ? (
+          <Alert variant='destructive' className='mb-4'>
+            <AlertDescription className='whitespace-pre-line'>
+              {formatValidationErrors(validationErrors.slice(0, 5)).join('\n')}
+              {validationErrors.length > 5
+                ? `\n...and ${validationErrors.length - 5} more`
+                : ''}
+            </AlertDescription>
+          </Alert>
+        ) : notice ? (
+          <Alert className='mb-4'>
+            <AlertDescription className='whitespace-pre-line'>
+              {notice}
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         {viewMode === 'blocks' ? (
           <div style={{ height }} className='border rounded-md overflow-hidden'>

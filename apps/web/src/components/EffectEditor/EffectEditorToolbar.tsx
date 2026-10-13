@@ -45,10 +45,7 @@ export function EffectEditorToolbar({
   onZoneChange,
 }: EffectEditorToolbarProps) {
   const handleValidate = () => {
-    if (onValidate) {
-      const isValid = onValidate();
-      console.log('Validation result:', isValid);
-    }
+    onValidate?.();
   };
 
   return (
