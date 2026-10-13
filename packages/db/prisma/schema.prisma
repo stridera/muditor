@@ -374,7 +374,9 @@ model ObjectAbilities {
   objects      Objects @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
   ability      Ability @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 
-  @@unique([objectZoneId, objectId, abilityId])
+  // Not unique: a potion/scroll may carry the same spell in several slots (legacy
+  // "healing potion" = CURE_LIGHT x2). One row per slot; the game fires them in `id` order.
+  @@index([objectZoneId, objectId])
 }
 
 model ClassAbilityCircles {
