@@ -200,7 +200,7 @@ function ShopsContent() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number, zoneId: number) => {
     if (
       !confirm(
         `Are you sure you want to delete Shop #${id}? This action cannot be undone.`
@@ -211,7 +211,8 @@ function ShopsContent() {
 
     setDeletingId(id);
     try {
-      await deleteShop({ variables: { id } });
+      // Shop ids repeat across zones: the mutation needs the full (zoneId, id) key.
+      await deleteShop({ variables: { id, zoneId } });
       await refetch();
     } catch (e) {
       void e; /* LoggingService.error('Error deleting shop', { error: e, shopId: id }); */
@@ -353,7 +354,7 @@ function ShopsContent() {
                   </div>
                   <div className='flex items-center gap-2 ml-4'>
                     <Link
-                      href={`/dashboard/shops/editor?id=${shop.id}&zone={shop.zoneId}`}
+                      href={`/dashboard/shops/editor?id=${shop.id}&zone=${shop.zoneId}`}
                       className='inline-flex items-center text-primary hover:text-primary/80 px-3 py-1 text-sm'
                       onClick={e => e.stopPropagation()}
                     >
@@ -363,7 +364,7 @@ function ShopsContent() {
                     <button
                       onClick={e => {
                         e.stopPropagation();
-                        handleDelete(shop.id);
+                        handleDelete(shop.id, shop.zoneId);
                       }}
                       disabled={deletingId === shop.id}
                       className='inline-flex items-center text-destructive hover:text-destructive/80 px-3 py-1 text-sm disabled:opacity-50'
