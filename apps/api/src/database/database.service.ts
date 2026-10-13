@@ -386,6 +386,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.spellCircle;
   }
 
+  get mountType() {
+    return this.client.mountType;
+  }
+
   get weatherText() {
     return this.client.weatherText;
   }

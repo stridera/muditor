@@ -2174,6 +2174,40 @@ enum MobTrait {
   SUMMONED
 }
 
+"""
+One summon-mount tier for one alignment side (Paladin = good, Anti-Paladin = evil)
+"""
+type MountTypeDto {
+  """"good" (Paladin) or "evil" (Anti-Paladin)"""
+  alignmentSide: String!
+
+  """Added to the mount max HP (2 x summoner level + a 50-100 roll)"""
+  hpBonus: Int!
+  id: Int!
+
+  """
+  Alignment magnitude: a good summoner needs alignment >= this, an evil one <= -this
+  """
+  minAlignment: Int!
+
+  """Minimum summoner level"""
+  minLevel: Int!
+
+  """Id of the mount mob prototype"""
+  mobId: Int!
+
+  """Zone of the mount mob prototype"""
+  mobZoneId: Int!
+
+  """Added to the mount max movement (alignment term + a 0-50 roll)"""
+  mvBonus: Int!
+
+  """
+  Tier number; the game takes the highest tier (in ascending order) whose gates the summoner meets, so the lowest tier of a side is its base mount
+  """
+  tier: Int!
+}
+
 enum MovementMode {
   ETHEREAL
   FLYING
@@ -2511,6 +2545,9 @@ type Mutation {
   updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
   updateMobResetEquipment(decorative: Boolean, id: ID!, maxInstances: Int, probability: Float, wearLocation: WearFlag): Boolean!
   updateMobResetEquipmentContent(data: UpdateResetContentInput!, id: ID!): Boolean!
+
+  """Edit the gates, mount mob or bonuses of a summon-mount tier"""
+  updateMountType(data: UpdateMountTypeInput!): MountTypeDto!
   updateObject(data: UpdateObjectInput!, id: Int!, zoneId: Int!): ObjectDto!
   updateObjectEffects(effects: [ObjectEffectInput!]!, id: Int!, zoneId: Int!): ObjectDto!
   updateObjectReset(data: UpdateObjectResetInput!, id: ID!): ObjectResetDto!
@@ -3010,6 +3047,9 @@ type Query {
 
   """Get mortal level definitions (1-99)"""
   mortalLevels: [LevelDefinitionDto!]!
+
+  """Summon-mount tiers (level and alignment gates, mount mob, bonuses)"""
+  mountTypes: [MountTypeDto!]!
   myAccountStorage: AccountStorageDto!
   myAccountWealthDisplay: WealthDisplayDto!
   myCharacters: [CharacterDto!]!
@@ -4445,6 +4485,19 @@ input UpdateMobResetInput {
   probability: Float
   roomId: Int
   roomZoneId: Int
+}
+
+"""
+Fields of a summon-mount tier that can be edited (tier and alignment side identify the row)
+"""
+input UpdateMountTypeInput {
+  hpBonus: Int
+  id: Int!
+  minAlignment: Int
+  minLevel: Int
+  mobId: Int
+  mobZoneId: Int
+  mvBonus: Int
 }
 
 input UpdateObjectInput {

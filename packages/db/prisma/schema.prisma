@@ -269,6 +269,28 @@ model SpellCircle {
   recoverSecs Int? @map("recover_secs")
 }
 
+/// One summon-mount tier per alignment side (Paladin = "good", Anti-Paladin = "evil"). The game
+/// picks the highest tier (ascending `tier`; the first row for a side is the base tier and
+/// always applies) whose min_level and min_alignment the summoner meets, then summons the mob
+/// (mob_zone_id, mob_id). min_alignment is a magnitude: a "good" summoner needs alignment >=
+/// min_alignment, an "evil" one alignment <= -min_alignment. The summoned mount's max HP is
+/// hp_bonus + 2*level (+ a 50-100 roll) and its max movement mv_bonus + an alignment term
+/// (+ a 0-50 roll). A database without these rows uses the game's built-in table.
+model MountType {
+  id            Int    @id @default(autoincrement())
+  tier          Int
+  alignmentSide String @map("alignment_side") // "good" | "evil"
+  minLevel      Int    @default(0) @map("min_level")
+  minAlignment  Int    @default(0) @map("min_alignment")
+  mobZoneId     Int    @map("mob_zone_id")
+  mobId         Int    @map("mob_id")
+  hpBonus       Int    @default(0) @map("hp_bonus")
+  mvBonus       Int    @default(0) @map("mv_bonus")
+  mob           Mobs   @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Restrict)
+
+  @@unique([tier, alignmentSide])
+}
+
 model AbilityRestrictions {
   id        Int     @id @default(autoincrement())
   abilityId Int     @unique @map("ability_id")
@@ -1189,6 +1211,7 @@ model Mobs {
   aiMode MobAiMode @default(CLASS) @map("ai_mode")
 
   mobResets          MobResets[]
+  mountTypes         MountType[]
   mobAbilities       MobAbilities[]
   defaultEffects     MobDefaultEffects[] // Effects mob always spawns with
   characterPets      CharacterPets[]

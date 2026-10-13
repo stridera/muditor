@@ -27,6 +27,7 @@ import { SettingsModule } from './settings/settings.module';
 import { SocialsModule } from './socials/socials.module';
 import { EffectAurasModule } from './effect-auras/effect-auras.module';
 import { StatusFlagValuesModule } from './status-flag-values/status-flag-values.module';
+import { MountTypesModule } from './mount-types/mount-types.module';
 import { SpellCirclesModule } from './spell-circles/spell-circles.module';
 import { SpellSyllablesModule } from './spell-syllables/spell-syllables.module';
 import { ReservedNamesModule } from './reserved-names/reserved-names.module';
@@ -114,6 +115,7 @@ import { createWsOnConnect, isWsContext, wsContext } from './auth/ws-auth';
     StatusFlagValuesModule,
     SpellSyllablesModule,
     SpellCirclesModule,
+    MountTypesModule,
     WeatherTextModule,
     ReservedNamesModule,
     CreationRecipesModule,

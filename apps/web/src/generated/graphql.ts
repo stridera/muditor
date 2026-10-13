@@ -2064,6 +2064,28 @@ export type MobTrait =
   | 'PLAYER_PHANTASM'
   | 'SUMMONED';
 
+/** One summon-mount tier for one alignment side (Paladin = good, Anti-Paladin = evil) */
+export type MountTypeDto = {
+  __typename?: 'MountTypeDto';
+  /** "good" (Paladin) or "evil" (Anti-Paladin) */
+  alignmentSide: Scalars['String']['output'];
+  /** Added to the mount max HP (2 x summoner level + a 50-100 roll) */
+  hpBonus: Scalars['Int']['output'];
+  id: Scalars['Int']['output'];
+  /** Alignment magnitude: a good summoner needs alignment >= this, an evil one <= -this */
+  minAlignment: Scalars['Int']['output'];
+  /** Minimum summoner level */
+  minLevel: Scalars['Int']['output'];
+  /** Id of the mount mob prototype */
+  mobId: Scalars['Int']['output'];
+  /** Zone of the mount mob prototype */
+  mobZoneId: Scalars['Int']['output'];
+  /** Added to the mount max movement (alignment term + a 0-50 roll) */
+  mvBonus: Scalars['Int']['output'];
+  /** Tier number; the game takes the highest tier (in ascending order) whose gates the summoner meets, so the lowest tier of a side is its base mount */
+  tier: Scalars['Int']['output'];
+};
+
 export type MovementMode =
   | 'ETHEREAL'
   | 'FLYING'
@@ -2313,6 +2335,8 @@ export type Mutation = {
   updateMobReset: MobResetDto;
   updateMobResetEquipment: Scalars['Boolean']['output'];
   updateMobResetEquipmentContent: Scalars['Boolean']['output'];
+  /** Edit the gates, mount mob or bonuses of a summon-mount tier */
+  updateMountType: MountTypeDto;
   updateObject: ObjectDto;
   updateObjectEffects: ObjectDto;
   updateObjectReset: ObjectResetDto;
@@ -3330,6 +3354,11 @@ export type MutationUpdateMobResetEquipmentContentArgs = {
 };
 
 
+export type MutationUpdateMountTypeArgs = {
+  data: UpdateMountTypeInput;
+};
+
+
 export type MutationUpdateObjectArgs = {
   data: UpdateObjectInput;
   id: Scalars['Int']['input'];
@@ -3920,6 +3949,8 @@ export type Query = {
   mobsCount: Scalars['Int']['output'];
   /** Get mortal level definitions (1-99) */
   mortalLevels: Array<LevelDefinitionDto>;
+  /** Summon-mount tiers (level and alignment gates, mount mob, bonuses) */
+  mountTypes: Array<MountTypeDto>;
   myAccountStorage: AccountStorageDto;
   myAccountWealthDisplay: WealthDisplayDto;
   myCharacters: Array<CharacterDto>;
@@ -5828,6 +5859,17 @@ export type UpdateMobResetInput = {
   probability?: InputMaybe<Scalars['Float']['input']>;
   roomId?: InputMaybe<Scalars['Int']['input']>;
   roomZoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Fields of a summon-mount tier that can be edited (tier and alignment side identify the row) */
+export type UpdateMountTypeInput = {
+  hpBonus?: InputMaybe<Scalars['Int']['input']>;
+  id: Scalars['Int']['input'];
+  minAlignment?: InputMaybe<Scalars['Int']['input']>;
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+  mobId?: InputMaybe<Scalars['Int']['input']>;
+  mobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  mvBonus?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdateObjectInput = {
