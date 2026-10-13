@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { searchTokens } from '../common/list-filter';
 import { DatabaseService } from '../database/database.service';
 import {
   UpdateGameConfigInput,
@@ -429,12 +430,51 @@ export class SettingsService {
   // ============================================
 
   /**
-   * Get all commands
+   * Commands matching `search` (every term must hit the name, an alias or the
+   * summary), ordered by category then name; paged when skip/take are given.
    */
-  async findAllCommands() {
+  async findAllCommands(args?: {
+    search?: string | undefined;
+    skip?: number | undefined;
+    take?: number | undefined;
+  }) {
     return this.db.command.findMany({
+      where: await this.commandListWhere(args?.search),
       orderBy: [{ category: 'asc' }, { name: 'asc' }],
+      ...(args?.skip !== undefined && { skip: args.skip }),
+      ...(args?.take !== undefined && { take: args.take }),
     });
+  }
+
+  /** Count for the same filter as {@link findAllCommands}. */
+  async countCommands(search?: string): Promise<number> {
+    return this.db.command.count({
+      where: await this.commandListWhere(search),
+    });
+  }
+
+  private async commandListWhere(
+    search?: string
+  ): Promise<Prisma.CommandWhereInput> {
+    const and: Prisma.CommandWhereInput[] = [];
+    for (const term of searchTokens(search)) {
+      // Prisma cannot substring-match inside a text[] column, so resolve the
+      // aliases that contain the term first ("tele" finds "teleport").
+      const like = `%${term.replace(/[\\%_]/g, '\\$&')}%`;
+      const aliasHits = await this.db.$queryRaw<{ name: string }[]>`
+        SELECT name FROM "Command"
+        WHERE EXISTS (SELECT 1 FROM unnest(aliases) AS a WHERE a ILIKE ${like})`;
+      and.push({
+        OR: [
+          { name: { contains: term, mode: 'insensitive' } },
+          { helpSummary: { contains: term, mode: 'insensitive' } },
+          ...(aliasHits.length > 0
+            ? [{ name: { in: aliasHits.map(r => r.name) } }]
+            : []),
+        ],
+      });
+    }
+    return and.length > 0 ? { AND: and } : {};
   }
 
   /**

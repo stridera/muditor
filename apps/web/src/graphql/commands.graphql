@@ -1,7 +1,8 @@
 # Command in-game help (summary/text) operations
 
-query GetCommandHelp {
-  commands {
+# Paged on the server: commandsCount is the total for the same search.
+query GetCommandHelp($search: String, $skip: Int, $take: Int) {
+  commands(search: $search, skip: $skip, take: $take) {
     name
     aliases
     category
@@ -13,6 +14,7 @@ query GetCommandHelp {
     heldByCastLag
     updatedAt
   }
+  commandsCount(search: $search)
 }
 
 mutation UpdateCommandHelp(

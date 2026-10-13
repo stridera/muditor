@@ -14,7 +14,7 @@ import {
   UpdateShopInput,
   UpdateShopInventoryInput,
 } from './shop.dto';
-import { ShopsService } from './shops.service';
+import { ShopsService, shopListWhere } from './shops.service';
 import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => ShopDto)
@@ -145,10 +145,24 @@ export class ShopsResolver {
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
-    @CurrentUser() user?: Users | null
+    @CurrentUser() user?: Users | null,
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('highProfit', { type: () => Boolean, nullable: true })
+    highProfit?: boolean,
+    @Args('hasKeeper', { type: () => Boolean, nullable: true })
+    hasKeeper?: boolean
   ): Promise<ShopDto[]> {
     const shops = await this.shopsService.findAll({
-      where: { ...inVisibleZone(hidesGodZones(user ?? null)) },
+      where: {
+        ...inVisibleZone(hidesGodZones(user ?? null)),
+        ...shopListWhere({
+          zoneId,
+          search: search?.trim().slice(0, 100),
+          highProfit,
+          hasKeeper,
+        }),
+      },
       ...(typeof skip === 'number' ? { skip: clampSkip(skip) } : {}),
       take: clampTake(take),
     });
@@ -200,9 +214,23 @@ export class ShopsResolver {
 
   @Query(() => Int, { name: 'shopsCount' })
   @UseGuards(OptionalJwtAuthGuard)
-  async count(@CurrentUser() user?: Users | null): Promise<number> {
+  async count(
+    @CurrentUser() user?: Users | null,
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('highProfit', { type: () => Boolean, nullable: true })
+    highProfit?: boolean,
+    @Args('hasKeeper', { type: () => Boolean, nullable: true })
+    hasKeeper?: boolean
+  ): Promise<number> {
     return this.shopsService.count({
       ...inVisibleZone(hidesGodZones(user ?? null)),
+      ...shopListWhere({
+        zoneId,
+        search: search?.trim().slice(0, 100),
+        highProfit,
+        hasKeeper,
+      }),
     });
   }
 

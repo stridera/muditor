@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@muditor/db';
 import { inVisibleZone } from '../common/god-zone-visibility';
+import { numericIdToken, searchTokens } from '../common/list-filter';
 import { DatabaseService } from '../database/database.service';
 
 const SHOP_INCLUDE = {
@@ -50,6 +51,43 @@ type ShopWithRelations = Prisma.ShopsGetPayload<{
   };
 }>;
 
+/** Filters of the paged shops list (also applied to its count). */
+export interface ShopListFilter {
+  zoneId?: number | null | undefined;
+  /** Terms are AND-ed; numbers match shop id / keeper id / zone, text the keeper's name. */
+  search?: string | null | undefined;
+  /** Both buy and sell profit at least 0.8. */
+  highProfit?: boolean | null | undefined;
+  /** true: has an assigned keeper; false: none. */
+  hasKeeper?: boolean | null | undefined;
+}
+
+export const HIGH_PROFIT_MIN = 0.8;
+
+export function shopListWhere(filter: ShopListFilter): Prisma.ShopsWhereInput {
+  const and: Prisma.ShopsWhereInput[] = searchTokens(filter.search).map(
+    term => {
+      const n = numericIdToken(term);
+      return {
+        OR: [
+          ...(n !== null ? [{ id: n }, { keeperId: n }, { zoneId: n }] : []),
+          { mobs: { plainName: { contains: term, mode: 'insensitive' } } },
+        ],
+      };
+    }
+  );
+  return {
+    ...(filter.zoneId != null && { zoneId: filter.zoneId }),
+    ...(filter.highProfit && {
+      buyProfit: { gte: HIGH_PROFIT_MIN },
+      sellProfit: { gte: HIGH_PROFIT_MIN },
+    }),
+    ...(filter.hasKeeper === true && { keeperId: { gt: 0 } }),
+    ...(filter.hasKeeper === false && { keeperId: { lte: 0 } }),
+    ...(and.length > 0 && { AND: and }),
+  };
+}
+
 @Injectable()
 export class ShopsService {
   constructor(private readonly database: DatabaseService) {}
@@ -80,7 +118,9 @@ export class ShopsService {
         },
         shopAccepts: true,
       },
-      orderBy: args?.orderBy ? { ...args.orderBy } : { id: 'asc' },
+      orderBy: args?.orderBy
+        ? { ...args.orderBy }
+        : [{ id: 'asc' }, { zoneId: 'asc' }],
     };
     if (typeof args?.skip === 'number') query.skip = args.skip;
     if (typeof args?.take === 'number') query.take = args.take;

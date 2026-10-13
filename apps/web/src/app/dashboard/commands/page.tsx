@@ -29,17 +29,18 @@ import {
   UpdateCommandHelpDocument,
   type GetCommandHelpQuery,
 } from '@/generated/graphql';
+import { ListPager } from '@/components/ui/list-pager';
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { CheckCircle, Loader2, Pencil, XCircle } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FLAG_FIELDS,
   SUMMARY_MAX,
   TEXT_MAX,
   flagsChanged,
   flagsOf,
-  matchesQuery,
   toMutationVars,
   validateHelpForm,
   type FlagsFormData,
@@ -47,6 +48,8 @@ import {
 } from './command-help';
 
 type CommandRow = GetCommandHelpQuery['commands'][number];
+
+const PAGE_SIZE = 50;
 
 export default function CommandsPage() {
   const { isBuilder, isCoder } = usePermissions();
@@ -63,10 +66,23 @@ export default function CommandsPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const debouncedSearch = useDebouncedValue(searchQuery.trim(), 300);
 
-  const { data, loading, error, refetch } = useQuery(GetCommandHelpDocument, {
-    fetchPolicy: 'cache-and-network',
-  });
+  // Search and paging run on the server, so only one page of commands (with
+  // their help text) is downloaded.
+  const { data, previousData, loading, error, refetch } = useQuery(
+    GetCommandHelpDocument,
+    {
+      variables: {
+        search: debouncedSearch || null,
+        skip: (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+      },
+      fetchPolicy: 'cache-and-network',
+    }
+  );
+  const shown = data ?? previousData;
 
   const [updateHelp, { loading: saving }] = useMutation(
     UpdateCommandHelpDocument,
@@ -97,10 +113,14 @@ export default function CommandsPage() {
     },
   });
 
-  const rows = useMemo(
-    () => (data?.commands ?? []).filter(c => matchesQuery(c, searchQuery)),
-    [data, searchQuery]
-  );
+  const rows = shown?.commands ?? [];
+  const total = shown?.commandsCount ?? 0;
+
+  // A page that no longer exists (the search narrowed) snaps back to the last one.
+  const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  useEffect(() => {
+    if (data && page > lastPage) setPage(lastPage);
+  }, [data, page, lastPage]);
 
   const openEdit = (row: CommandRow) => {
     setEditing(row);
@@ -135,7 +155,7 @@ export default function CommandsPage() {
     });
   };
 
-  if (loading && !data) {
+  if (loading && !shown) {
     return (
       <div className='flex items-center justify-center h-96'>
         <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
@@ -143,7 +163,7 @@ export default function CommandsPage() {
     );
   }
 
-  if (error) {
+  if (error && !shown) {
     return (
       <div className='container mx-auto p-6'>
         <Alert className='bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-800'>
@@ -161,10 +181,9 @@ export default function CommandsPage() {
       <div className='mb-6'>
         <h1 className='text-3xl font-bold text-foreground mb-2'>Commands</h1>
         <p className='text-muted-foreground'>
-          In-game <code>help &lt;command&gt;</code> text for{' '}
-          {data?.commands.length ?? 0} commands. Leave a field empty to use the
-          game&apos;s built-in default. The game picks up changes on restart,
-          not instantly.
+          In-game <code>help &lt;command&gt;</code> text for {total} commands.
+          Leave a field empty to use the game&apos;s built-in default. The game
+          picks up changes on restart, not instantly.
         </p>
       </div>
 
@@ -190,7 +209,10 @@ export default function CommandsPage() {
         <Input
           placeholder='Search by name, alias or summary...'
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={e => {
+            setSearchQuery(e.target.value);
+            setPage(1);
+          }}
           className='max-w-sm'
         />
       </div>
@@ -254,6 +276,15 @@ export default function CommandsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <ListPager
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={total}
+        shown={rows.length}
+        onPageChange={setPage}
+        noun='commands'
+      />
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className='sm:max-w-[640px] max-h-[90vh] overflow-y-auto'>

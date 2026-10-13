@@ -2966,11 +2966,14 @@ type Query {
   """Get all command categories"""
   commandCategories: [CommandCategory!]!
 
-  """Get all command definitions"""
-  commands: [CommandDto!]!
+  """Command definitions (all, or one page of the commands matching search)"""
+  commands(search: String, skip: Int, take: Int): [CommandDto!]!
 
   """Get commands by category"""
   commandsByCategory(category: CommandCategory!): [CommandDto!]!
+
+  """Number of commands matching search"""
+  commandsCount(search: String): Int!
 
   """Get a single creation recipe by ID"""
   creationRecipe(id: ID!): CreationRecipeDto!
@@ -3141,9 +3144,9 @@ type Query {
   serverStatus: ServerStatusType!
   shop(id: Int!, zoneId: Int!): ShopDto!
   shopByKeeper(id: Int!, zoneId: Int!): ShopDto!
-  shops(skip: Int, take: Int): [ShopDto!]!
+  shops(hasKeeper: Boolean, highProfit: Boolean, search: String, skip: Int, take: Int, zoneId: Int): [ShopDto!]!
   shopsByZone(zoneId: Int!): [ShopDto!]!
-  shopsCount: Int!
+  shopsCount(hasKeeper: Boolean, highProfit: Boolean, search: String, zoneId: Int): Int!
 
   """Get a single piece of site content by slug"""
   siteContent(slug: String!): SiteContentDto!
@@ -3159,11 +3162,11 @@ type Query {
   """Get a social by its command name"""
   socialByName(name: String!): SocialDto!
 
-  """Get all social commands"""
-  socials: [SocialDto!]!
+  """Social commands (all, or one page of those whose name matches search)"""
+  socials(search: String, skip: Int, take: Int): [SocialDto!]!
 
-  """Get total count of socials"""
-  socialsCount: Int!
+  """Number of socials whose name matches search (all if blank)"""
+  socialsCount(search: String): Int!
 
   """Slot recovery time for every spell circle (1-14)"""
   spellCircles: [SpellCircleDto!]!

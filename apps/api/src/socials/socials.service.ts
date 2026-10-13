@@ -3,8 +3,20 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import type { Prisma } from '@muditor/db';
+import { searchTokens } from '../common/list-filter';
 import { DatabaseService } from '../database/database.service';
 import { CreateSocialInput, UpdateSocialInput } from './social.input';
+
+/** Every search term must appear in the social's name. */
+function socialListWhere(search?: string): Prisma.SocialWhereInput {
+  const and = searchTokens(search).map(
+    (term): Prisma.SocialWhereInput => ({
+      name: { contains: term, mode: 'insensitive' },
+    })
+  );
+  return and.length > 0 ? { AND: and } : {};
+}
 
 @Injectable()
 export class SocialsService {
@@ -13,9 +25,16 @@ export class SocialsService {
   /**
    * Find all socials, ordered alphabetically by name
    */
-  async findAll() {
+  async findAll(args?: {
+    search?: string | undefined;
+    skip?: number | undefined;
+    take?: number | undefined;
+  }) {
     return this.db.social.findMany({
+      where: socialListWhere(args?.search),
       orderBy: { name: 'asc' },
+      ...(args?.skip !== undefined && { skip: args.skip }),
+      ...(args?.take !== undefined && { take: args.take }),
     });
   }
 
@@ -52,8 +71,8 @@ export class SocialsService {
   /**
    * Get total count of socials
    */
-  async count() {
-    return this.db.social.count();
+  async count(search?: string) {
+    return this.db.social.count({ where: socialListWhere(search) });
   }
 
   /**

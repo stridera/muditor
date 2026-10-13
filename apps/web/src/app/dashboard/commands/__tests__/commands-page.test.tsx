@@ -9,7 +9,6 @@ import CommandsPage from '../page';
 import {
   SUMMARY_MAX,
   TEXT_MAX,
-  matchesQuery,
   toMutationVars,
   validateHelpForm,
 } from '../command-help';
@@ -17,6 +16,7 @@ import {
 const mockUpdate = jest.fn();
 const mockUpdateFlags = jest.fn();
 const mockRefetch = jest.fn();
+const mockQueryVars: Array<Record<string, unknown>> = [];
 let mockIsCoder = false;
 
 const commands = [
@@ -50,10 +50,15 @@ jest.mock('@/hooks/use-permissions', () => ({
   usePermissions: () => ({ isBuilder: true, isCoder: mockIsCoder }),
 }));
 jest.mock('@apollo/client/react', () => ({
-  useQuery: (doc: unknown) =>
-    doc === GetCommandHelpDocument
-      ? { loading: false, data: { commands }, refetch: mockRefetch }
-      : { loading: false, data: undefined },
+  useQuery: (doc: unknown, opts?: { variables?: Record<string, unknown> }) => {
+    if (doc !== GetCommandHelpDocument) return { loading: false };
+    mockQueryVars.push(opts?.variables ?? {});
+    return {
+      loading: false,
+      data: { commands, commandsCount: 120 },
+      refetch: mockRefetch,
+    };
+  },
   useMutation: (doc: unknown) =>
     doc === UpdateCommandHelpDocument
       ? [mockUpdate, { loading: false }]
@@ -87,14 +92,6 @@ describe('command help form helpers', () => {
       validateHelpForm({ helpSummary: 'ok', helpText: 'a\nb' })
     ).toBeNull();
   });
-
-  it('matches name, alias and summary', () => {
-    const c = commands[0]!;
-    expect(matchesQuery(c, 'LOO')).toBe(true);
-    expect(matchesQuery(c, 'around')).toBe(true);
-    expect(matchesQuery(commands[1]!, 'tele')).toBe(true);
-    expect(matchesQuery(c, 'zzz')).toBe(false);
-  });
 });
 
 describe('Commands page', () => {
@@ -105,14 +102,36 @@ describe('Commands page', () => {
     mockUpdateFlags.mockResolvedValue({ data: {} });
   });
 
-  it('lists commands and filters by search', () => {
+  it('lists the server page and reports the server-side total', () => {
     render(<CommandsPage />);
     expect(screen.getByText('Look around.')).toBeInTheDocument();
     expect(screen.getByText('built-in default')).toBeInTheDocument();
+    expect(screen.getByTestId('list-pager-range')).toHaveTextContent(
+      'Showing 1-2 of 120 commands'
+    );
+    expect(mockQueryVars.at(-1)).toEqual({ search: null, skip: 0, take: 50 });
+  });
+
+  it('asks the server for the next page', () => {
+    render(<CommandsPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    expect(mockQueryVars.at(-1)).toEqual({ search: null, skip: 50, take: 50 });
+  });
+
+  it('sends the search to the server (debounced) instead of filtering locally', async () => {
+    render(<CommandsPage />);
     fireEvent.change(screen.getByPlaceholderText(/search/i), {
-      target: { value: 'goto' },
+      target: { value: ' goto ' },
     });
-    expect(screen.queryByText('Look around.')).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockQueryVars.at(-1)).toEqual({
+        search: 'goto',
+        skip: 0,
+        take: 50,
+      })
+    );
+    // Rows come from the server; nothing is hidden client-side.
+    expect(screen.getByText('Look around.')).toBeInTheDocument();
   });
 
   it('saves the edited help through the mutation', async () => {

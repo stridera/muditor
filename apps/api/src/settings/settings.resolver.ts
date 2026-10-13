@@ -4,6 +4,7 @@ import { UserRole, LoginStage, CommandCategory } from '@muditor/db';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
+import { clampSkip, clampTake } from '../common/pagination';
 import { GameConfigDto } from './game-config.dto';
 import { LevelDefinitionDto } from './level-definition.dto';
 import { SystemTextDto } from './system-text.dto';
@@ -275,11 +276,31 @@ export class SettingsResolver {
 
   @Query(() => [CommandDto], {
     name: 'commands',
-    description: 'Get all command definitions',
+    description:
+      'Command definitions (all, or one page of the commands matching search)',
   })
   @MinimumRole(UserRole.BUILDER)
-  async findAllCommands() {
-    return this.settingsService.findAllCommands();
+  async findAllCommands(
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('skip', { type: () => Int, nullable: true }) skip?: number,
+    @Args('take', { type: () => Int, nullable: true }) take?: number
+  ) {
+    return this.settingsService.findAllCommands({
+      search: search?.trim().slice(0, 200),
+      skip: clampSkip(skip),
+      take: clampTake(take),
+    });
+  }
+
+  @Query(() => Int, {
+    name: 'commandsCount',
+    description: 'Number of commands matching search',
+  })
+  @MinimumRole(UserRole.BUILDER)
+  async countCommands(
+    @Args('search', { type: () => String, nullable: true }) search?: string
+  ) {
+    return this.settingsService.countCommands(search?.trim().slice(0, 200));
   }
 
   @Query(() => [CommandDto], {

@@ -31,6 +31,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ColoredInput } from '@/components/ColoredInput';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
+import { ListPager } from '@/components/ui/list-pager';
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { usePermissions } from '@/hooks/use-permissions';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
@@ -43,11 +45,13 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const PAGE_SIZE = 50;
 
 const GET_SOCIALS = gql`
-  query GetSocialsPage {
-    socials {
+  query GetSocialsPage($search: String, $skip: Int, $take: Int) {
+    socials(search: $search, skip: $skip, take: $take) {
       id
       name
       hide
@@ -62,7 +66,7 @@ const GET_SOCIALS = gql`
       charAuto
       othersAuto
     }
-    socialsCount
+    socialsCount(search: $search)
   }
 `;
 
@@ -162,7 +166,22 @@ export default function SocialsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState<SocialFormData>(defaultFormData);
 
-  const { data, loading, error, refetch } = useQuery(GET_SOCIALS);
+  const [page, setPage] = useState(1);
+  const debouncedSearch = useDebouncedValue(searchQuery.trim(), 300);
+
+  // Search and paging run on the server, so only one page of socials is downloaded.
+  const { data, previousData, loading, error, refetch } = useQuery(
+    GET_SOCIALS,
+    {
+      variables: {
+        search: debouncedSearch || null,
+        skip: (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+      },
+      fetchPolicy: 'cache-and-network',
+    }
+  );
+  const shown = data ?? previousData;
 
   const [createSocial, { loading: creating }] = useMutation(CREATE_SOCIAL, {
     onCompleted: () => {
@@ -208,13 +227,15 @@ export default function SocialsPage() {
     },
   });
 
-  const filteredSocials = useMemo(() => {
-    const socials = (data as any)?.socials || [];
-    if (!searchQuery) return socials;
-    return socials.filter((social: any) =>
-      social.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [data, searchQuery]);
+  const filteredSocials = (shown as any)?.socials || [];
+  const socialsTotal: number = (shown as any)?.socialsCount || 0;
+
+  // A page that no longer exists (the last social on it was deleted, or the
+  // search narrowed) snaps back to the last one.
+  const lastPage = Math.max(1, Math.ceil(socialsTotal / PAGE_SIZE));
+  useEffect(() => {
+    if (data && page > lastPage) setPage(lastPage);
+  }, [data, page, lastPage]);
 
   const handleSocialClick = (social: any) => {
     setSelectedSocial(social);
@@ -299,7 +320,7 @@ export default function SocialsPage() {
 
   const canEdit = isCoder;
 
-  if (loading) {
+  if (loading && !shown) {
     return (
       <div className='flex items-center justify-center h-96'>
         <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
@@ -307,7 +328,7 @@ export default function SocialsPage() {
     );
   }
 
-  if (error) {
+  if (error && !shown) {
     return (
       <div className='container mx-auto p-6'>
         <Alert className='bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-800'>
@@ -325,8 +346,8 @@ export default function SocialsPage() {
       <div className='mb-6'>
         <h1 className='text-3xl font-bold text-foreground mb-2'>Socials</h1>
         <p className='text-muted-foreground'>
-          Manage social commands (emotes/actions) -{' '}
-          {(data as any)?.socialsCount || 0} total
+          Manage social commands (emotes/actions) - {socialsTotal}{' '}
+          {debouncedSearch ? 'matching' : 'total'}
         </p>
       </div>
 
@@ -352,7 +373,10 @@ export default function SocialsPage() {
         <Input
           placeholder='Search socials...'
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={e => {
+            setSearchQuery(e.target.value);
+            setPage(1);
+          }}
           className='max-w-sm'
         />
         {canEdit && (
@@ -456,6 +480,15 @@ export default function SocialsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <ListPager
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={socialsTotal}
+        shown={filteredSocials.length}
+        onPageChange={setPage}
+        noun='socials'
+      />
 
       {/* Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>

@@ -2,18 +2,47 @@
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { FlagBadge } from '@/components/ui/flag-badge';
+import { ListPager } from '@/components/ui/list-pager';
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useListState } from '@/hooks/use-list-state';
+import { searchText } from '@/lib/list-query';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ChevronDown, Edit, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useState, Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import EnhancedSearch from '../../../components/EnhancedSearch';
-import { applySearchFilters } from '../../../lib/search-utils';
 
+const SHOPS_PAGE_SIZE = 25;
+
+interface ShopsPageVariables {
+  zoneId?: number;
+  search: string | null;
+  highProfit: boolean | null;
+  hasKeeper: boolean | null;
+  skip: number;
+  take: number;
+}
+
+// Search, zone, filters and paging run on the server, so only the visible
+// page of shops (each with its inventory) is downloaded.
 const GET_SHOPS = gql`
-  query GetShopsInline {
-    shops {
+  query ShopsPage(
+    $zoneId: Int
+    $search: String
+    $highProfit: Boolean
+    $hasKeeper: Boolean
+    $skip: Int
+    $take: Int
+  ) {
+    shops(
+      zoneId: $zoneId
+      search: $search
+      highProfit: $highProfit
+      hasKeeper: $hasKeeper
+      skip: $skip
+      take: $take
+    ) {
       id
       buyProfit
       sellProfit
@@ -53,51 +82,12 @@ const GET_SHOPS = gql`
         keywords
       }
     }
-  }
-`;
-
-const GET_SHOPS_BY_ZONE = gql`
-  query GetShopsByZoneInline($zoneId: Int!) {
-    shopsByZone(zoneId: $zoneId) {
-      id
-      buyProfit
-      sellProfit
-      temper
-      flags
-      tradesWithFlags
-      noSuchItemMessages
-      doNotBuyMessages
-      missingCashMessages
-      buyMessages
-      sellMessages
-      keeperId
-      keeper {
-        id
-        zoneId
-        name
-        keywords
-      }
-      zoneId
-      createdAt
-      updatedAt
-      items {
-        id
-        amount
-        objectId
-        object {
-          id
-          zoneId
-          name
-          type
-          cost
-        }
-      }
-      accepts {
-        id
-        type
-        keywords
-      }
-    }
+    shopsCount(
+      zoneId: $zoneId
+      search: $search
+      highProfit: $highProfit
+      hasKeeper: $hasKeeper
+    )
   }
 `;
 
@@ -171,24 +161,36 @@ interface Shop {
 }
 
 function ShopsContent() {
-  const {
-    zone: selectedZone,
-    searchFilters,
-    setSearchFilters,
-  } = useListState();
+  const list = useListState();
+  const { zone: selectedZone, searchFilters, setSearchFilters } = list;
 
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [expandedShops, setExpandedShops] = useState<Set<number>>(new Set());
 
-  const { loading, error, data, refetch } = useQuery(
-    selectedZone ? GET_SHOPS_BY_ZONE : GET_SHOPS,
-    selectedZone != null ? { variables: { zoneId: selectedZone } } : {}
-  ) as {
-    loading: boolean;
-    error?: unknown;
-    data?: { shops?: Shop[]; shopsByZone?: Shop[] };
-    refetch: () => void;
+  const page = list.page;
+  const debouncedSearch = useDebouncedValue(searchText(searchFilters), 300);
+  const customOn = (key: string) => {
+    const v = searchFilters.customFilters?.[key];
+    return v === true || v === 'true';
   };
+  const { loading, error, data, previousData, refetch } = useQuery<
+    { shops: Shop[]; shopsCount: number },
+    ShopsPageVariables
+  >(GET_SHOPS, {
+    variables: {
+      // Omit (not null) when no zone is chosen: the list then spans all zones.
+      ...(selectedZone != null && { zoneId: selectedZone }),
+      search: debouncedSearch,
+      highProfit: customOn('isHighProfit') || null,
+      hasKeeper: customOn('hasKeeper') || null,
+      skip: (page - 1) * SHOPS_PAGE_SIZE,
+      take: SHOPS_PAGE_SIZE,
+    },
+    fetchPolicy: 'cache-and-network',
+  });
+  // Keep the previous page on screen while the next one loads so the search
+  // box is never unmounted mid-typing.
+  const shown = data ?? previousData;
 
   const [deleteShop] = useMutation(DELETE_SHOP);
 
@@ -222,18 +224,18 @@ function ShopsContent() {
     }
   };
 
-  // Get shops from whichever query is active
-  const shops = data?.shops || data?.shopsByZone || [];
+  const shops = shown?.shops ?? [];
+  const filteredShops = shops;
+  const shopsTotal = shown?.shopsCount ?? 0;
 
-  // Apply advanced search filters
-  const filteredShops = applySearchFilters(shops, searchFilters, {
-    // Custom field mappings for shop-specific filters
-    isHighProfit: shop => shop.buyProfit >= 0.8 && shop.sellProfit >= 0.8,
-    hasKeeper: shop => shop.keeperId && shop.keeperId > 0,
-  });
+  // A stale ?page= past the end (the filter narrowed) snaps back to the last page.
+  const lastPage = Math.max(1, Math.ceil(shopsTotal / SHOPS_PAGE_SIZE));
+  useEffect(() => {
+    if (data && page > lastPage) list.setPage(lastPage);
+  }, [data, page, lastPage, list]);
 
-  if (loading) return <div className='p-4'>Loading shops...</div>;
-  if (error) {
+  if (loading && !shown) return <div className='p-4'>Loading shops...</div>;
+  if (error && !shown) {
     const message =
       (error as { message?: string })?.message || 'Error loading shops';
     return <div className='p-4 text-destructive'>Error: {message}</div>;
@@ -247,7 +249,7 @@ function ShopsContent() {
             {selectedZone ? `Zone ${selectedZone} Shops` : 'Shops'}
           </h1>
           <p className='text-sm text-muted-foreground mt-1'>
-            {filteredShops.length} of {shops.length} shops
+            {shopsTotal} shops
             {selectedZone && ' in this zone'}
           </p>
         </div>
@@ -264,7 +266,7 @@ function ShopsContent() {
       <EnhancedSearch
         initialFilters={searchFilters}
         onFiltersChange={setSearchFilters}
-        placeholder='Search shops by ID, keeper ID, or zone...'
+        placeholder='Search shops by ID, keeper name or ID, or zone...'
         customFilterOptions={[
           {
             key: 'isHighProfit',
@@ -685,6 +687,15 @@ function ShopsContent() {
           ))}
         </div>
       )}
+
+      <ListPager
+        page={page}
+        pageSize={SHOPS_PAGE_SIZE}
+        total={shopsTotal}
+        shown={shops.length}
+        onPageChange={list.setPage}
+        noun='shops'
+      />
     </div>
   );
 }

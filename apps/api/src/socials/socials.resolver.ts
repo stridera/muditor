@@ -4,6 +4,7 @@ import { UserRole } from '@muditor/db';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
+import { clampSkip, clampTake } from '../common/pagination';
 import { SocialDto } from './social.dto';
 import { CreateSocialInput, UpdateSocialInput } from './social.input';
 import { SocialsService } from './socials.service';
@@ -17,11 +18,20 @@ export class SocialsResolver {
 
   @Query(() => [SocialDto], {
     name: 'socials',
-    description: 'Get all social commands',
+    description:
+      'Social commands (all, or one page of those whose name matches search)',
   })
   @MinimumRole(UserRole.IMMORTAL)
-  async findAll() {
-    return this.socialsService.findAll();
+  async findAll(
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('skip', { type: () => Int, nullable: true }) skip?: number,
+    @Args('take', { type: () => Int, nullable: true }) take?: number
+  ) {
+    return this.socialsService.findAll({
+      search: search?.trim().slice(0, 100),
+      skip: clampSkip(skip),
+      take: clampTake(take),
+    });
   }
 
   @Query(() => SocialDto, {
@@ -44,11 +54,13 @@ export class SocialsResolver {
 
   @Query(() => Int, {
     name: 'socialsCount',
-    description: 'Get total count of socials',
+    description: 'Number of socials whose name matches search (all if blank)',
   })
   @MinimumRole(UserRole.IMMORTAL)
-  async count() {
-    return this.socialsService.count();
+  async count(
+    @Args('search', { type: () => String, nullable: true }) search?: string
+  ) {
+    return this.socialsService.count(search?.trim().slice(0, 100));
   }
 
   @Query(() => [SocialDto], {

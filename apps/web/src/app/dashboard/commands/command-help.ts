@@ -28,19 +28,6 @@ export function toMutationVars(form: HelpFormData) {
   };
 }
 
-export function matchesQuery(
-  cmd: { name: string; aliases: string[]; helpSummary?: string | null },
-  query: string
-): boolean {
-  const q = query.trim().toLowerCase();
-  if (!q) return true;
-  return (
-    cmd.name.toLowerCase().includes(q) ||
-    cmd.aliases.some(a => a.toLowerCase().includes(q)) ||
-    (cmd.helpSummary ?? '').toLowerCase().includes(q)
-  );
-}
-
 /** Per-command policy flags (mechanics; editing needs CODER, unlike help text). */
 export const FLAG_FIELDS = [
   {

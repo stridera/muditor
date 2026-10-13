@@ -1,7 +1,7 @@
 # Social commands (emotes/actions) operations
 
-query GetSocials {
-  socials {
+query GetSocials($search: String, $skip: Int, $take: Int) {
+  socials(search: $search, skip: $skip, take: $take) {
     id
     name
     hide
@@ -16,7 +16,7 @@ query GetSocials {
     charAuto
     othersAuto
   }
-  socialsCount
+  socialsCount(search: $search)
 }
 
 query GetSocial($id: ID!) {
