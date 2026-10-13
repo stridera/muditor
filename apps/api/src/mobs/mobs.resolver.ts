@@ -41,23 +41,31 @@ export class MobsResolver {
 
   // Mob reads are public. Mobs in god zones are hidden from anonymous
   // callers and mortal accounts; IMMORTAL+ still see them.
+  // sortBy: level | name | id | zoneId (default id); sortDir: asc | desc.
   @Query(() => [MobDto], { name: 'mobs' })
   @UseGuards(OptionalJwtAuthGuard)
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
     @Args('search', { type: () => String, nullable: true }) search?: string,
-    @CurrentUser() user?: Users | null
+    @CurrentUser() user?: Users | null,
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @Args('levelMin', { type: () => Int, nullable: true }) levelMin?: number,
+    @Args('levelMax', { type: () => Int, nullable: true }) levelMax?: number,
+    @Args('sortBy', { type: () => String, nullable: true }) sortBy?: string,
+    @Args('sortDir', { type: () => String, nullable: true }) sortDir?: string
   ): Promise<MobDto[]> {
-    const params: {
-      skip?: number;
-      take?: number;
-      search?: string;
-      hideGodZones: boolean;
-    } = { hideGodZones: hidesGodZones(user ?? null) };
+    const params: Parameters<MobsService['findAll']>[0] = {
+      hideGodZones: hidesGodZones(user ?? null),
+      zoneId,
+      search: search?.trim().slice(0, 200),
+      levelMin,
+      levelMax,
+      sortBy,
+      sortDir,
+    };
     if (skip !== undefined) params.skip = clampSkip(skip);
     params.take = clampTake(take);
-    if (search !== undefined) params.search = search;
     const mobs = await this.mobsService.findAll(params);
     return mobs.map(m => mapMob(m));
   }
@@ -94,8 +102,20 @@ export class MobsResolver {
 
   @Query(() => Int, { name: 'mobsCount' })
   @UseGuards(OptionalJwtAuthGuard)
-  async count(@CurrentUser() user?: Users | null): Promise<number> {
-    return this.mobsService.count(undefined, hidesGodZones(user ?? null));
+  async count(
+    @CurrentUser() user?: Users | null,
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('levelMin', { type: () => Int, nullable: true }) levelMin?: number,
+    @Args('levelMax', { type: () => Int, nullable: true }) levelMax?: number
+  ): Promise<number> {
+    return this.mobsService.countFiltered({
+      hideGodZones: hidesGodZones(user ?? null),
+      zoneId,
+      search: search?.trim().slice(0, 200),
+      levelMin,
+      levelMax,
+    });
   }
 
   @Query(() => [MobDto], { name: 'searchMobs' })

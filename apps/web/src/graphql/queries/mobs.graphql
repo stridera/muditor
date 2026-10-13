@@ -69,35 +69,28 @@ query GetMob($id: Int!, $zoneId: Int!) {
   }
 }
 
-query GetMobs($skip: Int, $take: Int) {
-  mobs(skip: $skip, take: $take) {
-    id
-    zoneId
-    keywords
-    name
-    roomDescription
-    examineDescription
-    level
-    alignment
-    race
-    damageType
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    lifeForce
-    hpDice
-    damageDice
-    traits
-    behaviors
-    professions
-  }
-}
-
-query GetMobsByZone($zoneId: Int!) {
-  mobsByZone(zoneId: $zoneId) {
+# Mobs list page: search, zone, level range, sort and paging all run on the
+# server; mobsCount is the total across every page of the same filter.
+query MobsPage(
+  $zoneId: Int
+  $search: String
+  $levelMin: Int
+  $levelMax: Int
+  $sortBy: String
+  $sortDir: String
+  $skip: Int
+  $take: Int
+) {
+  mobs(
+    zoneId: $zoneId
+    search: $search
+    levelMin: $levelMin
+    levelMax: $levelMax
+    sortBy: $sortBy
+    sortDir: $sortDir
+    skip: $skip
+    take: $take
+  ) {
     id
     zoneId
     keywords
@@ -122,6 +115,12 @@ query GetMobsByZone($zoneId: Int!) {
     professions
     lifeForce
   }
+  mobsCount(
+    zoneId: $zoneId
+    search: $search
+    levelMin: $levelMin
+    levelMax: $levelMax
+  )
 }
 
 query SearchMobs($search: String!, $limit: Int, $zoneId: Int) {

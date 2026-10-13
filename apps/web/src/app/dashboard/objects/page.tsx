@@ -19,18 +19,21 @@ import {
   GetObjectDocument,
   type GetObjectQuery,
   type GetObjectQueryVariables,
-  GetObjectsByZoneDocument,
-  type GetObjectsByZoneQuery,
-  type GetObjectsByZoneQueryVariables,
-  GetObjectsDocument,
-  type GetObjectsQuery,
-  type GetObjectsQueryVariables,
   type ObjectDetailsFragment,
+  ObjectsPageDocument,
+  type ObjectsPageQuery,
+  type ObjectsPageQueryVariables,
   type ObjectSummaryFragment,
-  SearchObjectSummariesDocument,
-  type SearchObjectSummariesQuery,
-  type SearchObjectSummariesQueryVariables,
 } from '@/generated/graphql';
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
+import {
+  DEFAULT_PAGE_SIZE,
+  OBJECT_TYPES_ALL,
+  objectFilterVars,
+  pageSizeFrom,
+  pageWindow,
+  searchText,
+} from '@/lib/list-query';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
 import {
   ArrowDown,
@@ -52,11 +55,7 @@ import { useEffect, useRef, useState, Suspense } from 'react';
 import EnhancedSearch, {
   type EnhancedSearchRef,
 } from '../../../components/EnhancedSearch';
-import {
-  applySearchFilters,
-  createObjectPresets,
-  getUniqueValues,
-} from '../../../lib/search-utils';
+import { createObjectPresets } from '../../../lib/search-utils';
 
 // Inline queries removed; using unified generated documents & fragments.
 
@@ -67,8 +66,6 @@ const objectKey = (obj: { zoneId: number; id: number }) =>
 
 // Debounce before hitting the server with the search term.
 const SEARCH_DEBOUNCE_MS = 300;
-// Server-side search result cap (all-zones search).
-const SERVER_SEARCH_LIMIT = 500;
 
 function ObjectsPageContent() {
   return (
@@ -106,8 +103,9 @@ function ObjectsContent() {
   // Pagination, sort and filters live in the URL (see useListState)
   const currentPage = list.page;
   const setCurrentPage = list.setPage;
-  const itemsPerPage = parseInt(list.get('per') ?? '', 10) || 25;
-  const setItemsPerPage = (n: number) => list.set({ per: n === 25 ? null : n });
+  const itemsPerPage = pageSizeFrom(list.get('per'));
+  const setItemsPerPage = (n: number) =>
+    list.set({ per: n === DEFAULT_PAGE_SIZE ? null : n });
   const sortBy = list.get('sort') ?? 'level';
   const setSortBy = (v: string) => list.set({ sort: v === 'level' ? null : v });
   const sortOrder: 'asc' | 'desc' = list.get('dir') === 'desc' ? 'desc' : 'asc';
@@ -117,57 +115,39 @@ function ObjectsContent() {
   // Ref for search box focus
   const searchRef = useRef<EnhancedSearchRef>(null);
 
-  // Debounced search term, used to query the server when no zone is selected
-  const [debouncedTerm, setDebouncedTerm] = useState('');
-  useEffect(() => {
-    const timer = setTimeout(
-      () => setDebouncedTerm(searchFilters.searchTerm ?? ''),
-      SEARCH_DEBOUNCE_MS
-    );
-    return () => clearTimeout(timer);
-  }, [searchFilters.searchTerm]);
-
-  // With no zone selected the first 1000 objects (by id) don't cover the whole
-  // world, so a non-empty search term is resolved server-side instead.
-  // Quotes (exact-match syntax) are only meaningful to the client filter.
-  const serverSearchTerm = selectedZone
-    ? ''
-    : debouncedTerm.replace(/"/g, '').trim();
-  const useServerSearch = serverSearchTerm.length > 0;
-
-  // Zone-selected mode loads the whole zone; otherwise the first page of all
-  // objects (client-side filtered) or the server search results.
+  // Search, zone, type/level/cost/weight filters, sort and paging all run on
+  // the server, so only the visible page is downloaded. Typing is debounced.
+  const debouncedSearch = useDebouncedValue(
+    searchText(searchFilters),
+    SEARCH_DEBOUNCE_MS
+  );
+  const filterVars = objectFilterVars(searchFilters);
   const {
-    loading: listLoading,
-    error: listError,
-    data: listData,
+    loading,
+    error,
+    data,
+    previousData,
     refetch: refetchList,
-  } = useQuery<GetObjectsByZoneQuery | GetObjectsQuery>(
-    selectedZone ? GetObjectsByZoneDocument : GetObjectsDocument,
+  } = useQuery<ObjectsPageQuery, ObjectsPageQueryVariables>(
+    ObjectsPageDocument,
     {
-      variables: selectedZone ? { zoneId: selectedZone } : { take: 1000 },
-      skip: useServerSearch,
+      variables: {
+        // Omit (not null) when no zone is chosen: the list then spans all zones.
+        ...(selectedZone != null && { zoneId: selectedZone }),
+        search: debouncedSearch,
+        ...filterVars,
+        sortBy,
+        sortDir: sortOrder,
+        skip: (currentPage - 1) * itemsPerPage,
+        take: itemsPerPage,
+      },
+      fetchPolicy: 'cache-and-network',
     }
   );
-  const {
-    loading: searchLoading,
-    error: searchError,
-    data: searchData,
-    previousData: searchPreviousData,
-    refetch: refetchSearch,
-  } = useQuery<SearchObjectSummariesQuery, SearchObjectSummariesQueryVariables>(
-    SearchObjectSummariesDocument,
-    {
-      variables: { search: serverSearchTerm, limit: SERVER_SEARCH_LIMIT },
-      skip: !useServerSearch,
-    }
-  );
-  // Only the list query gates the page; search loading must not unmount the
-  // search box mid-typing.
-  const loading = useServerSearch ? false : listLoading;
-  const error = useServerSearch ? searchError : listError;
-  const data = useServerSearch ? (searchData ?? searchPreviousData) : listData;
-  const refetch = () => (useServerSearch ? refetchSearch() : refetchList());
+  // Keep the previous page on screen while the next one loads so the search
+  // box is never unmounted mid-typing.
+  const shown = data ?? previousData;
+  const refetch = () => refetchList();
 
   const [deleteObject] = useMutation<
     DeleteObjectMutation,
@@ -214,19 +194,11 @@ function ObjectsContent() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Extract objects from the query result
-  const rawObjects: ObjectSummaryFragment[] =
-    data && 'objectsByZone' in data
-      ? (data.objectsByZone as ObjectSummaryFragment[])
-      : data && 'objects' in data
-        ? ((data as GetObjectsQuery).objects as ObjectSummaryFragment[])
-        : data && 'searchObjects' in data
-          ? (data.searchObjects as ObjectSummaryFragment[])
-          : [];
-
   // Deduplicate objects based on composite key (zoneId, id)
   const objects: ObjectSummaryFragment[] = Array.from(
-    new Map(rawObjects.map(obj => [`${obj.zoneId}-${obj.id}`, obj])).values()
+    new Map(
+      (shown?.objects ?? []).map(obj => [`${obj.zoneId}-${obj.id}`, obj])
+    ).values()
   );
 
   // Type guard to differentiate summary vs detailed object
@@ -304,8 +276,8 @@ function ObjectsContent() {
     }
   };
 
-  // Get available types for filtering
-  const availableTypes = getUniqueValues(objects, 'type');
+  // The type filter offers every object type (a page only holds a few of them).
+  const availableTypes: string[] = OBJECT_TYPES_ALL;
 
   // Bulk operations
   // Selection is keyed by composite (zoneId, id) via objectKey so
@@ -424,7 +396,7 @@ function ObjectsContent() {
   const exportSelectedObjects = () => {
     if (selectedObjects.size === 0) return;
 
-    const selectedData = sortedDisplayObjects.filter(obj =>
+    const selectedData = paginatedObjects.filter(obj =>
       selectedObjects.has(objectKey(obj))
     );
     const jsonData = JSON.stringify(selectedData, null, 2);
@@ -440,82 +412,22 @@ function ObjectsContent() {
     URL.revokeObjectURL(url);
   };
 
-  // Apply advanced search filters and sorting
-  interface ObjectSearchShape {
-    id: number;
-    keywords?: string;
-    name?: string;
-    level: number;
-    type?: string;
-    cost: number;
-    weight: number;
-    zoneId: number;
-    // Additional fields (roomDescription, examineDescription, concealment) only available once detailed data is loaded
-    [key: string]: unknown;
-  }
-  const searchableObjects: ObjectSearchShape[] = objects.map(o => {
-    const base: ObjectSearchShape = {
-      id: o.id,
-      keywords: Array.isArray(o.keywords) ? o.keywords.join(' ') : o.keywords,
-      name: o.name,
-      level: o.level,
-      cost: o.cost,
-      weight: o.weight,
-      zoneId: o.zoneId,
-    };
-    if (o.type) {
-      // Only include type if defined; avoid assigning undefined
-      base.type = o.type as string;
-    }
-    return base;
-  });
-
-  // Apply search filters (zone filtering is done server-side)
-  const filteredObjects = applySearchFilters(searchableObjects, searchFilters, {
-    // Custom field mappings for object-specific filters
-    isValuable: obj => (obj.cost ?? 0) >= 1000,
-    isLightweight: obj => (obj.weight ?? 0) <= 5,
-    isHeavy: obj => (obj.weight ?? 0) >= 50,
-    minCost: obj => obj.cost ?? 0,
-    maxWeight: obj => obj.weight ?? 0,
-  });
-
-  // Sort the filtered objects
-  // Map filtered search shapes back to original fragment objects for display
-  const filteredKeySet = new Set(filteredObjects.map(objectKey));
-  const displayObjects = objects.filter(o => filteredKeySet.has(objectKey(o)));
-
-  const sortedDisplayObjects = [...displayObjects].sort((a, b) => {
-    const aVal = (a as unknown as Record<string, unknown>)[sortBy];
-    const bVal = (b as unknown as Record<string, unknown>)[sortBy];
-    const normA = aVal ?? (typeof bVal === 'string' ? '' : 0);
-    const normB = bVal ?? (typeof aVal === 'string' ? '' : 0);
-    let comparison: number;
-    if (typeof normA === 'string' && typeof normB === 'string') {
-      comparison = normA.localeCompare(normB);
-    } else {
-      const numA = Number(normA);
-      const numB = Number(normB);
-      comparison = numA === numB ? 0 : numA < numB ? -1 : 1;
-    }
-    return sortOrder === 'asc' ? comparison : -comparison;
-  });
-
-  // Calculate pagination with page clamping
-  const totalCount = sortedDisplayObjects.length;
-  const totalPages = Math.ceil(totalCount / itemsPerPage) || 1;
-  // Clamp currentPage to valid range to handle search filter changes
-  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
-  const startIndex = (validCurrentPage - 1) * itemsPerPage;
-  const paginatedObjects = sortedDisplayObjects.slice(
-    startIndex,
-    startIndex + itemsPerPage
+  const paginatedObjects = objects;
+  const totalCount = shown?.objectsCount ?? 0;
+  const { totalPages, startItem, endItem } = pageWindow(
+    currentPage,
+    itemsPerPage,
+    totalCount,
+    objects.length
   );
-  const startItem = totalCount > 0 ? startIndex + 1 : 0;
-  const endItem = Math.min(startIndex + itemsPerPage, totalCount);
 
-  if (loading) return <div className='p-4'>Loading objects...</div>;
-  if (error)
+  // A stale ?page= past the end (the filter narrowed) snaps back to the last page.
+  useEffect(() => {
+    if (data && currentPage > totalPages) setCurrentPage(totalPages);
+  }, [data, currentPage, totalPages, setCurrentPage]);
+
+  if (loading && !shown) return <div className='p-4'>Loading objects...</div>;
+  if (error && !shown)
     return <div className='p-4 text-destructive'>Error: {error.message}</div>;
 
   return (
@@ -671,12 +583,10 @@ function ObjectsContent() {
         </div>
       )}
 
-      {filteredObjects.length === 0 ? (
+      {paginatedObjects.length === 0 ? (
         <div className='text-center py-12'>
           <div className='text-muted-foreground mb-4'>
-            {useServerSearch && searchLoading
-              ? 'Searching...'
-              : 'No objects found'}
+            {loading ? 'Searching...' : 'No objects found'}
           </div>
           <Link
             href='/dashboard/objects/editor'

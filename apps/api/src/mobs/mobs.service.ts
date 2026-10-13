@@ -2,44 +2,97 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { type Mobs, Prisma } from '@muditor/db';
 import { inVisibleZone } from '../common/god-zone-visibility';
 import { assertNoPlayerPets, rethrowAsInUse } from '../common/proto-references';
+import {
+  intRange,
+  numericIdToken,
+  searchTokens,
+  sortDirection,
+} from '../common/list-filter';
 import { DatabaseService } from '../database/database.service';
+
+export interface MobListFilter {
+  zoneId?: number | null | undefined;
+  search?: string | null | undefined;
+  levelMin?: number | null | undefined;
+  levelMax?: number | null | undefined;
+  /** Omit mobs in god zones (public readers below IMMORTAL). */
+  hideGodZones?: boolean | undefined;
+}
+
+/** Sortable list columns; anything else falls back to the default order. */
+const MOB_SORT_FIELDS: Readonly<Record<string, string>> = {
+  level: 'level',
+  name: 'plainName',
+  id: 'id',
+  zoneId: 'zoneId',
+};
+
+/** Default is by id; a requested column always tie-breaks on (zoneId, id). */
+function mobOrderBy(
+  sortBy: string | null | undefined,
+  sortDir: string | null | undefined
+): Prisma.MobsOrderByWithRelationInput[] {
+  const field = sortBy ? MOB_SORT_FIELDS[sortBy] : undefined;
+  if (!field) return [{ id: 'asc' }, { zoneId: 'asc' }];
+  const order: Prisma.MobsOrderByWithRelationInput[] = [
+    { [field]: sortDirection(sortDir) },
+  ];
+  if (field !== 'zoneId') order.push({ zoneId: 'asc' });
+  if (field !== 'id') order.push({ id: 'asc' });
+  return order;
+}
 
 @Injectable()
 export class MobsService {
   constructor(private readonly database: DatabaseService) {}
 
-  async findAll(args?: {
-    skip?: number;
-    take?: number;
-    search?: string;
-    where?: Prisma.MobsWhereInput;
-    orderBy?: Prisma.MobsOrderByWithRelationInput;
-    /** Omit mobs in god zones (public readers below IMMORTAL). */
-    hideGodZones?: boolean;
-  }): Promise<Mobs[]> {
-    const whereClause: Prisma.MobsWhereInput = {
-      ...(args?.where || {}),
-      ...inVisibleZone(!!args?.hideGodZones),
+  /**
+   * WHERE shared by the paged list and its count. Search terms are AND-ed; each
+   * must hit the (colour-free) name or descriptions, a keyword, or the id.
+   */
+  listWhere(filter: MobListFilter = {}): Prisma.MobsWhereInput {
+    const and: Prisma.MobsWhereInput[] = searchTokens(filter.search).map(
+      term => {
+        const id = numericIdToken(term);
+        return {
+          OR: [
+            { plainName: { contains: term, mode: 'insensitive' } },
+            { plainRoomDescription: { contains: term, mode: 'insensitive' } },
+            {
+              plainExamineDescription: { contains: term, mode: 'insensitive' },
+            },
+            { keywords: { has: term.toLowerCase() } },
+            ...(id !== null ? [{ id }] : []),
+          ],
+        };
+      }
+    );
+    const level = intRange(filter.levelMin, filter.levelMax);
+    return {
+      ...(filter.zoneId != null && { zoneId: filter.zoneId }),
+      ...(level && { level }),
+      ...inVisibleZone(!!filter.hideGodZones),
+      ...(and.length > 0 && { AND: and }),
     };
+  }
 
-    // Add search filter if provided
-    if (args?.search && args.search.trim()) {
-      whereClause.OR = [
-        { name: { contains: args.search, mode: 'insensitive' } },
-        { keywords: { hasSome: [args.search.toLowerCase()] } },
-        { roomDescription: { contains: args.search, mode: 'insensitive' } },
-      ];
+  async findAll(
+    args?: MobListFilter & {
+      skip?: number;
+      take?: number;
+      where?: Prisma.MobsWhereInput;
+      sortBy?: string | null | undefined;
+      sortDir?: string | null | undefined;
     }
-
+  ): Promise<Mobs[]> {
+    const listWhere = this.listWhere(args);
     const findArgs: Prisma.MobsFindManyArgs = {
-      where: whereClause,
-      orderBy: args?.orderBy || { id: 'asc' },
-      include: {},
+      where: args?.where ? { AND: [args.where, listWhere] } : listWhere,
+      orderBy: mobOrderBy(args?.sortBy, args?.sortDir),
     };
     if (args?.skip !== undefined) findArgs.skip = args.skip;
     if (args?.take !== undefined) findArgs.take = args.take;
-    const mobs = await this.database.mobs.findMany(findArgs);
-    return mobs;
+    return this.database.mobs.findMany(findArgs);
   }
 
   async findOne(
@@ -103,6 +156,11 @@ export class MobsService {
     return this.database.mobs.count({
       where: { ...(where || {}), ...inVisibleZone(hideGodZones) },
     });
+  }
+
+  /** Count for the filtered list (same WHERE as {@link findAll}). */
+  async countFiltered(filter: MobListFilter = {}): Promise<number> {
+    return this.database.mobs.count({ where: this.listWhere(filter) });
   }
 
   async search(

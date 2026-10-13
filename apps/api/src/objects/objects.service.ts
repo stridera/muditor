@@ -11,33 +11,117 @@ import {
   assertNoPlayerItems,
   rethrowAsInUse,
 } from '../common/proto-references';
+import {
+  intRange,
+  numericIdToken,
+  searchTokens,
+  sortDirection,
+} from '../common/list-filter';
 import { DatabaseService } from '../database/database.service';
 import {
   SPELL_ITEM_TYPES,
   SPELL_MIRROR_KEYS,
 } from './object-abilities.service';
 
+export interface ObjectListFilter {
+  zoneId?: number | null | undefined;
+  search?: string | null | undefined;
+  types?: ObjectType[] | null | undefined;
+  levelMin?: number | null | undefined;
+  levelMax?: number | null | undefined;
+  costMin?: number | null | undefined;
+  weightMin?: number | null | undefined;
+  weightMax?: number | null | undefined;
+  /** Omit objects in god zones (public readers below IMMORTAL). */
+  hideGodZones?: boolean | undefined;
+}
+
+/** Sortable list columns; anything else falls back to the default order. */
+const OBJECT_SORT_FIELDS: Readonly<Record<string, string>> = {
+  level: 'level',
+  name: 'plainName',
+  type: 'type',
+  cost: 'cost',
+  weight: 'weight',
+  id: 'id',
+  zoneId: 'zoneId',
+};
+
+/** Default is by id; a requested column always tie-breaks on (zoneId, id). */
+function objectOrderBy(
+  sortBy: string | null | undefined,
+  sortDir: string | null | undefined
+): Prisma.ObjectsOrderByWithRelationInput[] {
+  const field = sortBy ? OBJECT_SORT_FIELDS[sortBy] : undefined;
+  if (!field) return [{ id: 'asc' }, { zoneId: 'asc' }];
+  const order: Prisma.ObjectsOrderByWithRelationInput[] = [
+    { [field]: sortDirection(sortDir) },
+  ];
+  if (field !== 'zoneId') order.push({ zoneId: 'asc' });
+  if (field !== 'id') order.push({ id: 'asc' });
+  return order;
+}
+
 @Injectable()
 export class ObjectsService {
   constructor(private readonly database: DatabaseService) {}
 
-  async findAll(args?: {
-    skip?: number;
-    take?: number;
-    where?: Prisma.ObjectsWhereInput;
-    orderBy?: Prisma.ObjectsOrderByWithRelationInput;
-    /** Omit objects in god zones (public readers below IMMORTAL). */
-    hideGodZones?: boolean;
-  }): Promise<Objects[]> {
-    const findArgs: Prisma.ObjectsFindManyArgs = {
-      orderBy: args?.orderBy || { id: 'asc' },
+  /**
+   * WHERE shared by the paged list and its count. Search terms are AND-ed; each
+   * must hit the (colour-free) name or descriptions, a keyword, the type, or the id.
+   */
+  listWhere(filter: ObjectListFilter = {}): Prisma.ObjectsWhereInput {
+    const and: Prisma.ObjectsWhereInput[] = searchTokens(filter.search).map(
+      term => {
+        const id = numericIdToken(term);
+        const type = (Object.values(ObjectType) as string[]).includes(
+          term.toUpperCase()
+        )
+          ? (term.toUpperCase() as ObjectType)
+          : null;
+        return {
+          OR: [
+            { plainName: { contains: term, mode: 'insensitive' } },
+            { plainRoomDescription: { contains: term, mode: 'insensitive' } },
+            {
+              plainExamineDescription: { contains: term, mode: 'insensitive' },
+            },
+            { keywords: { has: term.toLowerCase() } },
+            ...(id !== null ? [{ id }] : []),
+            ...(type !== null ? [{ type }] : []),
+          ],
+        };
+      }
+    );
+    const level = intRange(filter.levelMin, filter.levelMax);
+    const cost = intRange(filter.costMin, undefined);
+    const weight = intRange(filter.weightMin, filter.weightMax);
+    return {
+      ...(filter.zoneId != null && { zoneId: filter.zoneId }),
+      ...(filter.types &&
+        filter.types.length > 0 && { type: { in: filter.types } }),
+      ...(level && { level }),
+      ...(cost && { cost }),
+      ...(weight && { weight }),
+      ...inVisibleZone(!!filter.hideGodZones),
+      ...(and.length > 0 && { AND: and }),
     };
-    if (args?.where || args?.hideGodZones) {
-      findArgs.where = {
-        ...(args.where || {}),
-        ...inVisibleZone(!!args.hideGodZones),
-      };
+  }
+
+  async findAll(
+    args?: ObjectListFilter & {
+      skip?: number;
+      take?: number;
+      where?: Prisma.ObjectsWhereInput;
+      sortBy?: string | null | undefined;
+      sortDir?: string | null | undefined;
     }
+  ): Promise<Objects[]> {
+    const listWhere = this.listWhere(args);
+    const findArgs: Prisma.ObjectsFindManyArgs = {
+      where: args?.where ? { AND: [args.where, listWhere] } : listWhere,
+      orderBy: objectOrderBy(args?.sortBy, args?.sortDir),
+    };
     if (args?.skip !== undefined) findArgs.skip = args.skip;
     if (args?.take !== undefined) findArgs.take = args.take;
     return this.database.objects.findMany(findArgs);
@@ -137,6 +221,11 @@ export class ObjectsService {
     return this.database.objects.count({
       where: { ...(where || {}), ...inVisibleZone(hideGodZones) },
     });
+  }
+
+  /** Count for the filtered list (same WHERE as {@link findAll}). */
+  async countFiltered(filter: ObjectListFilter = {}): Promise<number> {
+    return this.database.objects.count({ where: this.listWhere(filter) });
   }
 
   async search(

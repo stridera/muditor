@@ -4,13 +4,19 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { useListState } from '@/hooks/use-list-state';
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import {
-  GetMobsDocument,
-  GetMobsByZoneDocument,
-  type GetMobsQuery,
-  type GetMobsByZoneQuery,
-  type GetMobsByZoneQueryVariables,
+  MobsPageDocument,
+  type MobsPageQuery,
+  type MobsPageQueryVariables,
 } from '@/generated/graphql';
+import {
+  mobFilterVars,
+  DEFAULT_PAGE_SIZE,
+  pageSizeFrom,
+  pageWindow,
+  searchText,
+} from '@/lib/list-query';
 import { useQuery } from '@apollo/client/react';
 import {
   ArrowDown,
@@ -33,10 +39,7 @@ import { useEffect, useRef, useState, Suspense } from 'react';
 import EnhancedSearch, {
   type EnhancedSearchRef,
 } from '../../../components/EnhancedSearch';
-import {
-  applySearchFilters,
-  createMobPresets,
-} from '../../../lib/search-utils';
+import { createMobPresets } from '../../../lib/search-utils';
 
 interface Mob {
   id: number;
@@ -91,8 +94,9 @@ function MobsContent() {
   // Pagination, sort and filters live in the URL (see useListState)
   const currentPage = list.page;
   const setCurrentPage = list.setPage;
-  const itemsPerPage = parseInt(list.get('per') ?? '', 10) || 25;
-  const setItemsPerPage = (n: number) => list.set({ per: n === 25 ? null : n });
+  const itemsPerPage = pageSizeFrom(list.get('per'));
+  const setItemsPerPage = (n: number) =>
+    list.set({ per: n === DEFAULT_PAGE_SIZE ? null : n });
   const sortBy = list.get('sort') ?? 'level';
   const setSortBy = (v: string) => list.set({ sort: v === 'level' ? null : v });
   const sortOrder: 'asc' | 'desc' = list.get('dir') === 'desc' ? 'desc' : 'asc';
@@ -116,31 +120,42 @@ function MobsContent() {
     }
   }, [idParam]);
 
-  // Fetch mobs using Apollo Client with conditional query
+  // Search, zone, level range, sort and paging all run on the server, so only
+  // the visible page is downloaded. Typing is debounced before it hits the API.
+  const debouncedSearch = useDebouncedValue(searchText(searchFilters), 300);
+  const { levelMin, levelMax } = mobFilterVars(searchFilters);
   const {
     loading,
     error: queryError,
     data,
+    previousData,
     refetch,
-  } = useQuery<GetMobsByZoneQuery | GetMobsQuery>(
-    selectedZone ? GetMobsByZoneDocument : GetMobsDocument,
-    {
-      variables: selectedZone ? { zoneId: selectedZone } : {},
-      skip: false, // Always run the query
-    }
-  );
-
-  // Extract mobs from the query result
-  const rawMobs: Mob[] =
-    data && 'mobsByZone' in data
-      ? (data.mobsByZone as Mob[])
-      : data && 'mobs' in data
-        ? (data.mobs as Mob[])
-        : [];
+  } = useQuery<MobsPageQuery, MobsPageQueryVariables>(MobsPageDocument, {
+    variables: {
+      // Omit (not null) when no zone is chosen: the list then spans all zones.
+      ...(selectedZone != null && { zoneId: selectedZone }),
+      search: debouncedSearch,
+      levelMin,
+      levelMax,
+      sortBy,
+      sortDir: sortOrder,
+      skip: (currentPage - 1) * itemsPerPage,
+      take: itemsPerPage,
+    },
+    fetchPolicy: 'cache-and-network',
+  });
+  // Keep the previous page on screen while the next one loads so the search
+  // box is never unmounted mid-typing.
+  const shown = data ?? previousData;
 
   // Deduplicate mobs based on composite key (zoneId, id)
   const mobs: Mob[] = Array.from(
-    new Map(rawMobs.map(mob => [`${mob.zoneId}-${mob.id}`, mob])).values()
+    new Map(
+      ((shown?.mobs ?? []) as Mob[]).map(mob => [
+        `${mob.zoneId}-${mob.id}`,
+        mob,
+      ])
+    ).values()
   );
 
   // Keyboard shortcut: '/' to focus search
@@ -161,35 +176,20 @@ function MobsContent() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Apply advanced search filters (zone filtering is done server-side)
-  const searchedMobs = applySearchFilters(mobs, searchFilters, {
-    // Custom field mappings for mob-specific filters
-    healthPoints: mob => (mob.level || 0) * 10, // Use level-based HP since dice are all 0
-    isHighLevel: mob => (mob.level || 0) >= 50,
-    isNewbie: mob => (mob.level || 0) <= 10,
-  });
-
-  // Apply client-side sorting
-  const sortedMobs = [...searchedMobs].sort((a, b) => {
-    const aVal = a[sortBy as keyof Mob] || 0;
-    const bVal = b[sortBy as keyof Mob] || 0;
-    if (sortOrder === 'asc') {
-      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-    } else {
-      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
-    }
-  });
-
-  // Apply client-side pagination with page clamping
-  const totalCount = sortedMobs.length;
-  const totalPages = Math.ceil(totalCount / itemsPerPage) || 1;
-  // Clamp currentPage to valid range to handle search filter changes
-  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
-  const startIndex = (validCurrentPage - 1) * itemsPerPage;
-  const filteredMobs = sortedMobs.slice(startIndex, startIndex + itemsPerPage);
+  const filteredMobs = mobs;
+  const totalCount = shown?.mobsCount ?? 0;
   const filteredCount = totalCount;
-  const startItem = totalCount > 0 ? startIndex + 1 : 0;
-  const endItem = Math.min(startIndex + itemsPerPage, totalCount);
+  const { totalPages, startItem, endItem } = pageWindow(
+    currentPage,
+    itemsPerPage,
+    totalCount,
+    mobs.length
+  );
+
+  // A stale ?page= past the end (the filter narrowed) snaps back to the last page.
+  useEffect(() => {
+    if (data && currentPage > totalPages) setCurrentPage(totalPages);
+  }, [data, currentPage, totalPages, setCurrentPage]);
 
   // Bulk operations
   // Selection is keyed by composite (zoneId, id) so same-numbered mobs in
@@ -527,8 +527,8 @@ function MobsContent() {
     setExpandedMobs(newExpanded);
   };
 
-  if (loading) return <div className='p-4'>Loading mobs...</div>;
-  if (queryError)
+  if (loading && !shown) return <div className='p-4'>Loading mobs...</div>;
+  if (queryError && !shown)
     return (
       <div className='p-4 text-red-600' data-testid='error-message'>
         Error: {queryError.message}

@@ -65,17 +65,48 @@ fragment ObjectDetails on ObjectDto {
   updatedAt
 }
 
-query GetObjects($skip: Int, $take: Int) {
-  objects(skip: $skip, take: $take) {
+# Objects list page: search, zone, type/level/cost/weight filters, sort and
+# paging all run on the server; objectsCount is the total for the same filter.
+query ObjectsPage(
+  $zoneId: Int
+  $search: String
+  $types: [ObjectType!]
+  $levelMin: Int
+  $levelMax: Int
+  $costMin: Int
+  $weightMin: Int
+  $weightMax: Int
+  $sortBy: String
+  $sortDir: String
+  $skip: Int
+  $take: Int
+) {
+  objects(
+    zoneId: $zoneId
+    search: $search
+    types: $types
+    levelMin: $levelMin
+    levelMax: $levelMax
+    costMin: $costMin
+    weightMin: $weightMin
+    weightMax: $weightMax
+    sortBy: $sortBy
+    sortDir: $sortDir
+    skip: $skip
+    take: $take
+  ) {
     ...ObjectSummary
   }
-  objectsCount
-}
-
-query GetObjectsByZone($zoneId: Int!) {
-  objectsByZone(zoneId: $zoneId) {
-    ...ObjectSummary
-  }
+  objectsCount(
+    zoneId: $zoneId
+    search: $search
+    types: $types
+    levelMin: $levelMin
+    levelMax: $levelMax
+    costMin: $costMin
+    weightMin: $weightMin
+    weightMax: $weightMax
+  )
 }
 
 query GetObject($id: Int!, $zoneId: Int!) {
@@ -92,13 +123,6 @@ query SearchObjects($search: String!, $limit: Int, $zoneId: Int) {
     plainName
     type
     level
-  }
-}
-
-# Full summaries for the objects list page (server-side search across all zones)
-query SearchObjectSummaries($search: String!, $limit: Int, $zoneId: Int) {
-  searchObjects(search: $search, limit: $limit, zoneId: $zoneId) {
-    ...ObjectSummary
   }
 }
 

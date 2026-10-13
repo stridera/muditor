@@ -423,6 +423,7 @@ describe('Mobs and objects in god zones', () => {
       findOne: jest.fn().mockResolvedValue(null),
       findByZone: jest.fn().mockResolvedValue([]),
       count: jest.fn().mockResolvedValue(0),
+      countFiltered: jest.fn().mockResolvedValue(0),
       search: jest.fn().mockResolvedValue([]),
     };
     const objectsService = {
@@ -431,6 +432,7 @@ describe('Mobs and objects in god zones', () => {
       findByZone: jest.fn().mockResolvedValue([]),
       findByType: jest.fn().mockResolvedValue([]),
       count: jest.fn().mockResolvedValue(0),
+      countFiltered: jest.fn().mockResolvedValue(0),
       search: jest.fn().mockResolvedValue([]),
     };
     const mobs = new MobsResolver(mobsService as unknown as MobsService);
@@ -461,7 +463,9 @@ describe('Mobs and objects in god zones', () => {
         undefined,
         hide
       );
-      expect(mobsService.count).toHaveBeenLastCalledWith(undefined, hide);
+      expect(mobsService.countFiltered.mock.lastCall![0]).toMatchObject({
+        hideGodZones: hide,
+      });
       expect(mobsService.search).toHaveBeenLastCalledWith(
         'titan',
         10,
@@ -473,7 +477,9 @@ describe('Mobs and objects in god zones', () => {
       });
       expect(objectsService.findOne).toHaveBeenLastCalledWith(12, 1, hide);
       expect(objectsService.findByZone).toHaveBeenLastCalledWith(12, hide);
-      expect(objectsService.count).toHaveBeenLastCalledWith(undefined, hide);
+      expect(objectsService.countFiltered.mock.lastCall![0]).toMatchObject({
+        hideGodZones: hide,
+      });
       expect(objectsService.search).toHaveBeenLastCalledWith(
         'sword',
         10,
@@ -519,6 +525,10 @@ describe('Mobs and objects in god zones', () => {
     expect(mobsDb.mobs.count).toHaveBeenLastCalledWith({
       where: hiddenFilter,
     });
+    await mobs.countFiltered({ hideGodZones: true, search: 'titan' });
+    expect(mobsDb.mobs.count.mock.lastCall![0].where).toMatchObject(
+      hiddenFilter
+    );
 
     const objDb = {
       objects: {
@@ -533,7 +543,9 @@ describe('Mobs and objects in god zones', () => {
       hiddenFilter
     );
     await objects.findAll({});
-    expect(objDb.objects.findMany.mock.calls[1]![0].where).toBeUndefined();
+    expect(objDb.objects.findMany.mock.calls[1]![0].where).not.toHaveProperty(
+      'zones'
+    );
     await objects.findOne(12, 1, true);
     expect(objDb.objects.findFirst.mock.calls[0]![0].where).toEqual({
       zoneId: 12,
@@ -550,5 +562,9 @@ describe('Mobs and objects in god zones', () => {
     expect(objDb.objects.count).toHaveBeenLastCalledWith({
       where: hiddenFilter,
     });
+    await objects.countFiltered({ hideGodZones: true, search: 'sword' });
+    expect(objDb.objects.count.mock.lastCall![0].where).toMatchObject(
+      hiddenFilter
+    );
   });
 });

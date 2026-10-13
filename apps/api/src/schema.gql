@@ -3063,9 +3063,9 @@ type Query {
   mobResets(mobId: Int!, mobZoneId: Int!): [MobResetDto!]!
   mobResetsByRoom(roomId: Int!, roomZoneId: Int!): [MobResetDto!]!
   mobResetsByZone(zoneId: Int!): [MobResetDto!]!
-  mobs(search: String, skip: Int, take: Int): [MobDto!]!
+  mobs(levelMax: Int, levelMin: Int, search: String, skip: Int, sortBy: String, sortDir: String, take: Int, zoneId: Int): [MobDto!]!
   mobsByZone(search: String, zoneId: Int!): [MobDto!]!
-  mobsCount: Int!
+  mobsCount(levelMax: Int, levelMin: Int, search: String, zoneId: Int): Int!
 
   """Get mortal level definitions (1-99)"""
   mortalLevels: [LevelDefinitionDto!]!
@@ -3091,10 +3091,10 @@ type Query {
   objectReset(id: ID!): ObjectResetDto
   objectResetsByRoom(roomId: Int!, roomZoneId: Int!): [ObjectResetDto!]!
   objectResetsByZone(zoneId: Int!): [ObjectResetDto!]!
-  objects(skip: Int, take: Int): [ObjectDto!]!
+  objects(costMin: Int, levelMax: Int, levelMin: Int, search: String, skip: Int, sortBy: String, sortDir: String, take: Int, types: [ObjectType!], weightMax: Int, weightMin: Int, zoneId: Int): [ObjectDto!]!
   objectsByType(type: ObjectType!): [ObjectDto!]!
   objectsByZone(zoneId: Int!): [ObjectDto!]!
-  objectsCount: Int!
+  objectsCount(costMin: Int, levelMax: Int, levelMin: Int, search: String, types: [ObjectType!], weightMax: Int, weightMin: Int, zoneId: Int): Int!
   onlineCharacters(userId: ID): [OnlineCharacterDto!]!
 
   """Get list of online players in FieryMUD"""

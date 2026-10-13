@@ -28,15 +28,38 @@ export class ObjectsResolver {
 
   // Object reads are public. Objects in god zones are hidden from anonymous
   // callers and mortal accounts; IMMORTAL+ still see them.
+  // sortBy: level | name | type | cost | weight | id | zoneId (default id);
+  // sortDir: asc | desc.
   @Query(() => [ObjectDto], { name: 'objects' })
   @UseGuards(OptionalJwtAuthGuard)
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
-    @CurrentUser() user?: Users | null
+    @CurrentUser() user?: Users | null,
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @Args('types', { type: () => [ObjectTypeEnum], nullable: true })
+    types?: ObjectTypeEnum[],
+    @Args('levelMin', { type: () => Int, nullable: true }) levelMin?: number,
+    @Args('levelMax', { type: () => Int, nullable: true }) levelMax?: number,
+    @Args('costMin', { type: () => Int, nullable: true }) costMin?: number,
+    @Args('weightMin', { type: () => Int, nullable: true }) weightMin?: number,
+    @Args('weightMax', { type: () => Int, nullable: true }) weightMax?: number,
+    @Args('sortBy', { type: () => String, nullable: true }) sortBy?: string,
+    @Args('sortDir', { type: () => String, nullable: true }) sortDir?: string
   ): Promise<ObjectDto[]> {
-    const params: { skip?: number; take?: number; hideGodZones: boolean } = {
+    const params: Parameters<ObjectsService['findAll']>[0] = {
       hideGodZones: hidesGodZones(user ?? null),
+      zoneId,
+      search: search?.trim().slice(0, 200),
+      types,
+      levelMin,
+      levelMax,
+      costMin,
+      weightMin,
+      weightMax,
+      sortBy,
+      sortDir,
     };
     if (skip !== undefined) params.skip = clampSkip(skip);
     params.take = clampTake(take);
@@ -89,8 +112,29 @@ export class ObjectsResolver {
 
   @Query(() => Int, { name: 'objectsCount' })
   @UseGuards(OptionalJwtAuthGuard)
-  async count(@CurrentUser() user?: Users | null): Promise<number> {
-    return this.objectsService.count(undefined, hidesGodZones(user ?? null));
+  async count(
+    @CurrentUser() user?: Users | null,
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @Args('types', { type: () => [ObjectTypeEnum], nullable: true })
+    types?: ObjectTypeEnum[],
+    @Args('levelMin', { type: () => Int, nullable: true }) levelMin?: number,
+    @Args('levelMax', { type: () => Int, nullable: true }) levelMax?: number,
+    @Args('costMin', { type: () => Int, nullable: true }) costMin?: number,
+    @Args('weightMin', { type: () => Int, nullable: true }) weightMin?: number,
+    @Args('weightMax', { type: () => Int, nullable: true }) weightMax?: number
+  ): Promise<number> {
+    return this.objectsService.countFiltered({
+      hideGodZones: hidesGodZones(user ?? null),
+      zoneId,
+      search: search?.trim().slice(0, 200),
+      types,
+      levelMin,
+      levelMax,
+      costMin,
+      weightMin,
+      weightMax,
+    });
   }
 
   @Query(() => [ObjectDto], { name: 'searchObjects' })
