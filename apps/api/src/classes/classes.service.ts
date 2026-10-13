@@ -7,6 +7,11 @@ import type { Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import { stripMarkup } from '../common/text-utils';
 import {
+  assertCoreTagsUnique,
+  coreTagsOf,
+  normalizeTags,
+} from '../common/core-tags';
+import {
   AssignSkillToClassInput,
   CreateClassCircleInput,
   CreateClassInput,
@@ -105,6 +110,18 @@ export class ClassesService {
       }
     }
 
+    const tags = data.tags !== undefined ? normalizeTags(data.tags) : undefined;
+    if (tags !== undefined) {
+      await assertCoreTagsUnique('class', coreTagsOf(tags), async core =>
+        (
+          await this.db.characterClass.findMany({
+            where: { id: { not: id }, tags: { hasSome: core } },
+            select: { name: true, plainName: true, tags: true },
+          })
+        ).map(c => ({ name: c.plainName ?? c.name, tags: c.tags }))
+      );
+    }
+
     const updateData: Prisma.CharacterClassUpdateInput = {
       ...(data.name !== undefined && {
         name: data.name,
@@ -117,9 +134,7 @@ export class ClassesService {
       ...(data.alignmentBias !== undefined && {
         alignmentBias: data.alignmentBias,
       }),
-      ...(data.tags !== undefined && {
-        tags: data.tags.map(t => t.trim()).filter(t => t.length > 0),
-      }),
+      ...(tags !== undefined && { tags }),
     };
     return this.db.characterClass.update({ where: { id }, data: updateData });
   }

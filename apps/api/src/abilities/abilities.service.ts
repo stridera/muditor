@@ -1,6 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, SpellSphere } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
+import {
+  assertCoreTagsUnique,
+  coreTagsOf,
+  normalizeTags,
+} from '../common/core-tags';
 import { isRenderableSphereColor } from './sphere-color';
 import {
   CreateAbilityInput,
@@ -96,6 +101,19 @@ export class AbilitiesService {
     });
   }
 
+  /** A `core:<role>` tag may sit on only one ability (the engine binds it by tag). */
+  private assertCoreTags(tags: string[], selfId?: number): Promise<void> {
+    return assertCoreTagsUnique('ability', coreTagsOf(tags), core =>
+      this.prisma.ability.findMany({
+        where: {
+          ...(selfId !== undefined && { id: { not: selfId } }),
+          tags: { hasSome: core },
+        },
+        select: { name: true, tags: true },
+      })
+    );
+  }
+
   async create(data: CreateAbilityInput) {
     const createData: Prisma.AbilityUncheckedCreateInput = {
       name: data.name,
@@ -121,7 +139,11 @@ export class AbilitiesService {
       createData.description = data.description;
     if (data.schoolId !== undefined) createData.schoolId = data.schoolId;
     if (data.notes !== undefined) createData.notes = data.notes;
-    if (data.tags !== undefined) createData.tags = data.tags;
+    if (data.tags !== undefined) {
+      const tags = normalizeTags(data.tags);
+      await this.assertCoreTags(tags);
+      createData.tags = tags;
+    }
     if (data.luaScript !== undefined) createData.luaScript = data.luaScript;
     if (data.sphere !== undefined) createData.sphere = data.sphere;
     if (data.damageType !== undefined) createData.damageType = data.damageType;
@@ -168,7 +190,11 @@ export class AbilitiesService {
       updateData.inCombatOnly = data.inCombatOnly;
     if (data.isArea !== undefined) updateData.isArea = data.isArea;
     if (data.notes !== undefined) updateData.notes = data.notes;
-    if (data.tags !== undefined) updateData.tags = data.tags;
+    if (data.tags !== undefined) {
+      const tags = normalizeTags(data.tags);
+      await this.assertCoreTags(tags, id);
+      updateData.tags = tags;
+    }
     if (data.luaScript !== undefined) updateData.luaScript = data.luaScript;
     if (data.sphere !== undefined) updateData.sphere = data.sphere;
     if (data.damageType !== undefined) updateData.damageType = data.damageType;

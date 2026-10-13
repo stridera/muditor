@@ -2,7 +2,9 @@ import type { DatabaseService } from '../database/database.service';
 import { ClassesService } from './classes.service';
 
 /** In-memory stand-in for the characterClass delegate (find/update only). */
-function makeDb() {
+function makeDb(
+  others: Array<{ name: string; plainName: string; tags: string[] }> = []
+) {
   const row: Record<string, unknown> = {
     id: 1,
     name: 'Warrior',
@@ -14,6 +16,11 @@ function makeDb() {
     tags: [],
   };
   const characterClass = {
+    // Other classes holding any of the asked-for tags
+    findMany: jest.fn(
+      async ({ where }: { where: { tags: { hasSome: string[] } } }) =>
+        others.filter(o => o.tags.some(t => where.tags.hasSome.includes(t)))
+    ),
     findUnique: jest.fn(async ({ where }: { where: { id?: number } }) =>
       where.id === row.id ? { ...row } : null
     ),
@@ -84,5 +91,38 @@ describe('ClassesService.update', () => {
       data: { tags: ['core:monk', 'x'] },
     });
     expect(updated).toMatchObject({ tags: ['core:monk', 'x'] });
+  });
+
+  it('rejects a core tag another class already carries', async () => {
+    const { db, characterClass } = makeDb([
+      { name: '<b>Monk</>', plainName: 'Monk', tags: ['core:monk'] },
+    ]);
+    const service = new ClassesService(db);
+
+    await expect(service.update(1, { tags: ['core:monk'] })).rejects.toThrow(
+      /core:monk is already used by the class "Monk"/
+    );
+    expect(characterClass.update).not.toHaveBeenCalled();
+  });
+
+  it('allows non-core tags to repeat and dedupes within one class', async () => {
+    const { db, characterClass } = makeDb([
+      { name: 'Monk', plainName: 'Monk', tags: ['martial'] },
+    ]);
+    const service = new ClassesService(db);
+
+    await service.update(1, { tags: ['martial', 'martial', 'core:thief'] });
+
+    expect(characterClass.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { tags: ['martial', 'core:thief'] },
+    });
+  });
+
+  it('rejects a bare core: tag', async () => {
+    const { db } = makeDb();
+    await expect(
+      new ClassesService(db).update(1, { tags: ['core:'] })
+    ).rejects.toThrow(/Invalid tag/);
   });
 });

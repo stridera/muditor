@@ -32,8 +32,14 @@ function makeDb() {
       return { ...row };
     }
   );
+  const findMany = jest.fn(
+    async ({ where }: { where: { tags: { hasSome: string[] } } }) =>
+      [{ name: 'Evade', tags: ['core:dodge'] }].filter(a =>
+        a.tags.some(t => where.tags.hasSome.includes(t))
+      )
+  );
   return {
-    db: { ability: { update } } as unknown as DatabaseService,
+    db: { ability: { update, findMany } } as unknown as DatabaseService,
     row,
     update,
   };
@@ -111,6 +117,26 @@ describe('AbilitiesService.update (partial update)', () => {
       description: null,
       questOnly: true,
     });
+  });
+});
+
+describe('AbilitiesService core tags', () => {
+  it('rejects a core tag another ability already carries', async () => {
+    const { db, update } = makeDb();
+    await expect(
+      new AbilitiesService(db).update(7, { tags: ['fire', 'core:dodge'] })
+    ).rejects.toThrow(/core:dodge is already used by the ability "Evade"/);
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('accepts unique core tags and trims/dedupes', async () => {
+    const { db, update } = makeDb();
+    await new AbilitiesService(db).update(7, {
+      tags: [' fire ', 'fire', 'core:new_role'],
+    });
+    expect(
+      (update.mock.calls[0]![0] as { data: { tags: string[] } }).data.tags
+    ).toEqual(['fire', 'core:new_role']);
   });
 });
 
