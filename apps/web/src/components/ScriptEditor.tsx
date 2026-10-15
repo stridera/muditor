@@ -579,7 +579,9 @@ export default function ScriptEditor({
   const savingRef = useRef(false);
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const lua = useLuaEditorTools(code, mounted);
+  const lua = useLuaEditorTools(code, mounted, formatted =>
+    handleCodeChange(formatted)
+  );
 
   useEffect(() => {
     setMounted(true);

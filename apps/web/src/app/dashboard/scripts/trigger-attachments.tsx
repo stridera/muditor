@@ -64,7 +64,7 @@ export default function TriggerAttachments({
   return (
     <section
       aria-label='Attached to'
-      className='mb-4 rounded-lg border border-border bg-card p-3'
+      className='mt-4 rounded-lg border border-border bg-card p-3'
     >
       <h2 className='text-sm font-medium'>
         Attached to

@@ -252,6 +252,29 @@ describe('Script libraries tab', () => {
       ).toBeInTheDocument();
     });
 
+    it('Format rewrites the editor value, then says when nothing is left to do', async () => {
+      mockPerms = headBuilder;
+      navigation.reset('/dashboard/scripts?tab=libraries&library=mine-lib');
+      render(<ScriptsPage />);
+      await screen.findByText('Edit Library');
+      await waitFor(() => expect(monacoProps).not.toBeNull());
+
+      const onChange = () =>
+        (monacoProps!.onChange as (v: string) => void)(
+          'if x then\nreturn 1   \nend'
+        );
+      act(onChange);
+      expect(monacoProps!.value).toBe('if x then\nreturn 1   \nend');
+
+      fireEvent.click(screen.getByRole('button', { name: 'Format' }));
+      expect(monacoProps!.value).toBe('if x then\n    return 1\nend\n');
+      expect(toastSuccess).not.toHaveBeenCalledWith('Already formatted');
+
+      fireEvent.click(screen.getByRole('button', { name: 'Format' }));
+      expect(monacoProps!.value).toBe('if x then\n    return 1\nend\n');
+      expect(toastSuccess).toHaveBeenCalledWith('Already formatted');
+    });
+
     it('offers Validate and Format (Format disabled) when read-only', async () => {
       mockPerms = staff;
       navigation.reset('/dashboard/scripts?tab=libraries&library=mine-lib');

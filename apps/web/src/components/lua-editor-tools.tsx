@@ -3,6 +3,8 @@
 import { lintLua, type LuaLintIssue } from '@muditor/types';
 import type { editor } from 'monaco-editor';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { formatLua } from '@/lib/format-lua';
 
 /**
  * Validate / Format / live-lint behaviour shared by the trigger script editor
@@ -11,7 +13,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * Wire it up with `onMount={tools.handleEditorDidMount}`, call `tools.validate`
  * / `tools.format` from buttons, and render `<LuaValidationResults>`.
  */
-export function useLuaEditorTools(code: string, mounted = true) {
+export function useLuaEditorTools(
+  code: string,
+  mounted = true,
+  /** Receives the formatted source; the owner puts it in its code state. */
+  applyCode?: (formatted: string) => void
+) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
   const lintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -133,9 +140,17 @@ export function useLuaEditorTools(code: string, mounted = true) {
     }
   }, [code, updateMarkers]);
 
+  // Monaco has no Lua formatter (formatDocument is a silent no-op for it), so
+  // format with our own and write the result back through the owner's state.
   const format = useCallback(() => {
-    editorRef.current?.getAction('editor.action.formatDocument')?.run();
-  }, []);
+    const formatted = formatLua(code);
+    if (formatted === code) {
+      toast.success('Already formatted');
+      return;
+    }
+    applyCode?.(formatted);
+    setValidationErrors(prev => (prev.length > 0 ? [] : prev));
+  }, [code, applyCode]);
 
   return {
     editorRef,

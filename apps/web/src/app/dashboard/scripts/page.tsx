@@ -665,12 +665,6 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
           )
         ) : (
           <>
-            {selectedTrigger && !isCreating && (
-              <TriggerAttachments
-                zoneId={selectedTrigger.zoneId}
-                id={selectedTrigger.id}
-              />
-            )}
             <ScriptEditor
               script={editorScript}
               onDirtyChange={setEditorDirty}
@@ -678,6 +672,13 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
                 ? { readOnly: true }
                 : { onSave: handleSaveScript })}
             />
+            {/* Below the editor so its position never depends on the attachment count. */}
+            {selectedTrigger && !isCreating && (
+              <TriggerAttachments
+                zoneId={selectedTrigger.zoneId}
+                id={selectedTrigger.id}
+              />
+            )}
           </>
         )}
       </div>

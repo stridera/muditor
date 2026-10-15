@@ -200,6 +200,11 @@ describe('Scripts page URL state', () => {
     navigation.reset('/dashboard/scripts?trigger=30:1');
     render(<ScriptsPage />);
     const panel = await screen.findByRole('region', { name: 'Attached to' });
+    // The panel sits below the editor so the editor never moves with the count.
+    expect(
+      screen.getByTestId('script-editor').compareDocumentPosition(panel) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
     expect(panel).toHaveTextContent('(3)');
     expect(screen.getByRole('link', { name: /a guard/ })).toHaveAttribute(
       'href',

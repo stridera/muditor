@@ -149,7 +149,7 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
   // The values the editor opened with; dirty is measured against these.
   const [loaded, setLoaded] = useState<LibraryDraft | null>(null);
   const [saving, setSaving] = useState<'save' | 'close' | null>(null);
-  const lua = useLuaEditorTools(code);
+  const lua = useLuaEditorTools(code, true, setCode);
 
   const isCreating = urlNew;
   const isEditing = draftKey !== null && (urlNew || urlLibrary != null);
