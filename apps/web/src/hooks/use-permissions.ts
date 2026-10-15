@@ -66,6 +66,13 @@ export interface UsePermissionsResult {
   error: any;
   refetch: () => Promise<void>;
   canEditZone: (zoneId?: number) => boolean;
+  /**
+   * True when the user can edit at least one zone: HEAD_BUILDER+ (every zone)
+   * or a BUILDER holding a live WRITE/ADMIN zone grant. Gates the Scripts panel.
+   */
+  canEditAnyZone: boolean;
+  /** Zone grants are still loading (canEditAnyZone/canEditZone fail closed). */
+  grantsLoading: boolean;
   canManageCharacters: (characterOwnerId?: string) => boolean;
   isPlayer: boolean;
   isImmortal: boolean;
@@ -102,14 +109,17 @@ export function usePermissions(): UsePermissionsResult {
   // Mirrors the API's ZonePermissionGuard: HEAD_BUILDER+ bypass grants, a
   // BUILDER needs a live WRITE (or ADMIN) grant on the zone. Fails closed
   // while the grants are still loading.
-  const { data: grantsData } = useQuery<MyZoneGrantsQueryResult>(
-    MY_ZONE_GRANTS_QUERY,
-    {
+  const { data: grantsData, loading: grantsQueryLoading } =
+    useQuery<MyZoneGrantsQueryResult>(MY_ZONE_GRANTS_QUERY, {
       skip: !user || !isBuilder || isHeadBuilder,
       errorPolicy: 'all',
-    }
-  );
+    });
+  const grantsLoading = !!grantsQueryLoading;
   const zoneGrants = grantsData?.myZoneGrants;
+
+  const grantAllowsWrite = (g: MyZoneGrant, now: number): boolean =>
+    (!g.expiresAt || new Date(g.expiresAt).getTime() > now) &&
+    (g.permissions.includes('WRITE') || g.permissions.includes('ADMIN'));
 
   const canEditZone = (zoneId?: number): boolean => {
     if (!permissions) return false;
@@ -117,12 +127,15 @@ export function usePermissions(): UsePermissionsResult {
     if (!isBuilder || zoneId === undefined || zoneId === null) return false;
     const now = Date.now();
     return (zoneGrants ?? []).some(
-      g =>
-        Number(g.zoneId) === zoneId &&
-        (!g.expiresAt || new Date(g.expiresAt).getTime() > now) &&
-        (g.permissions.includes('WRITE') || g.permissions.includes('ADMIN'))
+      g => Number(g.zoneId) === zoneId && grantAllowsWrite(g, now)
     );
   };
+
+  const canEditAnyZone =
+    !!permissions &&
+    (isHeadBuilder ||
+      (isBuilder &&
+        (zoneGrants ?? []).some(g => grantAllowsWrite(g, Date.now()))));
 
   const canManageCharacters = (characterOwnerId?: string): boolean => {
     if (!permissions || !user) return false;
@@ -142,6 +155,8 @@ export function usePermissions(): UsePermissionsResult {
     error,
     refetch,
     canEditZone,
+    canEditAnyZone,
+    grantsLoading,
     canManageCharacters,
     isPlayer,
     isImmortal,

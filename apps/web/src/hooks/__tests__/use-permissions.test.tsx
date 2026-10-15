@@ -102,4 +102,42 @@ describe('usePermissions role flags', () => {
       expect(can(990)).toBe(false);
     });
   });
+
+  describe('canEditAnyZone (Scripts panel access)', () => {
+    const anyZone = (role: UserRole) => {
+      mockRole = role;
+      const { result } = renderHook(() => usePermissions());
+      return result.current.canEditAnyZone;
+    };
+
+    it('is true for HEAD_BUILDER (103) and above without grants', () => {
+      mockGrants = [];
+      expect(anyZone('HEAD_BUILDER')).toBe(true);
+      expect(anyZone('CODER')).toBe(true);
+      expect(anyZone('IMPLEMENTOR')).toBe(true);
+    });
+
+    it('is false for PLAYER and IMMORTAL', () => {
+      mockGrants = [{ zoneId: '30', permissions: ['WRITE'] }];
+      expect(anyZone('PLAYER')).toBe(false);
+      expect(anyZone('IMMORTAL')).toBe(false);
+    });
+
+    it('for a BUILDER needs a live WRITE/ADMIN grant', () => {
+      mockGrants = [];
+      expect(anyZone('BUILDER')).toBe(false);
+      mockGrants = [{ zoneId: '32', permissions: ['READ'] }];
+      expect(anyZone('BUILDER')).toBe(false);
+      mockGrants = [
+        {
+          zoneId: '33',
+          permissions: ['WRITE'],
+          expiresAt: new Date(Date.now() - 1000).toISOString(),
+        },
+      ];
+      expect(anyZone('BUILDER')).toBe(false);
+      mockGrants = [{ zoneId: '30', permissions: ['WRITE'] }];
+      expect(anyZone('BUILDER')).toBe(true);
+    });
+  });
 });

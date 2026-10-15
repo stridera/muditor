@@ -1,6 +1,5 @@
 'use client';
 
-import { PermissionGuard } from '@/components/auth/permission-guard';
 import ScriptEditor, { type Script } from '@/components/ScriptEditor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,6 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { gql } from '@/generated/gql';
+import { usePermissions } from '@/hooks/use-permissions';
 import { useApolloClient, useQuery, useMutation } from '@apollo/client/react';
 import {
   AlertTriangle,
@@ -30,6 +30,8 @@ import {
   ArrowUpDown,
   Check,
   FileText,
+  Loader2,
+  Shield,
   Pencil,
   Plus,
   Search,
@@ -247,7 +249,17 @@ function ScriptsPageContent() {
   const [deleteTrigger] = useMutation(DELETE_TRIGGER);
   const [markReviewed] = useMutation(MARK_REVIEWED);
 
-  const triggers: TriggerData[] = (data?.triggers as TriggerData[]) ?? [];
+  const { canEditZone } = usePermissions();
+  // HEAD_BUILDER+ see every script; a zone-grant holder sees only the scripts
+  // of zones they can write (canEditZone is true for every zone at 103+).
+  const triggers: TriggerData[] = useMemo(
+    () =>
+      ((data?.triggers as TriggerData[]) ?? []).filter(t =>
+        canEditZone(t.zoneId)
+      ),
+     
+    [data, canEditZone]
+  );
 
   const filteredTriggers = useMemo(() => {
     return triggers.filter(trigger => {
@@ -363,6 +375,10 @@ function ScriptsPageContent() {
         const zoneId = parseInt(newScriptZone, 10);
         if (!Number.isInteger(zoneId) || zoneId < 0) {
           toast.error('Choose the zone this script belongs to.');
+          return;
+        }
+        if (!canEditZone(zoneId)) {
+          toast.error(`You do not have write access to zone ${zoneId}.`);
           return;
         }
         await createTrigger({
@@ -765,14 +781,52 @@ function ScriptsPageContent() {
   );
 }
 
+/**
+ * Scripts panel access: HEAD_BUILDER (level 103) and above, or anyone who can
+ * edit a zone (a BUILDER holding a live WRITE/ADMIN zone grant).
+ */
+function ScriptsAccessGate({ children }: { children: React.ReactNode }) {
+  const { permissions, loading, grantsLoading, canEditAnyZone } =
+    usePermissions();
+
+  if (loading || grantsLoading || !permissions) {
+    return (
+      <div className='flex items-center justify-center p-8'>
+        <Loader2 className='h-6 w-6 animate-spin' />
+      </div>
+    );
+  }
+
+  if (!canEditAnyZone) {
+    return (
+      <div
+        role='alert'
+        className='max-w-md mx-auto mt-8 rounded-lg border p-6 space-y-2'
+      >
+        <h2 className='flex items-center gap-2 text-lg font-semibold'>
+          <Shield className='h-5 w-5 text-red-500' />
+          Scripts are not available to you
+        </h2>
+        <p className='text-sm text-muted-foreground'>
+          The Scripts panel needs the Head Builder role (level 103 or higher) or
+          write access to at least one zone. Ask a head builder or implementor
+          for a zone grant.
+        </p>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
 export default function ScriptsPage() {
   return (
-    <PermissionGuard requireCoder={true}>
+    <ScriptsAccessGate>
       <Suspense
         fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
       >
         <ScriptsPageContent />
       </Suspense>
-    </PermissionGuard>
+    </ScriptsAccessGate>
   );
 }

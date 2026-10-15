@@ -183,7 +183,8 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
 export function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const { isImmortal, isBuilder, isHeadBuilder, isCoder } = usePermissions();
+  const { isImmortal, isBuilder, isHeadBuilder, isCoder, canEditAnyZone } =
+    usePermissions();
   const { isInZoneContext } = useZoneContext();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
@@ -291,11 +292,15 @@ export function Navigation() {
       href: '/dashboard/quests',
       icon: <ScrollText className='h-4 w-4' />,
     },
-    {
-      name: 'Scripts',
-      href: '/dashboard/scripts',
-      icon: <FileCode className='h-4 w-4' />,
-    },
+    ...(canEditAnyZone
+      ? [
+          {
+            name: 'Scripts',
+            href: '/dashboard/scripts',
+            icon: <FileCode className='h-4 w-4' />,
+          },
+        ]
+      : []),
   ];
 
   const quickLinks = showPlayerView ? playerQuickLinks : adminQuickLinks;

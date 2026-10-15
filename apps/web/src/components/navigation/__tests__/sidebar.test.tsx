@@ -21,13 +21,15 @@ jest.mock('@/contexts/auth-context', () => ({
     logout: jest.fn(),
   }),
 }));
+let mockPerms = {
+  isImmortal: true,
+  isBuilder: true,
+  isHeadBuilder: true,
+  isCoder: true,
+  canEditAnyZone: true,
+};
 jest.mock('@/hooks/use-permissions', () => ({
-  usePermissions: () => ({
-    isImmortal: true,
-    isBuilder: true,
-    isHeadBuilder: true,
-    isCoder: true,
-  }),
+  usePermissions: () => mockPerms,
 }));
 jest.mock('@apollo/client/react', () => ({
   useMutation: () => [jest.fn()],
@@ -98,5 +100,55 @@ describe('Sidebar at tablet widths', () => {
     })) as unknown as typeof window.matchMedia;
     render(<Sidebar />);
     expect(screen.getByText('Mobs')).toBeInTheDocument();
+  });
+});
+
+describe('Sidebar Scripts / Effects visibility', () => {
+  const base = {
+    isImmortal: true,
+    isBuilder: true,
+    isHeadBuilder: false,
+    isCoder: false,
+    canEditAnyZone: false,
+  };
+  afterEach(() => {
+    mockPerms = {
+      isImmortal: true,
+      isBuilder: true,
+      isHeadBuilder: true,
+      isCoder: true,
+      canEditAnyZone: true,
+    };
+  });
+
+  it('hides Scripts from a builder with no zone grant', () => {
+    mockPerms = base;
+    render(<Sidebar />);
+    expect(screen.queryByText('Scripts')).toBeNull();
+  });
+
+  it('shows Scripts to a builder who can edit a zone', () => {
+    mockPerms = { ...base, canEditAnyZone: true };
+    render(<Sidebar />);
+    expect(screen.getByText('Scripts')).toBeInTheDocument();
+    expect(screen.queryByText('Effects')).toBeNull();
+  });
+
+  it('shows Scripts to a head builder (103) but Effects only from coder (104)', () => {
+    mockPerms = { ...base, isHeadBuilder: true, canEditAnyZone: true };
+    render(<Sidebar />);
+    expect(screen.getByText('Scripts')).toBeInTheDocument();
+    expect(screen.queryByText('Effects')).toBeNull();
+  });
+
+  it('shows Effects to a coder (104)', () => {
+    mockPerms = {
+      ...base,
+      isHeadBuilder: true,
+      isCoder: true,
+      canEditAnyZone: true,
+    };
+    render(<Sidebar />);
+    expect(screen.getByText('Effects')).toBeInTheDocument();
   });
 });

@@ -1,5 +1,6 @@
 'use client';
 
+import { PermissionGuard } from '@/components/auth/permission-guard';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,7 @@ import {
   GetEffectsDocument,
   UpdateEffectDocument,
 } from '@/generated/graphql';
+import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import {
   AlertCircle,
@@ -91,7 +93,13 @@ const emptyFormData: EffectFormData = {
   defaultParams: '{}',
 };
 
-export default function EffectsPage() {
+/**
+ * Effect definitions are engine-level (new types need code changes): everyone
+ * who can open the page (IMMORTAL+) may read them, but only CODER (level 104+)
+ * may create, edit or delete them. The API enforces the same rule.
+ */
+function EffectsPageContent() {
+  const { isCoder: canManageEffects } = usePermissions();
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [page, setPage] = useState(0);
@@ -348,17 +356,21 @@ export default function EffectsPage() {
         <div>
           <h1 className='text-3xl font-bold'>Effects</h1>
           <p className='text-muted-foreground'>
-            Manage all available effects and their parameters
+            {canManageEffects
+              ? 'Manage all available effects and their parameters'
+              : 'Browse all available effects and their parameters. Creating, editing and deleting effects needs the Coder role (level 104+).'}
           </p>
         </div>
         <div className='flex items-center gap-4'>
           <Badge variant='secondary' className='text-lg px-4 py-2'>
             {totalCount} effects
           </Badge>
-          <Button onClick={openCreateDialog}>
-            <Plus className='h-4 w-4 mr-2' />
-            New Effect
-          </Button>
+          {canManageEffects && (
+            <Button onClick={openCreateDialog}>
+              <Plus className='h-4 w-4 mr-2' />
+              New Effect
+            </Button>
+          )}
         </div>
       </div>
 
@@ -478,25 +490,27 @@ export default function EffectsPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <div className='flex gap-1'>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              onClick={e => openEditDialog(effect, e)}
-                              title='Edit effect'
-                            >
-                              <Edit className='h-4 w-4' />
-                            </Button>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              onClick={e => openDeleteDialog(effect, e)}
-                              title='Delete effect'
-                              className='text-destructive hover:text-destructive'
-                            >
-                              <Trash2 className='h-4 w-4' />
-                            </Button>
-                          </div>
+                          {canManageEffects && (
+                            <div className='flex gap-1'>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                onClick={e => openEditDialog(effect, e)}
+                                title='Edit effect'
+                              >
+                                <Edit className='h-4 w-4' />
+                              </Button>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                onClick={e => openDeleteDialog(effect, e)}
+                                title='Delete effect'
+                                className='text-destructive hover:text-destructive'
+                              >
+                                <Trash2 className='h-4 w-4' />
+                              </Button>
+                            </div>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -851,5 +865,13 @@ export default function EffectsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function EffectsPage() {
+  return (
+    <PermissionGuard requireImmortal>
+      <EffectsPageContent />
+    </PermissionGuard>
   );
 }
