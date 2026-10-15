@@ -902,7 +902,7 @@ export default function ScriptEditor({
 
           <button
             onClick={insertTemplate}
-            disabled={!selectedTemplate}
+            disabled={!selectedTemplate || readOnly}
             className='text-sm bg-primary text-primary-foreground px-3 py-1 rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed'
           >
             Insert Template
@@ -934,7 +934,8 @@ export default function ScriptEditor({
           </button>
           <button
             onClick={formatCode}
-            className='text-sm bg-secondary text-secondary-foreground px-3 py-1 rounded hover:bg-secondary/80'
+            disabled={readOnly}
+            className='text-sm bg-secondary text-secondary-foreground px-3 py-1 rounded hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed'
           >
             Format
           </button>
@@ -962,7 +963,10 @@ export default function ScriptEditor({
         {/* Properties Sidebar */}
         {showSidebar && (
           <div className='w-[280px] shrink-0 border-r border-border bg-muted/50 overflow-y-auto'>
-            <div className='p-3 space-y-4'>
+            <fieldset
+              disabled={readOnly}
+              className='p-3 space-y-4 min-w-0 border-0 m-0'
+            >
               {/* Script Name */}
               <div>
                 <label className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
@@ -1072,7 +1076,7 @@ export default function ScriptEditor({
                   Comma-separated list
                 </p>
               </div>
-            </div>
+            </fieldset>
           </div>
         )}
 

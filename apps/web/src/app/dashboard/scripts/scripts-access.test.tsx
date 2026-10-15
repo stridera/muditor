@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ScriptsPage from './page';
 
 let mockPerms: Record<string, unknown> = {};
@@ -13,12 +13,20 @@ jest.mock('@/hooks/use-permissions', () => ({
 jest.mock('@/hooks/use-list-state', () => ({
   useListState: () => ({ zone: null }),
 }));
+let editorProps: Record<string, unknown> | null = null;
 jest.mock('@/components/ScriptEditor', () => ({
   __esModule: true,
-  default: () => null,
+  default: (props: Record<string, unknown>) => {
+    editorProps = props;
+    return <div data-testid='script-editor' />;
+  },
 }));
 jest.mock('@apollo/client/react', () => ({
-  useApolloClient: () => ({ query: jest.fn() }),
+  useApolloClient: () => ({
+    query: jest
+      .fn()
+      .mockResolvedValue({ data: { trigger: { commands: '-- x' } } }),
+  }),
   useMutation: () => [jest.fn()],
   useQuery: () => ({
     data: {
@@ -60,16 +68,25 @@ jest.mock('@apollo/client/react', () => ({
 }));
 
 const base = {
-  permissions: { role: 'BUILDER' },
+  permissions: { role: 'IMMORTAL' },
   loading: false,
   grantsLoading: false,
+  isImmortal: true,
   canEditAnyZone: false,
   canEditZone: () => false,
 };
 
 describe('Scripts page access', () => {
-  it('explains the requirement to a builder without a zone grant', () => {
-    mockPerms = base;
+  beforeEach(() => {
+    editorProps = null;
+  });
+
+  it('explains the requirement to non-staff', () => {
+    mockPerms = {
+      ...base,
+      permissions: { role: 'PLAYER' },
+      isImmortal: false,
+    };
     render(<ScriptsPage />);
     expect(
       screen.getByText('Scripts are not available to you')
@@ -77,18 +94,45 @@ describe('Scripts page access', () => {
     expect(screen.queryByText('Mine')).toBeNull();
   });
 
-  it('shows a grant holder only the scripts of the zones they can write', () => {
+  it('lets an immortal (100) browse every script, read-only', async () => {
+    mockPerms = base;
+    render(<ScriptsPage />);
+    expect(screen.getByText('Mine')).toBeInTheDocument();
+    expect(screen.getByText('Someone elses')).toBeInTheDocument();
+    expect(screen.queryByText('New Script')).toBeNull();
+    expect(screen.queryByTitle('Edit')).toBeNull();
+    expect(screen.queryByTitle('Delete')).toBeNull();
+    expect(screen.queryByTitle('Mark as reviewed')).toBeNull();
+
+    fireEvent.click(screen.getAllByTitle('View')[0]!);
+    await waitFor(() => expect(editorProps).not.toBeNull());
+    expect(editorProps!.readOnly).toBe(true);
+    expect(editorProps!.onSave).toBeUndefined();
+    expect(screen.getByText('View Script')).toBeInTheDocument();
+  });
+
+  it('gives a grant holder edit controls only on the zones they can write', async () => {
     mockPerms = {
       ...base,
+      permissions: { role: 'BUILDER' },
       canEditAnyZone: true,
       canEditZone: (z?: number) => z === 30,
     };
     render(<ScriptsPage />);
     expect(screen.getByText('Mine')).toBeInTheDocument();
-    expect(screen.queryByText('Someone elses')).toBeNull();
+    expect(screen.getByText('Someone elses')).toBeInTheDocument();
+    expect(screen.getByText('New Script')).toBeInTheDocument();
+    expect(screen.getAllByTitle('Edit')).toHaveLength(1);
+    expect(screen.getAllByTitle('Delete')).toHaveLength(1);
+    expect(screen.getAllByTitle('View')).toHaveLength(1);
+
+    fireEvent.click(screen.getByTitle('Edit'));
+    await waitFor(() => expect(editorProps).not.toBeNull());
+    expect(editorProps!.readOnly).toBeUndefined();
+    expect(editorProps!.onSave).toEqual(expect.any(Function));
   });
 
-  it('shows a head builder (103) every script', () => {
+  it('gives a head builder (103) edit controls on every script', () => {
     mockPerms = {
       ...base,
       permissions: { role: 'HEAD_BUILDER' },
@@ -98,5 +142,7 @@ describe('Scripts page access', () => {
     render(<ScriptsPage />);
     expect(screen.getByText('Mine')).toBeInTheDocument();
     expect(screen.getByText('Someone elses')).toBeInTheDocument();
+    expect(screen.getAllByTitle('Edit')).toHaveLength(2);
+    expect(screen.queryByTitle('View')).toBeNull();
   });
 });

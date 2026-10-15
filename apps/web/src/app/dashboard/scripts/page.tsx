@@ -29,6 +29,7 @@ import {
   ArrowUp,
   ArrowUpDown,
   Check,
+  Eye,
   FileText,
   Loader2,
   Shield,
@@ -249,16 +250,14 @@ function ScriptsPageContent() {
   const [deleteTrigger] = useMutation(DELETE_TRIGGER);
   const [markReviewed] = useMutation(MARK_REVIEWED);
 
-  const { canEditZone } = usePermissions();
-  // HEAD_BUILDER+ see every script; a zone-grant holder sees only the scripts
-  // of zones they can write (canEditZone is true for every zone at 103+).
+  // Every staff member (IMMORTAL+) sees every script read-only, like they can
+  // in game. Write controls follow canEditZone: all zones at HEAD_BUILDER+, a
+  // BUILDER only on zones with a live WRITE/ADMIN grant. The API enforces the
+  // same rule on every write.
+  const { canEditZone, canEditAnyZone } = usePermissions();
   const triggers: TriggerData[] = useMemo(
-    () =>
-      ((data?.triggers as TriggerData[]) ?? []).filter(t =>
-        canEditZone(t.zoneId)
-      ),
-     
-    [data, canEditZone]
+    () => (data?.triggers as TriggerData[]) ?? [],
+    [data]
   );
 
   const filteredTriggers = useMemo(() => {
@@ -350,6 +349,12 @@ function ScriptsPageContent() {
     setIsEditing(true);
   };
 
+  // The script open in the editor is read-only unless the viewer can write its zone.
+  const editorReadOnly =
+    !isCreating &&
+    selectedTrigger != null &&
+    !canEditZone(selectedTrigger.zoneId);
+
   const handleEditScript = async (trigger: TriggerData) => {
     try {
       const { data: source } = await client.query({
@@ -399,6 +404,12 @@ function ScriptsPageContent() {
           },
         });
       } else if (selectedTrigger) {
+        if (!canEditZone(selectedTrigger.zoneId)) {
+          toast.error(
+            `You do not have write access to zone ${selectedTrigger.zoneId}.`
+          );
+          return;
+        }
         await updateTrigger({
           variables: {
             zoneId: selectedTrigger.zoneId,
@@ -464,7 +475,11 @@ function ScriptsPageContent() {
         <div className='mb-6'>
           <div className='flex items-center justify-between'>
             <h1 className='text-2xl font-bold'>
-              {isCreating ? 'New Script' : 'Edit Script'}
+              {isCreating
+                ? 'New Script'
+                : editorReadOnly
+                  ? 'View Script'
+                  : 'Edit Script'}
               {selectedTrigger && (
                 <span className='text-muted-foreground font-mono text-lg ml-2'>
                   {selectedTrigger.zoneId}:{selectedTrigger.id}
@@ -498,7 +513,9 @@ function ScriptsPageContent() {
               ? convertTriggerToScript(selectedTrigger)
               : undefined
           }
-          onSave={handleSaveScript}
+          {...(editorReadOnly
+            ? { readOnly: true }
+            : { onSave: handleSaveScript })}
         />
       </div>
     );
@@ -513,7 +530,9 @@ function ScriptsPageContent() {
           <div>
             <h1 className='text-2xl font-bold'>Scripts</h1>
             <p className='text-muted-foreground mt-1'>
-              Manage Lua scripts for mobs, objects, and zones
+              {canEditAnyZone
+                ? 'Manage Lua scripts for mobs, objects, and zones'
+                : 'Browse Lua scripts for mobs, objects, and zones (read-only)'}
               {needsReviewCount > 0 && (
                 <span className='ml-2 text-yellow-500'>
                   ({needsReviewCount} need review)
@@ -521,10 +540,12 @@ function ScriptsPageContent() {
               )}
             </p>
           </div>
-          <Button onClick={handleNewScript}>
-            <Plus className='w-4 h-4 mr-2' />
-            New Script
-          </Button>
+          {canEditAnyZone && (
+            <Button onClick={handleNewScript}>
+              <Plus className='w-4 h-4 mr-2' />
+              New Script
+            </Button>
+          )}
         </div>
       </div>
 
@@ -731,7 +752,7 @@ function ScriptsPageContent() {
                   </TableCell>
                   <TableCell>
                     <div className='flex items-center gap-0.5'>
-                      {trigger.needsReview && (
+                      {trigger.needsReview && canEditZone(trigger.zoneId) && (
                         <Button
                           variant='ghost'
                           size='sm'
@@ -750,19 +771,25 @@ function ScriptsPageContent() {
                           e.stopPropagation();
                           handleEditScript(trigger);
                         }}
-                        title='Edit'
+                        title={canEditZone(trigger.zoneId) ? 'Edit' : 'View'}
                       >
-                        <Pencil className='w-3.5 h-3.5' />
+                        {canEditZone(trigger.zoneId) ? (
+                          <Pencil className='w-3.5 h-3.5' />
+                        ) : (
+                          <Eye className='w-3.5 h-3.5' />
+                        )}
                       </Button>
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        className='h-7 w-7 p-0 text-destructive hover:text-destructive/80'
-                        onClick={e => handleDeleteScript(e, trigger)}
-                        title='Delete'
-                      >
-                        <Trash2 className='w-3.5 h-3.5' />
-                      </Button>
+                      {canEditZone(trigger.zoneId) && (
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='h-7 w-7 p-0 text-destructive hover:text-destructive/80'
+                          onClick={e => handleDeleteScript(e, trigger)}
+                          title='Delete'
+                        >
+                          <Trash2 className='w-3.5 h-3.5' />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -782,12 +809,11 @@ function ScriptsPageContent() {
 }
 
 /**
- * Scripts panel access: HEAD_BUILDER (level 103) and above, or anyone who can
- * edit a zone (a BUILDER holding a live WRITE/ADMIN zone grant).
+ * Scripts panel access: every staff member (IMMORTAL, level 100+) may browse
+ * and read all scripts. Editing is decided per zone (see ScriptsPageContent).
  */
 function ScriptsAccessGate({ children }: { children: React.ReactNode }) {
-  const { permissions, loading, grantsLoading, canEditAnyZone } =
-    usePermissions();
+  const { permissions, loading, grantsLoading, isImmortal } = usePermissions();
 
   if (loading || grantsLoading || !permissions) {
     return (
@@ -797,7 +823,7 @@ function ScriptsAccessGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!canEditAnyZone) {
+  if (!isImmortal) {
     return (
       <div
         role='alert'
@@ -808,9 +834,7 @@ function ScriptsAccessGate({ children }: { children: React.ReactNode }) {
           Scripts are not available to you
         </h2>
         <p className='text-sm text-muted-foreground'>
-          The Scripts panel needs the Head Builder role (level 103 or higher) or
-          write access to at least one zone. Ask a head builder or implementor
-          for a zone grant.
+          The Scripts panel is for staff (Immortal, level 100 or higher).
         </p>
       </div>
     );

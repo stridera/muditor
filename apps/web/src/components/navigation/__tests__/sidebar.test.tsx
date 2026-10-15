@@ -121,17 +121,23 @@ describe('Sidebar Scripts / Effects visibility', () => {
     };
   });
 
-  it('hides Scripts from a builder with no zone grant', () => {
-    mockPerms = base;
+  it('shows Scripts (read-only) to an immortal (100) with no zone grant', () => {
+    mockPerms = { ...base, isBuilder: false };
     render(<Sidebar />);
-    expect(screen.queryByText('Scripts')).toBeNull();
+    expect(screen.getByText('Scripts')).toBeInTheDocument();
   });
 
-  it('shows Scripts to a builder who can edit a zone', () => {
-    mockPerms = { ...base, canEditAnyZone: true };
+  it('shows Scripts to a builder with no zone grant', () => {
+    mockPerms = base;
     render(<Sidebar />);
     expect(screen.getByText('Scripts')).toBeInTheDocument();
     expect(screen.queryByText('Effects')).toBeNull();
+  });
+
+  it('hides Scripts from non-staff', () => {
+    mockPerms = { ...base, isImmortal: false, isBuilder: false };
+    render(<Sidebar />);
+    expect(screen.queryByText('Scripts')).toBeNull();
   });
 
   it('shows Scripts to a head builder (103) but Effects only from coder (104)', () => {

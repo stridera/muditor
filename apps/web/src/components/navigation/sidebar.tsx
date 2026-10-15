@@ -85,8 +85,7 @@ export function Sidebar() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { selectedZone } = useZone();
-  const { isImmortal, isBuilder, isHeadBuilder, isCoder, canEditAnyZone } =
-    usePermissions();
+  const { isImmortal, isBuilder, isHeadBuilder, isCoder } = usePermissions();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
   const { data: openReportsData } = useQuery(ReportOpenCountDocument, {
     skip: !isImmortal,
@@ -263,8 +262,8 @@ export function Sidebar() {
     ],
   };
 
-  // Scripts: HEAD_BUILDER (103)+ or anyone who can edit a zone.
-  if (canEditAnyZone) {
+  // Scripts: readable by all staff (IMMORTAL+); writes are gated per zone.
+  if (isImmortal) {
     worldBuildingSection.items.push({
       name: 'Scripts',
       href: '/dashboard/scripts',

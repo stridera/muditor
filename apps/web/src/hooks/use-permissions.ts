@@ -68,7 +68,7 @@ export interface UsePermissionsResult {
   canEditZone: (zoneId?: number) => boolean;
   /**
    * True when the user can edit at least one zone: HEAD_BUILDER+ (every zone)
-   * or a BUILDER holding a live WRITE/ADMIN zone grant. Gates the Scripts panel.
+   * or a BUILDER holding a live WRITE/ADMIN zone grant. Gates the Scripts New Script button.
    */
   canEditAnyZone: boolean;
   /** Zone grants are still loading (canEditAnyZone/canEditZone fail closed). */
