@@ -158,3 +158,36 @@ describe('Sidebar Scripts / Effects visibility', () => {
     expect(screen.getByText('Effects')).toBeInTheDocument();
   });
 });
+
+describe('Sidebar Socials / System Messages / Validation visibility', () => {
+  const immortal = {
+    isImmortal: true,
+    isBuilder: false,
+    isHeadBuilder: false,
+    isCoder: false,
+    canEditAnyZone: false,
+  };
+  afterEach(() => {
+    mockPerms = {
+      isImmortal: true,
+      isBuilder: true,
+      isHeadBuilder: true,
+      isCoder: true,
+      canEditAnyZone: true,
+    };
+  });
+
+  it('shows Socials and System Messages to an immortal but hides Validation', () => {
+    mockPerms = immortal;
+    render(<Sidebar />);
+    expect(screen.getByText('Socials')).toBeInTheDocument();
+    expect(screen.getByText('System Messages')).toBeInTheDocument();
+    expect(screen.queryByText('Validation')).toBeNull();
+  });
+
+  it('shows Validation to a builder', () => {
+    mockPerms = { ...immortal, isBuilder: true };
+    render(<Sidebar />);
+    expect(screen.getByText('Validation')).toBeInTheDocument();
+  });
+});

@@ -110,11 +110,29 @@ export class ZonesResolver {
     return this.zonesService.update(id, data);
   }
 
+  /**
+   * Deleting a whole zone is zone ownership, not editing: beyond the WRITE
+   * guard it needs HEAD_BUILDER or above, or an ADMIN grant on that zone.
+   * A plain WRITE grant is not enough.
+   */
   @Mutation(() => ZoneDto)
   @RequireZoneWrite({ keys: ['id'] })
   async deleteZone(
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user: Users
   ): Promise<ZoneDto> {
+    if (!roleAtLeast(user.role, UserRole.HEAD_BUILDER)) {
+      const isZoneAdmin = await this.grantsService.checkZonePermission(
+        user.id,
+        id,
+        GrantPermission.ADMIN
+      );
+      if (!isZoneAdmin) {
+        throw new ForbiddenException(
+          'Deleting a zone needs HEAD_BUILDER or above, or an ADMIN grant on the zone'
+        );
+      }
+    }
     return this.zonesService.delete(id);
   }
 }

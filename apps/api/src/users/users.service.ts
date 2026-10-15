@@ -423,7 +423,7 @@ export class UsersService {
   }
 
   canViewValidation(user: Users): boolean {
-    return this.isImmortal(user);
+    return this.isBuilder(user);
   }
 
   async getMaxCharacterLevel(user: Users): Promise<number> {

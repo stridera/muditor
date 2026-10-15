@@ -98,7 +98,7 @@ type ClassCircle = GetClassCirclesQuery['classCirclesList'][number];
 type CircleSpell = NonNullable<ClassCircle['spells']>[number];
 
 export default function ClassesPage() {
-  const { isBuilder, isCoder } = usePermissions();
+  const { isHeadBuilder } = usePermissions();
   const apolloClient = useApolloClient();
 
   const [selectedClass, setSelectedClass] = useState<ClassData | null>(null);
@@ -446,7 +446,8 @@ export default function ClassesPage() {
     [classesData, searchQuery]
   );
 
-  const canEdit = isBuilder || isCoder;
+  // API: update/delete/skills/circles need HEAD_BUILDER (create needs CODER, no UI).
+  const canEdit = isHeadBuilder;
 
   if (classesLoading) {
     return (

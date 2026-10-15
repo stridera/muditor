@@ -312,20 +312,23 @@ export function Sidebar() {
     },
   ];
 
-  if (isCoder) {
-    gameSystemsItems.push({
+  // Reads are IMMORTAL at the API and the pages are read-only below CODER, so
+  // IMMORTAL+ get these two entries. Below CODER the rest of the Game Systems
+  // section stays hidden, so they get a small section of their own.
+  const readOnlyReferenceItems: NavItem[] = [
+    {
       name: 'Socials',
       href: '/dashboard/socials',
       icon: <MessageCircle className='h-4 w-4' />,
-    });
-  }
-
-  if (isCoder) {
-    gameSystemsItems.push({
+    },
+    {
       name: 'System Messages',
       href: '/dashboard/system-messages',
       icon: <MessageSquareText className='h-4 w-4' />,
-    });
+    },
+  ];
+  if (canAccessGameSystems) {
+    gameSystemsItems.push(...readOnlyReferenceItems);
   }
 
   if (isBuilder) {
@@ -416,18 +419,19 @@ export function Sidebar() {
       icon: <Users className='h-4 w-4' />,
     });
   }
-  adminItems.push(
-    {
-      name: 'Characters',
-      href: '/dashboard/admin/characters',
-      icon: <Users className='h-4 w-4' />,
-    },
-    {
+  adminItems.push({
+    name: 'Characters',
+    href: '/dashboard/admin/characters',
+    icon: <Users className='h-4 w-4' />,
+  });
+  // The validation API needs BUILDER.
+  if (isBuilder) {
+    adminItems.push({
       name: 'Validation',
       href: '/dashboard/validation',
       icon: <Monitor className='h-4 w-4' />,
-    }
-  );
+    });
+  }
 
   const adminSection: NavSection = {
     title: 'ADMIN',
@@ -566,6 +570,11 @@ export function Sidebar() {
           <>
             {renderSection(worldBuildingSection)}
             {canAccessGameSystems && renderSection(gameSystemsSection)}
+            {!canAccessGameSystems &&
+              renderSection({
+                title: 'GAME SYSTEMS',
+                items: readOnlyReferenceItems,
+              })}
             {renderSection(adminSection)}
           </>
         )}

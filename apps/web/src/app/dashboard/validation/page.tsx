@@ -603,7 +603,7 @@ function ValidationPageContent() {
 
 export default function ValidationPage() {
   return (
-    <PermissionGuard requireValidation={true}>
+    <PermissionGuard requireBuilder={true}>
       <ValidationPageContent />
     </PermissionGuard>
   );

@@ -101,7 +101,7 @@ type RaceFormData = {
 };
 
 export default function RacesPage() {
-  const { isBuilder, isCoder } = usePermissions();
+  const { isHeadBuilder } = usePermissions();
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -199,7 +199,8 @@ export default function RacesPage() {
     });
   };
 
-  const canEdit = isBuilder || isCoder;
+  // API: update/delete/skills/circles need HEAD_BUILDER (create needs CODER, no UI).
+  const canEdit = isHeadBuilder;
 
   const filteredRaces = (data as any)?.races?.filter((race: any) =>
     race.plainName.toLowerCase().includes(searchQuery.toLowerCase())
