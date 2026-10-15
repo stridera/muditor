@@ -4,6 +4,7 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { useListState } from '@/hooks/use-list-state';
+import { isEditableTarget } from '@/lib/keyboard';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import {
   MobsPageDocument,
@@ -164,11 +165,7 @@ function MobsContent() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only focus if '/' is pressed and we're not already in an input/textarea
-      if (
-        e.key === '/' &&
-        !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName) &&
-        !(e.target as HTMLElement)?.isContentEditable
-      ) {
+      if (e.key === '/' && !isEditableTarget(e.target)) {
         e.preventDefault();
         searchRef.current?.focus();
       }

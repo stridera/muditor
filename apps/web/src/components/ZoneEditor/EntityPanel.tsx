@@ -1,5 +1,6 @@
 'use client';
 
+import { isEditableTarget } from '@/lib/keyboard';
 import { updateMob, updateObject } from '@/lib/entity-mutations';
 import { useTheme } from 'next-themes';
 import React, { useEffect, useState } from 'react';
@@ -122,7 +123,7 @@ export const EntityPanel: React.FC<EntityPanelProps> = ({
       if (!selectedEntity) return; // Only active in detail view
       if (!editing) {
         // Start edit
-        if (e.key.toLowerCase() === 'e') {
+        if (e.key.toLowerCase() === 'e' && !isEditableTarget(e.target)) {
           e.preventDefault();
           setEditing(true);
           return;

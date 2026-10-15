@@ -4,6 +4,7 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { FlagBadge } from '@/components/ui/flag-badge';
 import { TypeBadge } from '@/components/ui/type-badge';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
+import { isEditableTarget } from '@/lib/keyboard';
 import { useListState } from '@/hooks/use-list-state';
 import {
   CreateObjectDocument,
@@ -180,11 +181,7 @@ function ObjectsContent() {
   // Keyboard shortcut: '/' focuses search box
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === '/' &&
-        !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName) &&
-        !(e.target as HTMLElement)?.isContentEditable
-      ) {
+      if (e.key === '/' && !isEditableTarget(e.target)) {
         e.preventDefault();
         searchRef.current?.focus();
       }

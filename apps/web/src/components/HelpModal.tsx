@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { isEditableTarget } from '@/lib/keyboard';
 import {
   Dialog,
   DialogContent,
@@ -362,11 +363,7 @@ export function useHelpModal(context: HelpContext = 'global') {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      const isInput =
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable;
+      const isInput = isEditableTarget(e.target);
 
       // ? key opens help (but not in input fields)
       // Note: ? requires shift key, so we check for '?' character directly

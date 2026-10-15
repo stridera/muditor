@@ -5,6 +5,7 @@ import { CreateRoomDialog } from '@/components/rooms/CreateRoomDialog';
 import type { CreatedRoom } from '@/hooks/use-create-room';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { isEditableTarget } from '@/lib/keyboard';
 import { friendlyGraphQLMessage } from '@/lib/error-utils';
 import React, {
   useCallback,
@@ -2244,17 +2245,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       const key = e.key;
       const lowered = key.toLowerCase();
       // Avoid interfering with typing in inputs/textareas/contentEditable
-      const target = e.target as HTMLElement | null;
-      if (target) {
-        const tag = target.tagName;
-        if (
-          tag === 'INPUT' ||
-          tag === 'TEXTAREA' ||
-          target.getAttribute('contenteditable') === 'true'
-        ) {
-          return; // ignore for typing contexts
-        }
-      }
+      if (isEditableTarget(e.target)) return; // ignore for typing contexts
       // Undo / Redo
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && lowered === 'z') {
         e.preventDefault();
