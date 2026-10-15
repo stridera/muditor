@@ -12,6 +12,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { ColoredInput } from '@/components/ColoredInput';
+import { ColoredTextInline } from '@/components/ColoredTextViewer';
+import { stripMarkup } from '@/utils/xmlLiteParser';
 import { Label } from '@/components/ui/label';
 import {
   Table,
@@ -69,6 +72,7 @@ const UPDATE_RACE = gql`
     updateRace(race: $race, data: $data) {
       race
       name
+      plainName
       playable
       humanoid
       magical
@@ -87,6 +91,7 @@ const UPDATE_RACE = gql`
 `;
 
 type RaceFormData = {
+  name: string;
   playable: boolean;
   humanoid: boolean;
   magical: boolean;
@@ -112,6 +117,7 @@ export default function RacesPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [formData, setFormData] = useState<RaceFormData>({
+    name: '',
     playable: false,
     humanoid: false,
     magical: false,
@@ -159,6 +165,7 @@ export default function RacesPage() {
     e.stopPropagation(); // Prevent row click
     setEditingRace(race);
     setFormData({
+      name: race.name ?? '',
       playable: race.playable,
       humanoid: race.humanoid,
       magical: race.magical,
@@ -178,6 +185,8 @@ export default function RacesPage() {
     e.preventDefault();
 
     const input = {
+      name: formData.name,
+      plainName: stripMarkup(formData.name),
       playable: formData.playable,
       humanoid: formData.humanoid,
       magical: formData.magical,
@@ -284,7 +293,7 @@ export default function RacesPage() {
                   onClick={() => handleRaceClick(race)}
                 >
                   <TableCell className='font-medium'>
-                    {race.plainName}
+                    <ColoredTextInline markup={race.name || race.plainName} />
                   </TableCell>
                   <TableCell>
                     <span className='text-sm'>{race.defaultSize}</span>
@@ -358,7 +367,12 @@ export default function RacesPage() {
         <DialogContent className='sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
-              <DialogTitle>Edit Race: {editingRace?.plainName}</DialogTitle>
+              <DialogTitle>
+                Edit Race:{' '}
+                <ColoredTextInline
+                  markup={editingRace?.name || editingRace?.plainName || ''}
+                />
+              </DialogTitle>
               <DialogDescription>
                 Update race attributes and statistics
               </DialogDescription>
@@ -372,6 +386,21 @@ export default function RacesPage() {
               </TabsList>
 
               <TabsContent value='flags' className='space-y-4 mt-4'>
+                <div>
+                  <Label htmlFor='raceName'>
+                    Display name (colour markup, e.g.
+                    &lt;b:red&gt;Name&lt;/&gt;)
+                  </Label>
+                  <ColoredInput
+                    id='raceName'
+                    value={formData.name}
+                    onChange={value =>
+                      setFormData({ ...formData, name: value })
+                    }
+                    placeholder='<b:red>Dragonborn</>'
+                  />
+                </div>
+
                 <div className='flex items-center space-x-2'>
                   <Checkbox
                     id='playable'
@@ -588,8 +617,12 @@ export default function RacesPage() {
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className='sm:max-w-[700px] max-h-[90vh] overflow-y-auto'>
           <DialogHeader>
-            <DialogTitle>{selectedRace?.plainName}</DialogTitle>
-            <DialogDescription>{selectedRace?.name}</DialogDescription>
+            <DialogTitle>
+              <ColoredTextInline
+                markup={selectedRace?.name || selectedRace?.plainName || ''}
+              />
+            </DialogTitle>
+            <DialogDescription>{selectedRace?.plainName}</DialogDescription>
           </DialogHeader>
 
           <Tabs defaultValue='info' className='mt-4'>
@@ -712,6 +745,7 @@ export default function RacesPage() {
                   setIsEditOpen(true);
                   setEditingRace(selectedRace);
                   setFormData({
+                    name: selectedRace.name ?? '',
                     playable: selectedRace.playable,
                     humanoid: selectedRace.humanoid,
                     magical: selectedRace.magical,

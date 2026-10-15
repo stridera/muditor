@@ -5,6 +5,7 @@ import {
   type GetRacesQuery,
   type Race,
 } from '@/generated/graphql';
+import { stripMarkup } from '@/utils/xmlLiteParser';
 import { useQuery } from '@apollo/client/react';
 
 export interface RaceOption {
@@ -37,7 +38,8 @@ export function useRaces(): UseRacesResult {
   const races: RaceOption[] = (data?.races || []).map(r => ({
     race: r.race,
     name: r.name,
-    displayName: r.plainName,
+    // Dropdown labels are plain text: strip game colour markup from Races.name.
+    displayName: stripMarkup(r.name) || r.plainName,
     playable: r.playable,
     humanoid: r.humanoid,
     magical: r.magical,
