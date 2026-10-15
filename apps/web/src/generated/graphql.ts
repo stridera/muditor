@@ -1242,6 +1242,14 @@ export type CreateRoomInput = {
   zoneId: Scalars['Int']['input'];
 };
 
+export type CreateScriptLibraryInput = {
+  code: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  /** Owning zone. Omit for a global library (HEAD_BUILDER and above only). */
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type CreateShopInput = {
   buyMessages?: Array<Scalars['String']['input']>;
   buyProfit?: Scalars['Float']['input'];
@@ -2166,6 +2174,7 @@ export type Mutation = {
   createReservedName: ReservedNameDto;
   createRoom: RoomDto;
   createRoomExit: RoomExitDto;
+  createScriptLibrary: ScriptLibraryDto;
   createShop: ShopDto;
   /** Create site content */
   createSiteContent: SiteContentDto;
@@ -2226,6 +2235,7 @@ export type Mutation = {
   deleteReservedName: Scalars['Boolean']['output'];
   deleteRoom: RoomDto;
   deleteRoomExit: RoomExitDto;
+  deleteScriptLibrary: ScriptLibraryDto;
   deleteShop: ShopDto;
   /** Delete site content */
   deleteSiteContent: Scalars['Boolean']['output'];
@@ -2361,6 +2371,7 @@ export type Mutation = {
   /** Replace all extra descriptions of a room (keywords + text shown by "look <keyword>") */
   updateRoomExtraDescriptions: RoomDto;
   updateRoomPosition: RoomDto;
+  updateScriptLibrary: ScriptLibraryDto;
   updateShop: ShopDto;
   updateShopInventory: ShopDto;
   /** Update site content */
@@ -2659,6 +2670,11 @@ export type MutationCreateRoomExitArgs = {
 };
 
 
+export type MutationCreateScriptLibraryArgs = {
+  input: CreateScriptLibraryInput;
+};
+
+
 export type MutationCreateShopArgs = {
   data: CreateShopInput;
 };
@@ -2912,6 +2928,11 @@ export type MutationDeleteRoomArgs = {
 
 export type MutationDeleteRoomExitArgs = {
   exitId: Scalars['Float']['input'];
+};
+
+
+export type MutationDeleteScriptLibraryArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -3493,6 +3514,12 @@ export type MutationUpdateRoomPositionArgs = {
 };
 
 
+export type MutationUpdateScriptLibraryArgs = {
+  id: Scalars['Int']['input'];
+  input: UpdateScriptLibraryInput;
+};
+
+
 export type MutationUpdateShopArgs = {
   data: UpdateShopInput;
   id: Scalars['Int']['input'];
@@ -4025,6 +4052,8 @@ export type Query = {
   rooms: Array<RoomDto>;
   roomsByZone: Array<RoomDto>;
   roomsCount: Scalars['Int']['output'];
+  scriptLibraries: Array<ScriptLibraryDto>;
+  scriptLibrary: ScriptLibraryDto;
   /** Search help entries by keyword, title, or content */
   searchHelp: Array<HelpEntryDto>;
   searchMobs: Array<MobDto>;
@@ -4587,6 +4616,11 @@ export type QueryRoomsCountArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   sector?: InputMaybe<Sector>;
   zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryScriptLibraryArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -5222,6 +5256,20 @@ export type SaveType =
   | 'FORTITUDE'
   | 'REFLEX'
   | 'WILL';
+
+export type ScriptLibraryDto = {
+  __typename?: 'ScriptLibraryDto';
+  code: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  lineCount: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  updatedBy?: Maybe<Scalars['String']['output']>;
+  zoneId?: Maybe<Scalars['Int']['output']>;
+};
 
 export type ScriptType =
   | 'MOB'
@@ -6210,6 +6258,14 @@ export type UpdateRoomPositionInput = {
   layoutZ?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type UpdateScriptLibraryInput = {
+  code?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** Move to another zone. Null makes the library global (HEAD_BUILDER and above only); omit to keep it. */
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type UpdateShopInput = {
   buyMessages?: InputMaybe<Array<Scalars['String']['input']>>;
   buyProfit?: InputMaybe<Scalars['Float']['input']>;
@@ -6804,6 +6860,33 @@ export type RoomDetailsQueryVariables = Exact<{
 
 
 export type RoomDetailsQuery = { __typename?: 'Query', room: { __typename?: 'RoomDto', id: number, name: string, roomDescription: string, sector: Sector, zoneId: number, baseLightLevel: number, capacity: number, entryRestriction?: string | null, isPeaceful: boolean, allowsMagic: boolean, allowsRecall: boolean, allowsSummon: boolean, allowsTeleport: boolean, isDeathTrap: boolean, createdAt: any, updatedAt: any, createdBy?: string | null, updatedBy?: string | null, layoutX?: number | null, layoutY?: number | null, layoutZ?: number | null, exits: Array<{ __typename?: 'RoomExitDto', id: string, direction: Direction, description?: string | null, keywords: Array<string>, keyZoneId?: number | null, keyId?: number | null, toZoneId?: number | null, toRoomId?: number | null, flags: Array<ExitFlag>, defaultState: ExitState, hitPoints?: number | null }>, extraDescs: Array<{ __typename?: 'RoomExtraDescriptionDto', id: string, keywords: Array<string>, description: string }> } };
+
+export type GetScriptLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetScriptLibrariesQuery = { __typename?: 'Query', scriptLibraries: Array<{ __typename?: 'ScriptLibraryDto', id: number, name: string, zoneId?: number | null, description?: string | null, code: string, lineCount: number, createdAt: any, updatedAt: any, updatedBy?: string | null }> };
+
+export type CreateScriptLibraryMutationVariables = Exact<{
+  input: CreateScriptLibraryInput;
+}>;
+
+
+export type CreateScriptLibraryMutation = { __typename?: 'Mutation', createScriptLibrary: { __typename?: 'ScriptLibraryDto', id: number, name: string } };
+
+export type UpdateScriptLibraryMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  input: UpdateScriptLibraryInput;
+}>;
+
+
+export type UpdateScriptLibraryMutation = { __typename?: 'Mutation', updateScriptLibrary: { __typename?: 'ScriptLibraryDto', id: number, name: string } };
+
+export type DeleteScriptLibraryMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteScriptLibraryMutation = { __typename?: 'Mutation', deleteScriptLibrary: { __typename?: 'ScriptLibraryDto', id: number } };
 
 export type GetTriggersForScriptsPageQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -9232,6 +9315,10 @@ export const GetRaceSkillsDocument = {"kind":"Document","definitions":[{"kind":"
 export const UpdateRaceInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateRaceInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"race"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Race"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"race"},"value":{"kind":"Variable","name":{"kind":"Name","value":"race"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"playable"}},{"kind":"Field","name":{"kind":"Name","value":"humanoid"}},{"kind":"Field","name":{"kind":"Name","value":"magical"}},{"kind":"Field","name":{"kind":"Name","value":"defaultSize"}},{"kind":"Field","name":{"kind":"Name","value":"defaultComposition"}},{"kind":"Field","name":{"kind":"Name","value":"maxStrength"}},{"kind":"Field","name":{"kind":"Name","value":"maxDexterity"}},{"kind":"Field","name":{"kind":"Name","value":"maxIntelligence"}},{"kind":"Field","name":{"kind":"Name","value":"maxWisdom"}},{"kind":"Field","name":{"kind":"Name","value":"maxConstitution"}},{"kind":"Field","name":{"kind":"Name","value":"maxCharisma"}},{"kind":"Field","name":{"kind":"Name","value":"expFactor"}},{"kind":"Field","name":{"kind":"Name","value":"hpFactor"}}]}}]}}]} as unknown as DocumentNode<UpdateRaceInlineMutation, UpdateRaceInlineMutationVariables>;
 export const RoomsPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RoomsPage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sector"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Sector"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rooms"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"sector"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sector"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"sector"}},{"kind":"Field","name":{"kind":"Name","value":"isPeaceful"}},{"kind":"Field","name":{"kind":"Name","value":"isDeathTrap"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roomsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"sector"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sector"}}}]}]}}]} as unknown as DocumentNode<RoomsPageQuery, RoomsPageQueryVariables>;
 export const RoomDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RoomDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"room"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"sector"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"baseLightLevel"}},{"kind":"Field","name":{"kind":"Name","value":"capacity"}},{"kind":"Field","name":{"kind":"Name","value":"entryRestriction"}},{"kind":"Field","name":{"kind":"Name","value":"isPeaceful"}},{"kind":"Field","name":{"kind":"Name","value":"allowsMagic"}},{"kind":"Field","name":{"kind":"Name","value":"allowsRecall"}},{"kind":"Field","name":{"kind":"Name","value":"allowsSummon"}},{"kind":"Field","name":{"kind":"Name","value":"allowsTeleport"}},{"kind":"Field","name":{"kind":"Name","value":"isDeathTrap"}},{"kind":"Field","name":{"kind":"Name","value":"exits"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"direction"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"keyZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keyId"}},{"kind":"Field","name":{"kind":"Name","value":"toZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"toRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"defaultState"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}}]}},{"kind":"Field","name":{"kind":"Name","value":"extraDescs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"layoutX"}},{"kind":"Field","name":{"kind":"Name","value":"layoutY"}},{"kind":"Field","name":{"kind":"Name","value":"layoutZ"}}]}}]}}]} as unknown as DocumentNode<RoomDetailsQuery, RoomDetailsQueryVariables>;
+export const GetScriptLibrariesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetScriptLibraries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scriptLibraries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"lineCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}}]}}]}}]} as unknown as DocumentNode<GetScriptLibrariesQuery, GetScriptLibrariesQueryVariables>;
+export const CreateScriptLibraryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateScriptLibrary"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateScriptLibraryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createScriptLibrary"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateScriptLibraryMutation, CreateScriptLibraryMutationVariables>;
+export const UpdateScriptLibraryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateScriptLibrary"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateScriptLibraryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateScriptLibrary"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<UpdateScriptLibraryMutation, UpdateScriptLibraryMutationVariables>;
+export const DeleteScriptLibraryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteScriptLibrary"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteScriptLibrary"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteScriptLibraryMutation, DeleteScriptLibraryMutationVariables>;
 export const GetTriggersForScriptsPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggersForScriptsPage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"numArgs"}},{"kind":"Field","name":{"kind":"Name","value":"argList"}},{"kind":"Field","name":{"kind":"Name","value":"lineCount"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"needsReview"}},{"kind":"Field","name":{"kind":"Name","value":"syntaxError"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}}]}}]}}]} as unknown as DocumentNode<GetTriggersForScriptsPageQuery, GetTriggersForScriptsPageQueryVariables>;
 export const GetTriggerSourceForScriptsPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggerSourceForScriptsPage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"trigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}}]}}]}}]} as unknown as DocumentNode<GetTriggerSourceForScriptsPageQuery, GetTriggerSourceForScriptsPageQueryVariables>;
 export const GetAllTriggerSourcesForScriptsSearchDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAllTriggerSourcesForScriptsSearch"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}}]}}]}}]} as unknown as DocumentNode<GetAllTriggerSourcesForScriptsSearchQuery, GetAllTriggerSourcesForScriptsSearchQueryVariables>;

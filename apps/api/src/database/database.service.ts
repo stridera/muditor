@@ -258,6 +258,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.triggers;
   }
 
+  get scriptLibrary() {
+    return this.client.scriptLibrary;
+  }
+
   get mobTriggers() {
     return this.client.mobTriggers;
   }

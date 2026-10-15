@@ -28,6 +28,7 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  BookOpen,
   Check,
   Eye,
   FileText,
@@ -38,7 +39,15 @@ import {
   Search,
   Trash2,
 } from 'lucide-react';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
+import LibrariesPanel from './libraries-panel';
 import { toast } from 'sonner';
 import { useListState } from '@/hooks/use-list-state';
 import { extractErrorMessage } from '@/lib/error-utils';
@@ -215,7 +224,7 @@ function SortIcon({
   );
 }
 
-function ScriptsPageContent() {
+function ScriptsPageContent({ header }: { header: ReactNode }) {
   const list = useListState();
   // Zone for a NEW script: starts from the selected zone and can be changed
   // while creating. Scripts used to be saved to zone 1 regardless.
@@ -525,6 +534,7 @@ function ScriptsPageContent() {
 
   return (
     <div className='container mx-auto p-6'>
+      {header}
       <div className='mb-6'>
         <div className='flex items-center justify-between'>
           <div>
@@ -843,13 +853,71 @@ function ScriptsAccessGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/** Where the scripting guide lives (it ships with the game server repo). */
+const SCRIPTING_GUIDE_URL =
+  'https://github.com/stridera/fierymud-rs/blob/main/docs/SCRIPTING.md';
+
+type ScriptsTab = 'triggers' | 'libraries';
+
+function ScriptsTabs({
+  tab,
+  onChange,
+}: {
+  tab: ScriptsTab;
+  onChange: (tab: ScriptsTab) => void;
+}) {
+  const tabClass = (active: boolean) =>
+    `px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+      active
+        ? 'border-primary text-foreground'
+        : 'border-transparent text-muted-foreground hover:text-foreground'
+    }`;
+  return (
+    <div className='mb-6 flex items-center justify-between border-b border-border'>
+      <div role='tablist' aria-label='Script kinds' className='flex'>
+        <button
+          role='tab'
+          aria-selected={tab === 'triggers'}
+          className={tabClass(tab === 'triggers')}
+          onClick={() => onChange('triggers')}
+        >
+          Triggers
+        </button>
+        <button
+          role='tab'
+          aria-selected={tab === 'libraries'}
+          className={tabClass(tab === 'libraries')}
+          onClick={() => onChange('libraries')}
+        >
+          Libraries
+        </button>
+      </div>
+      <a
+        href={SCRIPTING_GUIDE_URL}
+        target='_blank'
+        rel='noreferrer'
+        className='flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground'
+      >
+        <BookOpen className='w-4 h-4' />
+        Scripting guide
+      </a>
+    </div>
+  );
+}
+
 export default function ScriptsPage() {
+  const [tab, setTab] = useState<ScriptsTab>('triggers');
+  const header = <ScriptsTabs tab={tab} onChange={setTab} />;
   return (
     <ScriptsAccessGate>
       <Suspense
         fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
       >
-        <ScriptsPageContent />
+        {tab === 'libraries' ? (
+          <LibrariesPanel header={header} />
+        ) : (
+          <ScriptsPageContent header={header} />
+        )}
       </Suspense>
     </ScriptsAccessGate>
   );

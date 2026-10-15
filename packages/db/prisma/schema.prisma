@@ -1336,7 +1336,7 @@ model Objects {
   // Element an elemental weapon deals (FIRE/COLD/ACID/SHOCK/POISON/ALIGN), separate
   // from the physical weaponDamageType that picks the weapon family (slashing /
   // piercing / bludgeoning) and proficiency. NULL = deals its physical type.
-  weaponElement DamageType? @map("weapon_element")
+  weaponElement    DamageType? @map("weapon_element")
 
   // Permanent fixture: If set, this object always exists in this room (no reset needed)
   // Use for fountains, signs, furniture, etc. that never move or despawn
@@ -1773,6 +1773,27 @@ model Triggers {
   @@id([zoneId, id])
 }
 
+/// Importable Lua library scripts. The game resolves `require("<name>")` from this
+/// table (name -> code); libraries are NOT triggers and cannot be attached to anything.
+/// zoneId is optional organisation/permission scope: a library with a zone is editable
+/// by builders holding a WRITE grant on that zone, a library without one by HEAD_BUILDER+.
+model ScriptLibrary {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  zoneId      Int?     @map("zone_id")
+  description String?
+  code        String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdBy   String?  @map("created_by")
+  updatedBy   String?  @map("updated_by")
+
+  zone Zones? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+
+  @@index([zoneId])
+  @@map("ScriptLibrary")
+}
+
 /// Junction table for Mob-Trigger many-to-many relationship
 /// In DG Scripts, triggers are shared - a single trigger can be attached to multiple mobs
 /// via "T <trigger_id>" lines in mob files
@@ -1963,29 +1984,29 @@ model Events {
 }
 
 model Zones {
-  id               Int            @id
+  id               Int             @id
   name             String
-  lifespan         Int            @default(30)
-  resetMode        ResetMode      @default(NORMAL)
-  hemisphere       Hemisphere     @default(NORTHWEST)
-  climate          Climate        @default(NONE)
+  lifespan         Int             @default(30)
+  resetMode        ResetMode       @default(NORMAL)
+  hemisphere       Hemisphere      @default(NORTHWEST)
+  climate          Climate         @default(NONE)
   // God zones are staff-only content: hidden from mortals (game commands,
   // public website, world map), grant no exploration achievements, and are
   // never picked as a random teleport destination. HEAD_BUILDER+ only.
-  isGodZone        Boolean        @default(false) @map("is_god_zone")
+  isGodZone        Boolean         @default(false) @map("is_god_zone")
   // Internal zones are plumbing, not content (the Void, reserved/non-loading item zones):
   // they grant no exploration credit and stay out of zone listings and achievements.
   // Unlike god zones they are not hidden from staff tools. HEAD_BUILDER+ only.
-  isInternal       Boolean        @default(false) @map("is_internal")
+  isInternal       Boolean         @default(false) @map("is_internal")
   // Mobs of this zone lie down to sleep at night (game hours 22-04, outdoor
   // rooms, never mid-fight) and wake at dawn. Off by default; a mob can
   // override it with the SLEEPS_AT_NIGHT / AWAKE_AT_NIGHT behaviors.
-  mobsSleepAtNight Boolean        @default(false) @map("mobs_sleep_at_night")
-  createdAt        DateTime       @default(now()) @map("created_at")
-  updatedAt        DateTime       @updatedAt @map("updated_at")
-  deletedAt        DateTime?      @map("deleted_at")
-  createdBy        String?        @map("created_by")
-  updatedBy        String?        @map("updated_by")
+  mobsSleepAtNight Boolean         @default(false) @map("mobs_sleep_at_night")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  deletedAt        DateTime?       @map("deleted_at")
+  createdBy        String?         @map("created_by")
+  updatedBy        String?         @map("updated_by")
   mobResets        MobResets[]
   mobs             Mobs[]
   objectResets     ObjectResets[]
@@ -1993,6 +2014,7 @@ model Zones {
   rooms            Room[]
   shops            Shops[]
   triggers         Triggers[]
+  scriptLibraries  ScriptLibrary[]
   // Quest system
   quests           Quests[]
 }

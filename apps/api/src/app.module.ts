@@ -35,6 +35,7 @@ import { CreationRecipesModule } from './creation-recipes/creation-recipes.modul
 import { SystemMessagesModule } from './system-messages/system-messages.module';
 import { WeatherTextModule } from './weather-text/weather-text.module';
 import { TriggersModule } from './triggers/triggers.module';
+import { ScriptLibrariesModule } from './script-libraries/script-libraries.module';
 import { UsersModule } from './users/users.module';
 import { ValidationModule } from './validation/validation.module';
 import { ZonesModule } from './zones/zones.module';
@@ -104,6 +105,7 @@ import { createWsOnConnect, isWsContext, wsContext } from './auth/ws-auth';
     QuestsModule,
     ShopsModule,
     TriggersModule,
+    ScriptLibrariesModule,
     ValidationModule,
     CharactersModule,
     GrantsModule,

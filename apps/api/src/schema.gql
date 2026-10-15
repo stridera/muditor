@@ -1247,6 +1247,15 @@ input CreateRoomInput {
   zoneId: Int!
 }
 
+input CreateScriptLibraryInput {
+  code: String!
+  description: String
+  name: String!
+
+  """Owning zone. Omit for a global library (HEAD_BUILDER and above only)."""
+  zoneId: Int
+}
+
 input CreateShopInput {
   buyMessages: [String!]! = []
   buyProfit: Float! = 1
@@ -2312,6 +2321,7 @@ type Mutation {
   createReservedName(data: CreateReservedNameInput!): ReservedNameDto!
   createRoom(data: CreateRoomInput!): RoomDto!
   createRoomExit(data: CreateRoomExitInput!): RoomExitDto!
+  createScriptLibrary(input: CreateScriptLibraryInput!): ScriptLibraryDto!
   createShop(data: CreateShopInput!): ShopDto!
 
   """Create site content"""
@@ -2383,6 +2393,7 @@ type Mutation {
   deleteReservedName(id: ID!): Boolean!
   deleteRoom(id: Int!, zoneId: Int!): RoomDto!
   deleteRoomExit(exitId: Float!): RoomExitDto!
+  deleteScriptLibrary(id: Int!): ScriptLibraryDto!
   deleteShop(id: Int!, zoneId: Int!): ShopDto!
 
   """Delete site content"""
@@ -2579,6 +2590,7 @@ type Mutation {
   """
   updateRoomExtraDescriptions(extraDescs: [RoomExtraDescriptionInput!]!, id: Int!, zoneId: Int!): RoomDto!
   updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!, zoneId: Int!): RoomDto!
+  updateScriptLibrary(id: Int!, input: UpdateScriptLibraryInput!): ScriptLibraryDto!
   updateShop(data: UpdateShopInput!, id: Int!, zoneId: Int!): ShopDto!
   updateShopInventory(data: UpdateShopInventoryInput!, id: Int!, zoneId: Int!): ShopDto!
 
@@ -3131,6 +3143,8 @@ type Query {
   rooms(lightweight: Boolean = false, search: String, sector: Sector, skip: Int, take: Int, zoneId: Int): [RoomDto!]!
   roomsByZone(lightweight: Boolean = false, zoneId: Int!): [RoomDto!]!
   roomsCount(search: String, sector: Sector, zoneId: Int): Int!
+  scriptLibraries: [ScriptLibraryDto!]!
+  scriptLibrary(id: Int!): ScriptLibraryDto!
 
   """Search help entries by keyword, title, or content"""
   searchHelp(filter: HelpEntryFilterInput, query: String!): [HelpEntryDto!]!
@@ -3701,6 +3715,19 @@ enum SaveType {
   FORTITUDE
   REFLEX
   WILL
+}
+
+type ScriptLibraryDto {
+  code: String!
+  createdAt: DateTime!
+  createdBy: String
+  description: String
+  id: Int!
+  lineCount: Int!
+  name: String!
+  updatedAt: DateTime!
+  updatedBy: String
+  zoneId: Int
 }
 
 enum ScriptType {
@@ -4758,6 +4785,17 @@ input UpdateRoomPositionInput {
   layoutX: Int
   layoutY: Int
   layoutZ: Int
+}
+
+input UpdateScriptLibraryInput {
+  code: String
+  description: String
+  name: String
+
+  """
+  Move to another zone. Null makes the library global (HEAD_BUILDER and above only); omit to keep it.
+  """
+  zoneId: Int
 }
 
 input UpdateShopInput {
