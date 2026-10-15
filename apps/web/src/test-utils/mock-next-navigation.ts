@@ -82,7 +82,7 @@ export const nextNavigationMock = {
   },
   useSearchParams: () => {
     const url = useSyncExternalStore(subscribe, getSnapshot);
-     
+
     return useMemo(() => new URLSearchParams(url.split('?')[1] ?? ''), [url]);
   },
 };
