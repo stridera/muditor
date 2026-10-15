@@ -23,6 +23,7 @@ import {
 import { gql } from '@/generated/gql';
 import { usePermissions } from '@/hooks/use-permissions';
 import {
+  hasActiveUnsavedChanges,
   useEscapeToClose,
   useUnsavedChangesGuard,
 } from '@/hooks/use-unsaved-changes-guard';
@@ -43,14 +44,24 @@ import {
   Search,
   Trash2,
 } from 'lucide-react';
+import Link from 'next/link';
 import {
   Suspense,
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
 import LibrariesPanel from './libraries-panel';
+import TriggerAttachments from './trigger-attachments';
+import {
+  parseTriggerParam,
+  triggerParam,
+  useScriptsUrl,
+  useUrlTextFilter,
+} from './use-scripts-url';
 import { toast } from 'sonner';
 import { useListState } from '@/hooks/use-list-state';
 import { extractErrorMessage } from '@/lib/error-utils';
@@ -227,21 +238,44 @@ function SortIcon({
   );
 }
 
+const SORT_KEYS: readonly SortKey[] = [
+  'id',
+  'name',
+  'attachType',
+  'flags',
+  'attachment',
+  'lines',
+  'updatedAt',
+];
+
 function ScriptsPageContent({ header }: { header: ReactNode }) {
   const list = useListState();
+  // List filters, sort and the open script live in the URL (see
+  // use-scripts-url.ts) so Back/Forward, reload and deep links work.
+  const url = useScriptsUrl();
   // Zone for a NEW script: starts from the selected zone and can be changed
   // while creating. Scripts used to be saved to zone 1 regardless.
   const [newScriptZone, setNewScriptZone] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterReview, setFilterReview] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useUrlTextFilter(url, 'q');
+  const filterType = url.get('type') ?? 'all';
+  const filterReview = url.get('status') ?? 'all';
+  const sortParam = url.get('sort');
+  const sortKey: SortKey = SORT_KEYS.includes(sortParam as SortKey)
+    ? (sortParam as SortKey)
+    : 'id';
+  const sortDir: SortDir = url.get('dir') === 'desc' ? 'desc' : 'asc';
+  const urlTriggerRaw = url.get('trigger');
+  const urlTrigger = parseTriggerParam(urlTriggerRaw);
+  const isCreating = url.get('new') === '1';
+  const isEditing = isCreating || urlTriggerRaw != null;
+  const urlTriggerKey = urlTrigger
+    ? triggerParam(urlTrigger.zoneId, urlTrigger.id)
+    : null;
   const [selectedTrigger, setSelectedTrigger] = useState<TriggerData | null>(
     null
   );
-  const [isEditing, setIsEditing] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
-  const [sortKey, setSortKey] = useState<SortKey>('id');
-  const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [openError, setOpenError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const client = useApolloClient();
   const { data, loading, error, refetch } = useQuery(GET_TRIGGERS);
@@ -332,10 +366,9 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
-      setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
+      url.update({ dir: sortDir === 'asc' ? 'desc' : 'asc' });
     } else {
-      setSortKey(key);
-      setSortDir('asc');
+      url.update({ sort: key, dir: 'asc' });
     }
   };
 
@@ -347,12 +380,20 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
     [selectedTrigger]
   );
 
+  // Back to the list. When the unsaved-changes guard has put a sentinel entry
+  // on top of the history, replace it instead of stacking another entry.
   const closeEditor = useCallback(() => {
-    setIsEditing(false);
-    setSelectedTrigger(null);
-    setIsCreating(false);
     setEditorDirty(false);
-  }, []);
+    url.update(
+      { trigger: null, new: null },
+      { history: hasActiveUnsavedChanges() ? 'replace' : 'push' }
+    );
+  }, [url]);
+
+  // The editor can also vanish through Back/Forward: forget its dirty flag.
+  useEffect(() => {
+    if (!isEditing) setEditorDirty(false);
+  }, [isEditing]);
 
   const { guard } = useUnsavedChangesGuard(isEditing && editorDirty);
   const handleCancel = useMemo(() => guard(closeEditor), [guard, closeEditor]);
@@ -363,9 +404,7 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
 
   const handleNewScript = () => {
     setNewScriptZone(list.zone != null ? String(list.zone) : '');
-    setSelectedTrigger(null);
-    setIsCreating(true);
-    setIsEditing(true);
+    url.update({ trigger: null, new: '1' });
   };
 
   // The script open in the editor is read-only unless the viewer can write its zone.
@@ -374,27 +413,81 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
     selectedTrigger != null &&
     !canEditZone(selectedTrigger.zoneId);
 
-  const handleEditScript = async (trigger: TriggerData) => {
-    try {
-      const { data: source } = await client.query({
-        query: GET_TRIGGER_SOURCE,
-        variables: { zoneId: trigger.zoneId, id: trigger.id },
-        fetchPolicy: 'network-only',
-      });
-      setSelectedTrigger({
-        ...trigger,
-        commands: source?.trigger.commands ?? '',
-      });
-      setIsCreating(false);
-      setIsEditing(true);
-    } catch (err) {
-      toast.error(`Could not open the script: ${extractErrorMessage(err)}`);
-    }
+  const handleEditScript = (trigger: TriggerData) => {
+    url.update({
+      trigger: triggerParam(trigger.zoneId, trigger.id),
+      new: null,
+    });
   };
 
-  const handleSaveScript = async (script: Partial<Script>) => {
+  // Load the script named in the URL (deep link, Back/Forward, a row click).
+  // Metadata comes from the list; the Lua source is fetched for this one script.
+  const loadedKeyRef = useRef<string | null>(null);
+  const triggersRef = useRef(triggers);
+  triggersRef.current = triggers;
+  const clientRef = useRef(client);
+  clientRef.current = client;
+  const listLoaded = data != null;
+  useEffect(() => {
+    if (isCreating || urlTriggerKey == null) {
+      loadedKeyRef.current = null;
+      setSelectedTrigger(null);
+      setOpenError(
+        !isCreating && urlTriggerRaw != null
+          ? `"${urlTriggerRaw}" is not a script address. Use zone:id, e.g. 30:5.`
+          : null
+      );
+      return;
+    }
+    if (loadedKeyRef.current === urlTriggerKey) return;
+    if (!listLoaded) return;
+    const base = triggersRef.current.find(
+      t => t.zoneId === urlTrigger!.zoneId && t.id === urlTrigger!.id
+    );
+    if (!base) {
+      loadedKeyRef.current = null;
+      setSelectedTrigger(null);
+      setOpenError(`Script ${urlTriggerKey} does not exist.`);
+      return;
+    }
+    let cancelled = false;
+    setOpenError(null);
+    setSelectedTrigger(null);
+    clientRef.current
+      .query({
+        query: GET_TRIGGER_SOURCE,
+        variables: { zoneId: base.zoneId, id: base.id },
+        fetchPolicy: 'network-only',
+      })
+      .then(({ data: source }) => {
+        if (cancelled) return;
+        loadedKeyRef.current = urlTriggerKey;
+        setSelectedTrigger({
+          ...base,
+          commands: source?.trigger.commands ?? '',
+        });
+      })
+      .catch(err => {
+        if (cancelled) return;
+        setOpenError(`Could not open the script: ${extractErrorMessage(err)}`);
+        toast.error(`Could not open the script: ${extractErrorMessage(err)}`);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the URL address and list availability only
+  }, [urlTriggerKey, urlTriggerRaw, isCreating, listLoaded]);
+
+  const handleSaveScript = async (
+    script: Partial<Script>,
+    { close }: { close: boolean }
+  ) => {
+    if (saving) return;
+    setSaving(true);
     try {
       const flagsArray = script.flags ?? [];
+      let savedZoneId: number | undefined;
+      let savedId: number | undefined;
       if (isCreating) {
         const zoneId = parseInt(newScriptZone, 10);
         if (!Number.isInteger(zoneId) || zoneId < 0) {
@@ -405,7 +498,7 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
           toast.error(`You do not have write access to zone ${zoneId}.`);
           return;
         }
-        await createTrigger({
+        const result = await createTrigger({
           variables: {
             input: {
               zoneId,
@@ -422,6 +515,8 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
             },
           },
         });
+        savedZoneId = result?.data?.createTrigger?.zoneId;
+        savedId = result?.data?.createTrigger?.id;
       } else if (selectedTrigger) {
         if (!canEditZone(selectedTrigger.zoneId)) {
           toast.error(
@@ -445,12 +540,35 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
             },
           },
         });
+        savedZoneId = selectedTrigger.zoneId;
+        savedId = selectedTrigger.id;
       }
-      await refetch();
-      closeEditor();
+      const refreshed = await refetch();
+      toast.success(`Saved "${script.name || 'script'}"`);
+      if (close || savedZoneId == null || savedId == null) {
+        closeEditor();
+        return;
+      }
+      // Stay on the page: the saved script becomes the editor's baseline (so it
+      // is no longer "unsaved"), and a new script gets its own address.
+      const fresh = (
+        refreshed?.data?.triggers as TriggerData[] | undefined
+      )?.find(t => t.zoneId === savedZoneId && t.id === savedId);
+      if (!fresh) {
+        closeEditor();
+        return;
+      }
+      const key = triggerParam(savedZoneId, savedId);
+      loadedKeyRef.current = key;
+      setSelectedTrigger({ ...fresh, commands: script.commands ?? '' });
+      if (isCreating) {
+        url.update({ new: null, trigger: key }, { history: 'replace' });
+      }
     } catch (err) {
       console.error('Failed to save script:', err);
       toast.error(`Could not save the script: ${extractErrorMessage(err)}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -487,6 +605,14 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
   };
 
   if (isEditing) {
+    const titleAddress = isCreating
+      ? null
+      : (urlTriggerKey ?? urlTriggerRaw ?? null);
+    const ready =
+      isCreating ||
+      (selectedTrigger != null &&
+        triggerParam(selectedTrigger.zoneId, selectedTrigger.id) ===
+          urlTriggerKey);
     return (
       <div className='container mx-auto p-6'>
         <div className='mb-6'>
@@ -497,9 +623,11 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
                 : editorReadOnly
                   ? 'View Script'
                   : 'Edit Script'}
-              {selectedTrigger && (
+              {titleAddress && (
                 <span className='text-muted-foreground font-mono text-lg ml-2'>
-                  {selectedTrigger.zoneId}:{selectedTrigger.id}
+                  {selectedTrigger
+                    ? `${selectedTrigger.zoneId}:${selectedTrigger.id}`
+                    : titleAddress}
                 </span>
               )}
             </h1>
@@ -518,19 +646,40 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
                 </label>
               )}
               <Button variant='outline' onClick={handleCancel}>
-                Cancel
+                {ready ? 'Cancel' : 'Back to list'}
               </Button>
             </div>
           </div>
         </div>
 
-        <ScriptEditor
-          script={editorScript}
-          onDirtyChange={setEditorDirty}
-          {...(editorReadOnly
-            ? { readOnly: true }
-            : { onSave: handleSaveScript })}
-        />
+        {!ready ? (
+          openError ? (
+            <div role='alert' className='py-8 text-center text-destructive'>
+              {openError}
+            </div>
+          ) : (
+            <div className='py-8 text-center text-muted-foreground'>
+              <Loader2 className='mx-auto mb-2 h-6 w-6 animate-spin' />
+              Loading script...
+            </div>
+          )
+        ) : (
+          <>
+            {selectedTrigger && !isCreating && (
+              <TriggerAttachments
+                zoneId={selectedTrigger.zoneId}
+                id={selectedTrigger.id}
+              />
+            )}
+            <ScriptEditor
+              script={editorScript}
+              onDirtyChange={setEditorDirty}
+              {...(editorReadOnly
+                ? { readOnly: true }
+                : { onSave: handleSaveScript })}
+            />
+          </>
+        )}
       </div>
     );
   }
@@ -574,7 +723,12 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
             className='pl-10'
           />
         </div>
-        <Select value={filterType} onValueChange={setFilterType}>
+        <Select
+          value={filterType}
+          onValueChange={value =>
+            url.update({ type: value === 'all' ? null : value })
+          }
+        >
           <SelectTrigger className='w-40'>
             <SelectValue placeholder='Filter by type' />
           </SelectTrigger>
@@ -585,7 +739,12 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
             <SelectItem value='WORLD'>World/Zone</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={filterReview} onValueChange={setFilterReview}>
+        <Select
+          value={filterReview}
+          onValueChange={value =>
+            url.update({ status: value === 'all' ? null : value })
+          }
+        >
           <SelectTrigger className='w-44'>
             <SelectValue placeholder='Filter by status' />
           </SelectTrigger>
@@ -727,7 +886,15 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
                   <TableCell className='font-mono text-xs text-muted-foreground'>
                     {trigger.zoneId}:{trigger.id}
                   </TableCell>
-                  <TableCell className='font-medium'>{trigger.name}</TableCell>
+                  <TableCell className='font-medium'>
+                    <Link
+                      href={`?trigger=${triggerParam(trigger.zoneId, trigger.id)}`}
+                      onClick={e => e.stopPropagation()}
+                      className='hover:underline'
+                    >
+                      {trigger.name}
+                    </Link>
+                  </TableCell>
                   <TableCell>
                     <div className='flex items-center gap-1.5'>
                       <Badge className={getTypeColor(trigger.attachType)}>
@@ -910,9 +1077,22 @@ function ScriptsTabs({
   );
 }
 
-export default function ScriptsPage() {
-  const [tab, setTab] = useState<ScriptsTab>('triggers');
-  const header = <ScriptsTabs tab={tab} onChange={setTab} />;
+function ScriptsPageRoot() {
+  const url = useScriptsUrl();
+  const tab: ScriptsTab =
+    url.get('tab') === 'libraries' ? 'libraries' : 'triggers';
+  // Switching tab starts that tab's own list: only the zone selection carries over.
+  const header = (
+    <ScriptsTabs
+      tab={tab}
+      onChange={next =>
+        url.update(
+          { tab: next === 'libraries' ? 'libraries' : null },
+          { reset: true }
+        )
+      }
+    />
+  );
   return (
     <ScriptsAccessGate>
       <Suspense
@@ -925,5 +1105,16 @@ export default function ScriptsPage() {
         )}
       </Suspense>
     </ScriptsAccessGate>
+  );
+}
+
+export default function ScriptsPage() {
+  // useSearchParams needs a Suspense boundary above it.
+  return (
+    <Suspense
+      fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+    >
+      <ScriptsPageRoot />
+    </Suspense>
   );
 }

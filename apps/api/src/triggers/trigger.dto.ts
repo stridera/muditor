@@ -63,6 +63,22 @@ export class TriggerDto {
   flags: string[];
 }
 
+/** One mob, object or room a trigger is attached to (backlink target). */
+@ObjectType()
+export class TriggerAttachmentDto {
+  @Field(() => String, { description: 'MOB, OBJECT or ROOM' })
+  kind: 'MOB' | 'OBJECT' | 'ROOM';
+
+  @Field(() => Int)
+  zoneId: number;
+
+  @Field(() => Int)
+  id: number;
+
+  @Field()
+  name: string;
+}
+
 @InputType()
 export class CreateTriggerInput {
   @Field(() => Int)

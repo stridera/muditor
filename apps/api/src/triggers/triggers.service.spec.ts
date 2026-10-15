@@ -204,3 +204,67 @@ describe('TriggersService attach to a missing entity', () => {
     ).rejects.toBe(boom);
   });
 });
+
+describe('TriggersService.findAttachments', () => {
+  const setup = () => {
+    const prisma = {
+      mobTriggers: {
+        findMany: jest.fn().mockResolvedValue([
+          {
+            mob: {
+              zoneId: 30,
+              id: 7,
+              name: '&1a guard&0',
+              plainName: 'a guard',
+            },
+          },
+        ]),
+      },
+      objectTriggers: {
+        findMany: jest
+          .fn()
+          .mockResolvedValue([
+            { object: { zoneId: 12, id: 3, name: 'a lamp', plainName: '' } },
+          ]),
+      },
+      roomTriggers: {
+        findMany: jest
+          .fn()
+          .mockResolvedValue([{ room: { zoneId: 30, id: 0, name: 'A hall' } }]),
+      },
+    };
+    const service = new TriggersService(
+      prisma as unknown as ConstructorParameters<typeof TriggersService>[0]
+    );
+    return { service, prisma };
+  };
+
+  it('lists mobs, objects and rooms using plain names where available', async () => {
+    const { service } = setup();
+    await expect(service.findAttachments(30, 5)).resolves.toEqual([
+      { kind: 'MOB', zoneId: 30, id: 7, name: 'a guard' },
+      { kind: 'OBJECT', zoneId: 12, id: 3, name: 'a lamp' },
+      { kind: 'ROOM', zoneId: 30, id: 0, name: 'A hall' },
+    ]);
+  });
+
+  it('hides entities in god zones from non-staff readers only', async () => {
+    const { service, prisma } = setup();
+    await service.findAttachments(30, 5, true);
+    expect(prisma.mobTriggers.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          triggerZoneId: 30,
+          triggerId: 5,
+          mob: { zones: { isGodZone: false } },
+        },
+      })
+    );
+    await service.findAttachments(30, 5, false);
+    expect(prisma.roomTriggers.findMany).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        where: { triggerZoneId: 30, triggerId: 5, room: {} },
+      })
+    );
+  });
+});

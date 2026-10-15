@@ -1,11 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Editor from './MonacoEditor';
-import type { editor } from 'monaco-editor';
 import { useTheme } from 'next-themes';
-import { ChevronLeft, ChevronRight, Settings2 } from 'lucide-react';
-import { lintLua, type LuaLintIssue } from '@muditor/types';
+import { ChevronLeft, ChevronRight, Loader2, Settings2 } from 'lucide-react';
+import {
+  LuaToolButtons,
+  LuaValidationResults,
+  useLuaEditorTools,
+} from './lua-editor-tools';
+import { useSaveShortcut } from '@/hooks/use-save-shortcut';
 
 export interface Script {
   id: string;
@@ -24,7 +28,15 @@ export interface Script {
 
 interface ScriptEditorProps {
   script?: Script | undefined;
-  onSave?: (script: Partial<Script>) => void;
+  /**
+   * Save the script. `close: true` is "Save & Close" (the page leaves the
+   * editor afterwards); `close: false` is "Save" / Ctrl+S (stay on the page).
+   * Return a promise to get the pending state on the buttons.
+   */
+  onSave?: (
+    script: Partial<Script>,
+    options: { close: boolean }
+  ) => void | Promise<void>;
   onTest?: (script: Partial<Script>) => void;
   onChange?: (value: string) => void;
   /** Reports whether the editor differs from the script it was loaded with. */
@@ -561,14 +573,13 @@ export default function ScriptEditor({
   const [argList, setArgList] = useState(script?.argList || '');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [isValidating, setIsValidating] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showSidebar, setShowSidebar] = useState(true);
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
-  const lintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Which save button is waiting on the server (null = idle).
+  const [saving, setSaving] = useState<'save' | 'close' | null>(null);
+  const savingRef = useRef(false);
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const lua = useLuaEditorTools(code, mounted);
 
   useEffect(() => {
     setMounted(true);
@@ -654,20 +665,8 @@ export default function ScriptEditor({
     });
   };
 
-  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
-    editorRef.current = editor;
-
-    const model = editor.getModel();
-    if (model && typeof window !== 'undefined') {
-      import('@/lib/monaco-setup').then(({ monaco }) => {
-        monacoRef.current = monaco;
-        monaco.editor.setModelLanguage(model, 'lua');
-      });
-    }
-  };
-
   useEffect(() => {
-    if (mounted && editorRef.current && typeof window !== 'undefined') {
+    if (mounted && lua.editorRef.current && typeof window !== 'undefined') {
       import('@/lib/monaco-setup').then(({ monaco }) => {
         const themeName =
           resolvedTheme === 'dark' ? 'muditor-dark' : 'muditor-light';
@@ -676,119 +675,20 @@ export default function ScriptEditor({
     }
   }, [resolvedTheme, mounted]);
 
-  const updateMarkers = useCallback((issues: LuaLintIssue[]) => {
-    const monaco = monacoRef.current;
-    const model = editorRef.current?.getModel();
-    if (!monaco || !model) return;
-
-    const markers = issues.map(issue => ({
-      severity:
-        issue.severity === 'error'
-          ? monaco.MarkerSeverity.Error
-          : monaco.MarkerSeverity.Warning,
-      message: issue.message,
-      startLineNumber: issue.line,
-      startColumn: issue.column,
-      endLineNumber: issue.line,
-      endColumn: issue.endColumn,
-      source: 'lua-lint',
-    }));
-
-    monaco.editor.setModelMarkers(model, 'lua-lint', markers);
-  }, []);
-
-  // Debounced lint on code changes — real-time inline squiggly underlines
-  useEffect(() => {
-    if (!mounted) return;
-
-    if (lintTimerRef.current) {
-      clearTimeout(lintTimerRef.current);
-    }
-
-    lintTimerRef.current = setTimeout(() => {
-      const issues = lintLua(code);
-      updateMarkers(issues);
-    }, 500);
-
-    return () => {
-      if (lintTimerRef.current) {
-        clearTimeout(lintTimerRef.current);
-      }
-    };
-  }, [code, mounted, updateMarkers]);
-
   const handleCodeChange = (value: string | undefined) => {
     const newCode = value || '';
     setCode(newCode);
     onChange?.(newCode);
 
-    if (validationErrors.length > 0) {
-      setValidationErrors([]);
-    }
-  };
-
-  const validateScript = async () => {
-    setIsValidating(true);
-    try {
-      const errors: string[] = [];
-      const lines = code.split('\n');
-
-      // Existing basic checks
-      lines.forEach((line, index) => {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith('--')) return;
-
-        if (
-          trimmed.includes('function') &&
-          !trimmed.includes('end') &&
-          !lines.slice(index + 1).some(l => l.includes('end'))
-        ) {
-          errors.push(`Line ${index + 1}: Function may be missing 'end'`);
-        }
-
-        if (
-          (trimmed.includes('if') ||
-            trimmed.includes('for') ||
-            trimmed.includes('while')) &&
-          !trimmed.includes('then') &&
-          !trimmed.includes('do')
-        ) {
-          errors.push(
-            `Line ${index + 1}: Control structure may be missing 'then' or 'do'`
-          );
-        }
-      });
-
-      const openParens = (code.match(/\(/g) || []).length;
-      const closeParens = (code.match(/\)/g) || []).length;
-      if (openParens !== closeParens) {
-        errors.push('Unbalanced parentheses');
-      }
-
-      // Run linter and merge results
-      const lintIssues = lintLua(code);
-      for (const issue of lintIssues) {
-        const severity = issue.severity === 'error' ? 'Error' : 'Warning';
-        errors.push(`Line ${issue.line} [${severity}]: ${issue.message}`);
-      }
-
-      // Update Monaco markers immediately
-      updateMarkers(lintIssues);
-
-      setValidationErrors(errors);
-    } catch (err) {
-      setValidationErrors(['Validation error: ' + (err as Error).message]);
-    } finally {
-      setIsValidating(false);
-    }
+    lua.clearValidation();
   };
 
   const insertTemplate = () => {
-    if (selectedTemplate && editorRef.current) {
+    if (selectedTemplate && lua.editorRef.current) {
       const template =
         scriptTemplates[selectedTemplate as keyof typeof scriptTemplates];
       if (template && typeof template === 'object' && 'code' in template) {
-        editorRef.current.setValue(template.code);
+        lua.editorRef.current.setValue(template.code);
         setCode(template.code);
         onChange?.(template.code);
       }
@@ -816,12 +716,6 @@ export default function ScriptEditor({
     }
   );
 
-  const formatCode = () => {
-    if (editorRef.current) {
-      editorRef.current.getAction('editor.action.formatDocument')?.run();
-    }
-  };
-
   const handleAttachTypeChange = (newType: string) => {
     const validFlags = getAllValidFlags(newType);
     setAttachType(newType);
@@ -834,18 +728,30 @@ export default function ScriptEditor({
     );
   };
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave({
-        ...script,
-        name: scriptName,
-        attachType,
-        flags,
-        argList,
-        commands: code,
-      });
+  const handleSave = async (close: boolean) => {
+    if (!onSave || readOnly || savingRef.current) return;
+    savingRef.current = true;
+    setSaving(close ? 'close' : 'save');
+    try {
+      await onSave(
+        {
+          ...script,
+          name: scriptName,
+          attachType,
+          flags,
+          argList,
+          commands: code,
+        },
+        { close }
+      );
+    } finally {
+      savingRef.current = false;
+      setSaving(null);
     }
   };
+
+  // Ctrl/Cmd+S saves and stays (also from inside Monaco / the form fields).
+  useSaveShortcut(() => void handleSave(false), !!onSave && !readOnly);
 
   const handleTest = () => {
     if (onTest) {
@@ -954,20 +860,12 @@ export default function ScriptEditor({
 
         {/* Action Buttons */}
         <div className='flex items-center gap-2 justify-end'>
-          <button
-            onClick={validateScript}
-            disabled={isValidating}
-            className='text-sm bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 disabled:opacity-50'
-          >
-            {isValidating ? 'Validating...' : 'Validate'}
-          </button>
-          <button
-            onClick={formatCode}
-            disabled={readOnly}
-            className='text-sm bg-secondary text-secondary-foreground px-3 py-1 rounded hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed'
-          >
-            Format
-          </button>
+          <LuaToolButtons
+            onValidate={lua.validate}
+            onFormat={lua.format}
+            isValidating={lua.isValidating}
+            readOnly={readOnly}
+          />
           {onTest && (
             <button
               onClick={handleTest}
@@ -977,12 +875,32 @@ export default function ScriptEditor({
             </button>
           )}
           {onSave && (
-            <button
-              onClick={handleSave}
-              className='text-sm bg-primary text-primary-foreground px-3 py-1 rounded hover:bg-primary/90'
-            >
-              Save
-            </button>
+            <>
+              <button
+                type='button'
+                onClick={() => void handleSave(false)}
+                disabled={saving !== null}
+                title='Save and keep editing (Ctrl+S)'
+                className='text-sm bg-primary text-primary-foreground px-3 py-1 rounded hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-1.5'
+              >
+                {saving === 'save' && (
+                  <Loader2 className='w-3.5 h-3.5 animate-spin' />
+                )}
+                {saving === 'save' ? 'Saving…' : 'Save'}
+              </button>
+              <button
+                type='button'
+                onClick={() => void handleSave(true)}
+                disabled={saving !== null}
+                title='Save and return to the list'
+                className='text-sm bg-primary text-primary-foreground px-3 py-1 rounded hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-1.5'
+              >
+                {saving === 'close' && (
+                  <Loader2 className='w-3.5 h-3.5 animate-spin' />
+                )}
+                {saving === 'close' ? 'Saving…' : 'Save & Close'}
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -1124,7 +1042,7 @@ export default function ScriptEditor({
             value={code}
             onChange={handleCodeChange}
             beforeMount={handleEditorWillMount}
-            onMount={handleEditorDidMount}
+            onMount={lua.handleEditorDidMount}
             options={{
               readOnly,
               minimap: { enabled: true },
@@ -1153,38 +1071,7 @@ export default function ScriptEditor({
         </div>
       </div>
 
-      {/* Validation Results */}
-      {validationErrors.length > 0 && (
-        <div className='bg-destructive/10 border-t border-destructive/20 p-3'>
-          <h4 className='text-sm font-medium text-destructive mb-2'>
-            Validation Issues ({validationErrors.length}):
-          </h4>
-          <ul className='text-sm space-y-1'>
-            {validationErrors.map((error, index) => (
-              <li key={index} className='flex items-start gap-2'>
-                <span
-                  className={
-                    error.includes('[Warning]')
-                      ? 'text-yellow-500'
-                      : 'text-destructive'
-                  }
-                >
-                  {error.includes('[Warning]') ? '!' : '×'}
-                </span>
-                <span
-                  className={
-                    error.includes('[Warning]')
-                      ? 'text-yellow-600 dark:text-yellow-400'
-                      : 'text-destructive/90'
-                  }
-                >
-                  {error}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <LuaValidationResults errors={lua.validationErrors} />
 
       {/* Help Section */}
       <details className='bg-muted border-t border-border'>

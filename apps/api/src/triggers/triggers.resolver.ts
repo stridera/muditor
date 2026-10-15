@@ -17,6 +17,7 @@ import { hidesGodZones } from '../common/god-zone-visibility';
 import {
   AttachTriggerInput,
   CreateTriggerInput,
+  TriggerAttachmentDto,
   TriggerDto,
   UpdateTriggerInput,
 } from './trigger.dto';
@@ -89,6 +90,22 @@ export class TriggersResolver {
       hidesGodZones(user ?? null)
     );
     return trigger;
+  }
+
+  // Backlinks: the mobs, objects and rooms this trigger is attached to. Same
+  // read rule as `trigger`: public, god-zone entities hidden from non-staff.
+  @Query(() => [TriggerAttachmentDto], { name: 'triggerAttachments' })
+  @UseGuards(OptionalJwtAuthGuard)
+  async findAttachments(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
+  ) {
+    return this.triggersService.findAttachments(
+      zoneId,
+      id,
+      hidesGodZones(user ?? null)
+    );
   }
 
   @Query(() => [TriggerDto], { name: 'triggersByAttachment' })

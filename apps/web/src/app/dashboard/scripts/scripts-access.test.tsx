@@ -4,9 +4,15 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ScriptsPage from './page';
+import { navigation } from '@/test-utils/mock-next-navigation';
 
 let mockPerms: Record<string, unknown> = {};
 
+jest.mock(
+  'next/navigation',
+  () =>
+    jest.requireActual('@/test-utils/mock-next-navigation').nextNavigationMock
+);
 jest.mock('@/hooks/use-permissions', () => ({
   usePermissions: () => mockPerms,
 }));
@@ -79,6 +85,7 @@ const base = {
 describe('Scripts page access', () => {
   beforeEach(() => {
     editorProps = null;
+    navigation.reset();
   });
 
   it('explains the requirement to non-staff', () => {

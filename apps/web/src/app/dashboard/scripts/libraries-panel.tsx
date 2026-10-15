@@ -1,6 +1,11 @@
 'use client';
 
 import MonacoEditor from '@/components/MonacoEditor';
+import {
+  LuaToolButtons,
+  LuaValidationResults,
+  useLuaEditorTools,
+} from '@/components/lua-editor-tools';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,11 +20,31 @@ import { gql } from '@/generated/gql';
 import { usePermissions } from '@/hooks/use-permissions';
 import { extractErrorMessage } from '@/lib/error-utils';
 import { useMutation, useQuery } from '@apollo/client/react';
-import { Eye, FileText, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import {
+  Eye,
+  FileText,
+  Loader2,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+} from 'lucide-react';
+import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useSaveShortcut } from '@/hooks/use-save-shortcut';
+import {
+  hasActiveUnsavedChanges,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { toast } from 'sonner';
+import { useScriptsUrl, useUrlTextFilter } from './use-scripts-url';
 
 // Libraries are small (a few KB of Lua each), so the list carries the source;
 // that keeps search-inside-source and opening a library free of extra requests.
@@ -107,16 +132,27 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
   const [updateLibrary] = useMutation(UPDATE_LIBRARY);
   const [deleteLibrary] = useMutation(DELETE_LIBRARY);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  // What is open lives in the URL (?library=<name> or ?new=1) so Back/Forward,
+  // reload and deep links work; the draft fields below are the editor's state.
+  const url = useScriptsUrl();
+  const urlLibrary = url.get('library');
+  const urlNew = url.get('new') === '1';
+  const [searchTerm, setSearchTerm] = useUrlTextFilter(url, 'q');
+
   const [selected, setSelected] = useState<LibraryData | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  // Which record the draft was initialised from: 'new', 'lib:<id>' or null.
+  const [draftKey, setDraftKey] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [zone, setZone] = useState('');
   const [description, setDescription] = useState('');
   const [code, setCode] = useState('');
   // The values the editor opened with; dirty is measured against these.
   const [loaded, setLoaded] = useState<LibraryDraft | null>(null);
+  const [saving, setSaving] = useState<'save' | 'close' | null>(null);
+  const lua = useLuaEditorTools(code);
+
+  const isCreating = urlNew;
+  const isEditing = draftKey !== null && (urlNew || urlLibrary != null);
 
   const libraries: LibraryData[] = useMemo(
     () => (data?.scriptLibraries as LibraryData[]) ?? [],
@@ -152,48 +188,62 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
       code.replace(/\r\n?/g, '\n') !== loaded.code.replace(/\r\n?/g, '\n'));
   const { guard } = useUnsavedChangesGuard(isDirty);
 
-  const openLibrary = (library: LibraryData) => {
+  const initDraft = useCallback((key: string, library: LibraryData | null) => {
+    const draft: LibraryDraft = library
+      ? {
+          name: library.name,
+          zone: library.zoneId == null ? '' : String(library.zoneId),
+          description: library.description ?? '',
+          code: library.code,
+        }
+      : { name: '', zone: '', description: '', code: NEW_LIBRARY_TEMPLATE };
     setSelected(library);
-    setIsCreating(false);
-    setName(library.name);
-    setZone(library.zoneId == null ? '' : String(library.zoneId));
-    setDescription(library.description ?? '');
-    setCode(library.code);
-    setLoaded({
-      name: library.name,
-      zone: library.zoneId == null ? '' : String(library.zoneId),
-      description: library.description ?? '',
-      code: library.code,
-    });
-    setIsEditing(true);
-  };
+    setName(draft.name);
+    setZone(draft.zone);
+    setDescription(draft.description);
+    setCode(draft.code);
+    setLoaded(draft);
+    setDraftKey(key);
+  }, []);
 
-  const startCreate = () => {
-    setSelected(null);
-    setIsCreating(true);
-    setName('');
-    setZone('');
-    setDescription('');
-    setCode(NEW_LIBRARY_TEMPLATE);
-    setLoaded({
-      name: '',
-      zone: '',
-      description: '',
-      code: NEW_LIBRARY_TEMPLATE,
-    });
-    setIsEditing(true);
-  };
+  // Keep the draft in step with the URL: open the library named there, start
+  // a new one, or drop the draft when the URL is back at the list.
+  useEffect(() => {
+    if (urlNew) {
+      if (draftKey !== 'new') initDraft('new', null);
+      return;
+    }
+    if (!urlLibrary) {
+      if (draftKey !== null) {
+        setDraftKey(null);
+        setSelected(null);
+        setLoaded(null);
+      }
+      return;
+    }
+    const library = libraries.find(l => l.name === urlLibrary);
+    if (!library) return; // still loading, or renamed while open
+    if (draftKey !== `lib:${library.id}`)
+      initDraft(`lib:${library.id}`, library);
+  }, [urlNew, urlLibrary, libraries, draftKey, initDraft]);
 
-  const close = () => {
-    setIsEditing(false);
-    setIsCreating(false);
-    setSelected(null);
-    setLoaded(null);
-  };
+  const openLibrary = (library: LibraryData) =>
+    url.update({ library: library.name, new: null });
+
+  const startCreate = () => url.update({ library: null, new: '1' });
+
+  // Leaving the editor from the editor: if the unsaved-changes guard has put a
+  // sentinel entry on top of the history, replace it instead of stacking.
+  const close = () =>
+    url.update(
+      { library: null, new: null },
+      { history: hasActiveUnsavedChanges() ? 'replace' : 'push' }
+    );
   // Cancel asks first when there are unsaved edits; saving closes directly.
   const cancel = guard(close);
 
-  const handleSave = async () => {
+  const handleSave = async (closeAfter: boolean) => {
+    if (saving || readOnly || !isEditing) return;
     if (!NAME_PATTERN.test(name)) {
       toast.error(
         'Name must be 1-64 characters: lowercase letters, digits, "_", "-", "." or "/".'
@@ -214,27 +264,55 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
       );
       return;
     }
+    setSaving(closeAfter ? 'close' : 'save');
     try {
+      const input = { name, zoneId, description: description || null, code };
+      let savedId: number | undefined = selected?.id;
       if (isCreating) {
-        await createLibrary({
-          variables: {
-            input: { name, zoneId, description: description || null, code },
-          },
-        });
+        const result = await createLibrary({ variables: { input } });
+        savedId = result?.data?.createScriptLibrary?.id;
       } else if (selected) {
-        await updateLibrary({
-          variables: {
-            id: selected.id,
-            input: { name, zoneId, description: description || null, code },
-          },
-        });
+        await updateLibrary({ variables: { id: selected.id, input } });
       }
       await refetch();
-      close();
+      toast.success(`Saved library "${name}"`);
+      if (closeAfter || savedId == null) {
+        close();
+      } else {
+        // Stay on the page: the saved values are the new baseline, and a
+        // new/renamed library gets its own address.
+        const draft: LibraryDraft = {
+          name,
+          zone: trimmedZone,
+          description,
+          code,
+        };
+        setLoaded(draft);
+        setDraftKey(`lib:${savedId}`);
+        setSelected({
+          ...(selected ?? {
+            id: savedId,
+            lineCount: 0,
+            createdAt: '',
+            updatedAt: '',
+          }),
+          id: savedId,
+          name,
+          zoneId,
+          description: description || null,
+          code,
+        });
+        url.update({ library: name, new: null }, { history: 'replace' });
+      }
     } catch (err) {
       toast.error(`Could not save the library: ${extractErrorMessage(err)}`);
+    } finally {
+      setSaving(null);
     }
   };
+
+  // Ctrl/Cmd+S saves without closing.
+  useSaveShortcut(() => void handleSave(false), isEditing && !readOnly);
 
   const handleDelete = async (e: React.MouseEvent, library: LibraryData) => {
     e.stopPropagation();
@@ -269,11 +347,40 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
               </span>
             )}
           </h1>
-          <div className='flex gap-2'>
+          <div className='flex items-center gap-2'>
             <Button variant='outline' onClick={cancel}>
               Cancel
             </Button>
-            {!readOnly && <Button onClick={handleSave}>Save</Button>}
+            <LuaToolButtons
+              onValidate={lua.validate}
+              onFormat={lua.format}
+              isValidating={lua.isValidating}
+              readOnly={readOnly}
+            />
+            {!readOnly && (
+              <>
+                <Button
+                  onClick={() => void handleSave(false)}
+                  disabled={saving !== null}
+                  title='Save and keep editing (Ctrl+S)'
+                >
+                  {saving === 'save' && (
+                    <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                  )}
+                  {saving === 'save' ? 'Saving…' : 'Save'}
+                </Button>
+                <Button
+                  onClick={() => void handleSave(true)}
+                  disabled={saving !== null}
+                  title='Save and return to the list'
+                >
+                  {saving === 'close' && (
+                    <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                  )}
+                  {saving === 'close' ? 'Saving…' : 'Save & Close'}
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -330,7 +437,11 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
             defaultLanguage='lua'
             theme={resolvedTheme === 'dark' ? 'vs-dark' : 'vs'}
             value={code}
-            onChange={value => setCode(value ?? '')}
+            onChange={value => {
+              setCode(value ?? '');
+              lua.clearValidation();
+            }}
+            onMount={lua.handleEditorDidMount}
             options={{
               readOnly,
               minimap: { enabled: false },
@@ -340,13 +451,30 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
             }}
           />
         </div>
+        <LuaValidationResults errors={lua.validationErrors} />
       </div>
     );
   }
 
+  const notFound =
+    urlLibrary != null &&
+    !urlNew &&
+    !loading &&
+    !error &&
+    !libraries.some(l => l.name === urlLibrary);
+
   return (
     <div className='container mx-auto p-6'>
       {header}
+      {notFound && (
+        <div
+          role='alert'
+          className='mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm'
+        >
+          There is no library named{' '}
+          <code className='font-mono'>{urlLibrary}</code>.
+        </div>
+      )}
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-2xl font-bold'>Script Libraries</h1>
@@ -413,7 +541,13 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
                     onClick={() => openLibrary(library)}
                   >
                     <TableCell className='font-mono font-medium'>
-                      {library.name}
+                      <Link
+                        href={`?tab=libraries&library=${encodeURIComponent(library.name)}`}
+                        onClick={e => e.stopPropagation()}
+                        className='hover:underline'
+                      >
+                        {library.name}
+                      </Link>
                     </TableCell>
                     <TableCell className='text-xs text-muted-foreground'>
                       {library.zoneId == null

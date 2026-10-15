@@ -2,11 +2,23 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import ScriptsPage from './page';
+import { navigation } from '@/test-utils/mock-next-navigation';
 
 let mockPerms: Record<string, unknown> = {};
 
+jest.mock(
+  'next/navigation',
+  () =>
+    jest.requireActual('@/test-utils/mock-next-navigation').nextNavigationMock
+);
 jest.mock('@/hooks/use-permissions', () => ({
   usePermissions: () => mockPerms,
 }));
@@ -32,7 +44,10 @@ jest.mock('@/components/MonacoEditor', () => ({
 const createLibrary = jest.fn().mockResolvedValue({});
 const updateLibrary = jest.fn().mockResolvedValue({});
 const deleteLibrary = jest.fn().mockResolvedValue({});
-jest.mock('sonner', () => ({ toast: { error: jest.fn() } }));
+const toastSuccess = jest.fn();
+jest.mock('sonner', () => ({
+  toast: { error: jest.fn(), success: (...a: unknown[]) => toastSuccess(...a) },
+}));
 jest.mock('@apollo/client/react', () => ({
   useApolloClient: () => ({ query: jest.fn() }),
   useMutation: (doc: {
@@ -114,6 +129,7 @@ describe('Script libraries tab', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     monacoProps = null;
+    navigation.reset();
   });
 
   it('links to the scripting guide', () => {
@@ -213,5 +229,108 @@ describe('Script libraries tab', () => {
     });
     fireEvent.click(screen.getByText('Save'));
     expect(createLibrary).not.toHaveBeenCalled();
+  });
+
+  describe('editing a library', () => {
+    const headBuilder = {
+      ...staff,
+      permissions: { role: 'HEAD_BUILDER' },
+      isHeadBuilder: true,
+      canEditAnyZone: true,
+      canEditZone: () => true,
+    };
+
+    it('has the same Validate and Format buttons as the trigger editor', async () => {
+      mockPerms = headBuilder;
+      navigation.reset('/dashboard/scripts?tab=libraries&library=mine-lib');
+      render(<ScriptsPage />);
+      expect(
+        await screen.findByRole('button', { name: 'Validate' })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Format' })
+      ).toBeInTheDocument();
+    });
+
+    it('offers Validate and Format (Format disabled) when read-only', async () => {
+      mockPerms = staff;
+      navigation.reset('/dashboard/scripts?tab=libraries&library=mine-lib');
+      render(<ScriptsPage />);
+      expect(
+        await screen.findByRole('button', { name: 'Validate' })
+      ).toBeEnabled();
+      expect(screen.getByRole('button', { name: 'Format' })).toBeDisabled();
+    });
+
+    it('opens from the URL and Back returns to the list', async () => {
+      mockPerms = headBuilder;
+      render(<ScriptsPage />);
+      fireEvent.click(screen.getByRole('tab', { name: 'Libraries' }));
+      fireEvent.click(screen.getAllByTitle('Edit')[0]!);
+      await screen.findByText('Edit Library');
+      expect(navigation.url).toBe(
+        '/dashboard/scripts?tab=libraries&library=mine-lib'
+      );
+      act(() => navigation.back());
+      await waitFor(() =>
+        expect(screen.queryByText('Edit Library')).toBeNull()
+      );
+      expect(screen.getByText('Script Libraries')).toBeInTheDocument();
+    });
+
+    it('Save stays on the page, Ctrl+S too, Save & Close leaves', async () => {
+      mockPerms = headBuilder;
+      navigation.reset('/dashboard/scripts?tab=libraries&library=mine-lib');
+      render(<ScriptsPage />);
+      await screen.findByText('Edit Library');
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+      });
+      await waitFor(() => expect(updateLibrary).toHaveBeenCalledTimes(1));
+      expect(toastSuccess).toHaveBeenCalled();
+      expect(screen.getByText('Edit Library')).toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.keyDown(window, { key: 's', ctrlKey: true });
+      });
+      await waitFor(() => expect(updateLibrary).toHaveBeenCalledTimes(2));
+      expect(screen.getByText('Edit Library')).toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Save & Close' }));
+      });
+      await waitFor(() =>
+        expect(screen.queryByText('Edit Library')).toBeNull()
+      );
+      expect(navigation.url).toBe('/dashboard/scripts?tab=libraries');
+    });
+
+    it('shows a disabled Saving... button while the save is pending', async () => {
+      mockPerms = headBuilder;
+      let finish: () => void = () => {};
+      updateLibrary.mockImplementationOnce(
+        () =>
+          new Promise<object>(resolve => {
+            finish = () => resolve({});
+          })
+      );
+      navigation.reset('/dashboard/scripts?tab=libraries&library=mine-lib');
+      render(<ScriptsPage />);
+      await screen.findByText('Edit Library');
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+      expect(
+        await screen.findByRole('button', { name: 'Saving…' })
+      ).toBeDisabled();
+      await act(async () => finish());
+      expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
+    });
+
+    it('reports a missing library in a deep link', async () => {
+      mockPerms = headBuilder;
+      navigation.reset('/dashboard/scripts?tab=libraries&library=nope');
+      render(<ScriptsPage />);
+      expect(await screen.findByRole('alert')).toHaveTextContent('nope');
+    });
   });
 });

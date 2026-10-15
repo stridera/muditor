@@ -3216,6 +3216,7 @@ type Query {
   """Get system text entries by category"""
   systemTextsByCategory(category: String!): [SystemTextDto!]!
   trigger(id: Int!, zoneId: Int!): TriggerDto!
+  triggerAttachments(id: Int!, zoneId: Int!): [TriggerAttachmentDto!]!
   triggers: [TriggerDto!]!
   triggersByAttachment(attachType: ScriptType!, entityId: Int!, zoneId: Int!): [TriggerDto!]!
   triggersByZone(zoneId: Int!): [TriggerDto!]!
@@ -4137,6 +4138,15 @@ enum TargetType {
   RIDER
   SELF
   UNCONSCIOUS
+}
+
+type TriggerAttachmentDto {
+  id: Int!
+
+  """MOB, OBJECT or ROOM"""
+  kind: String!
+  name: String!
+  zoneId: Int!
 }
 
 type TriggerDto {

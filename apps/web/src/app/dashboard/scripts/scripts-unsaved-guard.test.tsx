@@ -2,10 +2,22 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { useEffect } from 'react';
 import ScriptsPage from './page';
+import { navigation } from '@/test-utils/mock-next-navigation';
 
+jest.mock(
+  'next/navigation',
+  () =>
+    jest.requireActual('@/test-utils/mock-next-navigation').nextNavigationMock
+);
 jest.mock('@/hooks/use-permissions', () => ({
   usePermissions: () => ({
     permissions: { role: 'HEAD_BUILDER' },
@@ -79,9 +91,14 @@ async function openEditor() {
   render(<ScriptsPage />);
   fireEvent.click(screen.getByTitle('Edit'));
   await screen.findByTestId('script-editor');
+  // Let the editor's mount effect report its dirty state to the page.
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
 }
 
 beforeEach(() => {
+  navigation.reset();
   mockEditorDirty = false;
   confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
 });

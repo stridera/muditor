@@ -11,6 +11,7 @@ import { DatabaseService } from '../database/database.service';
 import {
   AttachTriggerInput,
   CreateTriggerInput,
+  TriggerAttachmentDto,
   UpdateTriggerInput,
 } from './trigger.dto';
 
@@ -132,6 +133,70 @@ export class TriggersService {
     }
 
     return trigger;
+  }
+
+  /**
+   * Every mob, object and room this trigger is attached to (junction rows),
+   * ordered by kind then zone/id. Entities in god zones are left out when
+   * `hideGodZones` is set, like every other public read.
+   */
+  async findAttachments(
+    zoneId: number,
+    id: number,
+    hideGodZones = false
+  ): Promise<TriggerAttachmentDto[]> {
+    const where = { triggerZoneId: zoneId, triggerId: id };
+    const entityHidden = inVisibleZone(hideGodZones);
+    const [mobs, objects, rooms] = await Promise.all([
+      this.prisma.mobTriggers.findMany({
+        where: { ...where, mob: entityHidden },
+        select: {
+          mob: {
+            select: { zoneId: true, id: true, name: true, plainName: true },
+          },
+        },
+      }),
+      this.prisma.objectTriggers.findMany({
+        where: { ...where, object: entityHidden },
+        select: {
+          object: {
+            select: { zoneId: true, id: true, name: true, plainName: true },
+          },
+        },
+      }),
+      this.prisma.roomTriggers.findMany({
+        where: { ...where, room: entityHidden },
+        select: { room: { select: { zoneId: true, id: true, name: true } } },
+      }),
+    ]);
+    const byKey = (a: TriggerAttachmentDto, b: TriggerAttachmentDto) =>
+      a.zoneId - b.zoneId || a.id - b.id;
+    return [
+      ...mobs
+        .map(m => ({
+          kind: 'MOB' as const,
+          zoneId: m.mob.zoneId,
+          id: m.mob.id,
+          name: m.mob.plainName || m.mob.name,
+        }))
+        .sort(byKey),
+      ...objects
+        .map(o => ({
+          kind: 'OBJECT' as const,
+          zoneId: o.object.zoneId,
+          id: o.object.id,
+          name: o.object.plainName || o.object.name,
+        }))
+        .sort(byKey),
+      ...rooms
+        .map(r => ({
+          kind: 'ROOM' as const,
+          zoneId: r.room.zoneId,
+          id: r.room.id,
+          name: r.room.name,
+        }))
+        .sort(byKey),
+    ];
   }
 
   async findByAttachment(
