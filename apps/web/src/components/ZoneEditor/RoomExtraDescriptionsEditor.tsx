@@ -6,6 +6,7 @@ import {
   saveRoomExtraDescriptions,
   type ExtraDescription,
 } from '@/lib/reset-api';
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
 import { useEffect, useState } from 'react';
 
 interface Row {
@@ -46,6 +47,7 @@ export function RoomExtraDescriptionsEditor({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
+  useUnsavedChangesGuard(dirty, 'Discard your unsaved extra descriptions?');
 
   useEffect(() => {
     let cancelled = false;

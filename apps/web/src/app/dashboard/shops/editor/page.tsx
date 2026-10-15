@@ -45,6 +45,10 @@ import { extractErrorMessage, friendlyGraphQLMessage } from '@/lib/error-utils';
 import type { ShopItem, ShopQueryResult } from '@/lib/shopMapping';
 import { mapShopItems } from '@/lib/shopMapping';
 import { buildShopSavePayload, type ShopKeeperRef } from '@/lib/shopPayload';
+import {
+  useDirtyBaseline,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
 
 interface MessageListProps {
   title: string;
@@ -171,6 +175,20 @@ const shopValidationRules: ValidationRules<ShopFormData> = [
 
 // Types now imported from mapping helpers
 
+/** Everything the shop save sends (dirty-checked as one). */
+interface ShopEditState {
+  formData: ShopFormData;
+  buyMessages: string[];
+  sellMessages: string[];
+  noSuchItemMessages: string[];
+  doNotBuyMessages: string[];
+  missingCashMessages: string[];
+  shopItems: ShopItem[];
+  acceptedTypes: string[];
+  selectedFlags: string[];
+  selectedTradesWithFlags: string[];
+}
+
 function ShopEditorContent() {
   const listHref = useListReturnHref('/dashboard/shops');
   const searchParams = useSearchParams();
@@ -203,6 +221,22 @@ function ShopEditorContent() {
   const [selectedTradesWithFlags, setSelectedTradesWithFlags] = useState<
     string[]
   >([]);
+
+  const { isDirty, setBaseline } = useDirtyBaseline<ShopEditState>({
+    formData,
+    buyMessages,
+    sellMessages,
+    noSuchItemMessages,
+    doNotBuyMessages,
+    missingCashMessages,
+    shopItems,
+    acceptedTypes,
+    selectedFlags,
+    selectedTradesWithFlags,
+  });
+  // Unsaved edits are guarded against Back, in-app navigation and tab close;
+  // saving disarms the guard before it redirects.
+  const { disarm } = useUnsavedChangesGuard(isDirty);
 
   // Add Item Modal state
   const [showAddItemModal, setShowAddItemModal] = useState(false);
@@ -301,61 +335,51 @@ function ShopEditorContent() {
         keeperZoneId: loadedKeeperZoneId,
       });
       // Transform array-based messages into individual editable fields
-      setFormData({
-        id: shop.id ?? 0,
-        buyProfit: typeof shop.buyProfit === 'number' ? shop.buyProfit : 1.0,
-        sellProfit: typeof shop.sellProfit === 'number' ? shop.sellProfit : 1.0,
-        temper: typeof shop.temper === 'number' ? shop.temper : 0,
-        keeperId: typeof shop.keeperId === 'number' ? shop.keeperId : null,
-        keeperZoneId: loadedKeeperZoneId,
-        zoneId: typeof shop.zoneId === 'number' ? shop.zoneId : formData.zoneId,
-      });
-      setNoSuchItemMessages(
-        Array.isArray(shop.noSuchItemMessages) && shop.noSuchItemMessages.length
-          ? shop.noSuchItemMessages
-          : ['']
-      );
-      setDoNotBuyMessages(
-        Array.isArray(shop.doNotBuyMessages) && shop.doNotBuyMessages.length
-          ? shop.doNotBuyMessages
-          : ['']
-      );
-      setMissingCashMessages(
-        Array.isArray(shop.missingCashMessages) &&
-          shop.missingCashMessages.length
-          ? shop.missingCashMessages
-          : ['']
-      );
-      setBuyMessages(
-        Array.isArray(shop.buyMessages) && shop.buyMessages.length
-          ? shop.buyMessages
-          : ['']
-      );
-      setSellMessages(
-        Array.isArray(shop.sellMessages) && shop.sellMessages.length
-          ? shop.sellMessages
-          : ['']
-      );
-      setShopItems(mapShopItems(shop as ShopQueryResult));
-      setAcceptedTypes(
-        Array.isArray(shop.accepts)
+      const messagesOrBlank = (value: string[] | undefined) =>
+        Array.isArray(value) && value.length ? value : [''];
+      const loaded: ShopEditState = {
+        formData: {
+          id: shop.id ?? 0,
+          buyProfit: typeof shop.buyProfit === 'number' ? shop.buyProfit : 1.0,
+          sellProfit:
+            typeof shop.sellProfit === 'number' ? shop.sellProfit : 1.0,
+          temper: typeof shop.temper === 'number' ? shop.temper : 0,
+          keeperId: typeof shop.keeperId === 'number' ? shop.keeperId : null,
+          keeperZoneId: loadedKeeperZoneId,
+          zoneId:
+            typeof shop.zoneId === 'number' ? shop.zoneId : formData.zoneId,
+        },
+        noSuchItemMessages: messagesOrBlank(shop.noSuchItemMessages),
+        doNotBuyMessages: messagesOrBlank(shop.doNotBuyMessages),
+        missingCashMessages: messagesOrBlank(shop.missingCashMessages),
+        buyMessages: messagesOrBlank(shop.buyMessages),
+        sellMessages: messagesOrBlank(shop.sellMessages),
+        shopItems: mapShopItems(shop as ShopQueryResult),
+        acceptedTypes: Array.isArray(shop.accepts)
           ? shop.accepts
               .map((a: { type?: string }) =>
                 typeof a.type === 'string' ? a.type : undefined
               )
               .filter((t: string | undefined): t is string => !!t)
-          : []
-      );
-      setSelectedFlags(
-        Array.isArray(shop.flags)
+          : [],
+        selectedFlags: Array.isArray(shop.flags)
           ? shop.flags.map((f: ShopFlag) => String(f))
-          : []
-      );
-      setSelectedTradesWithFlags(
-        Array.isArray(shop.tradesWithFlags)
+          : [],
+        selectedTradesWithFlags: Array.isArray(shop.tradesWithFlags)
           ? shop.tradesWithFlags.map((f: ShopTradesWith) => String(f))
-          : []
-      );
+          : [],
+      };
+      setFormData(loaded.formData);
+      setNoSuchItemMessages(loaded.noSuchItemMessages);
+      setDoNotBuyMessages(loaded.doNotBuyMessages);
+      setMissingCashMessages(loaded.missingCashMessages);
+      setBuyMessages(loaded.buyMessages);
+      setSellMessages(loaded.sellMessages);
+      setShopItems(loaded.shopItems);
+      setAcceptedTypes(loaded.acceptedTypes);
+      setSelectedFlags(loaded.selectedFlags);
+      setSelectedTradesWithFlags(loaded.selectedTradesWithFlags);
+      setBaseline(loaded);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -570,6 +594,7 @@ function ShopEditorContent() {
             toast.error(
               `Shop created, but its inventory was not saved: ${extractErrorMessage(inventoryErr)}`
             );
+            disarm();
             router.push(
               `/dashboard/shops/editor?id=${newId}&zone=${formData.zoneId}`
             );
@@ -617,6 +642,7 @@ function ShopEditorContent() {
       }
 
       // Redirect back to shops list
+      disarm();
       window.location.href = '/dashboard/shops';
     } catch (err) {
       console.error('Error saving shop:', err);

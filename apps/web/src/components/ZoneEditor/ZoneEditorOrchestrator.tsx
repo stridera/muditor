@@ -3,6 +3,7 @@
 import { isValidRoomId, isValidZoneId, nextFreeRoomId } from '@/lib/room-utils';
 import { CreateRoomDialog } from '@/components/rooms/CreateRoomDialog';
 import type { CreatedRoom } from '@/hooks/use-create-room';
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { isEditableTarget } from '@/lib/keyboard';
@@ -468,6 +469,15 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     Partial<PropertyPanelRoom>
   >({});
   const [savingRoom, setSavingRoom] = useState(false);
+  // The room as it was before the first unsaved edit, so discarding restores
+  // the optimistic changes handleRoomChange applies to the rooms state.
+  const roomEditSnapshotRef = useRef<Room | null>(null);
+  const hasPendingRoomEdits = Object.keys(pendingRoomEdits).length > 0;
+  // Reload / tab close / app navigation warn while room edits are unsaved.
+  useUnsavedChangesGuard(
+    hasPendingRoomEdits,
+    'Discard your unsaved room changes?'
+  );
   const { canEditZone } = usePermissions();
   const {
     open: helpOpen,
@@ -1645,12 +1655,28 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     }, 120);
   }, [viewMode, worldZoneBounds, worldRooms]);
 
-  // Room selection
-  const handleSelectRoom = useCallback((roomId: number) => {
-    setSelectedRoomId(roomId);
-    // Reset pending edits when switching rooms
+  // Leaving a room with unsaved property edits asks first; on yes the edits
+  // (and their optimistic copy in the rooms state) are discarded.
+  const confirmDiscardRoomEdits = useCallback((): boolean => {
+    if (!hasPendingRoomEdits) return true;
+    if (!window.confirm('Discard your unsaved room changes?')) return false;
+    const snapshot = roomEditSnapshotRef.current;
+    if (snapshot) {
+      setRooms(rs => rs.map(r => (r.id === snapshot.id ? snapshot : r)));
+    }
+    roomEditSnapshotRef.current = null;
     setPendingRoomEdits({});
-  }, []);
+    return true;
+  }, [hasPendingRoomEdits]);
+
+  // Room selection
+  const handleSelectRoom = useCallback(
+    (roomId: number) => {
+      if (roomId !== selectedRoomId && !confirmDiscardRoomEdits()) return;
+      setSelectedRoomId(roomId);
+    },
+    [selectedRoomId, confirmDiscardRoomEdits]
+  );
 
   // Room property change handler
   const handleRoomChange = useCallback(
@@ -1662,15 +1688,15 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       setPendingRoomEdits(prev => ({ ...prev, [field]: value }));
       // Optimistically update rooms state
       setRooms(rs =>
-        rs.map(r =>
-          r.id === selectedRoomId
-            ? {
-                ...r,
-                [field === 'roomDescription' ? 'roomDescription' : field]:
-                  value,
-              }
-            : r
-        )
+        rs.map(r => {
+          if (r.id !== selectedRoomId) return r;
+          // Idempotent: only the first edit records the saved state.
+          roomEditSnapshotRef.current ??= r;
+          return {
+            ...r,
+            [field === 'roomDescription' ? 'roomDescription' : field]: value,
+          };
+        })
       );
     },
     [selectedRoomId]
@@ -1864,6 +1890,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           )
         );
         // Clear pending edits
+        roomEditSnapshotRef.current = null;
         setPendingRoomEdits({});
       } else {
         console.error('Failed to save room:', json.errors);
@@ -1907,9 +1934,10 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         return updated;
       });
 
+      if (!confirmDiscardRoomEdits()) return;
       setSelectedRoomId(newActiveRoomId);
     },
-    []
+    [confirmDiscardRoomEdits]
   );
 
   // Undo/Redo integration
@@ -3041,6 +3069,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             if (viewMode === 'world-map') {
               const data = node.data as any;
               if (data?.zoneId != null && data?.isZoneBoundary) {
+                if (!confirmDiscardRoomEdits()) return;
                 setActiveZoneId(data.zoneId);
                 setViewMode('zone');
                 setSelectedRoomId(null);
@@ -3049,6 +3078,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 return;
               }
               if (data?.roomId != null && data?.zoneId != null) {
+                if (!confirmDiscardRoomEdits()) return;
                 setActiveZoneId(data.zoneId);
                 setSelectedRoomId(data.roomId);
                 setViewMode('zone');
@@ -3059,6 +3089,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             }
             const idNum = parseInt(node.id, 10);
             if (!isNaN(idNum)) {
+              if (idNum !== selectedRoomId && !confirmDiscardRoomEdits()) {
+                return;
+              }
               setSelectedRoomId(idNum);
               // Update Z-level to match clicked room's floor
               const clickedRoom = rooms.find(r => r.id === idNum);

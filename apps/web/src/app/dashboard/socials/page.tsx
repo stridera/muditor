@@ -45,6 +45,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { useGuardedDialog } from '@/hooks/use-unsaved-changes-guard';
 import { useEffect, useState } from 'react';
 
 const PAGE_SIZE = 50;
@@ -165,6 +166,18 @@ export default function SocialsPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState<SocialFormData>(defaultFormData);
+  const handleCreateOpenChange = useGuardedDialog(
+    isCreateOpen,
+    formData,
+    setIsCreateOpen,
+    'Discard your unsaved social?'
+  );
+  const handleEditOpenChange = useGuardedDialog(
+    isEditOpen,
+    formData,
+    setIsEditOpen,
+    'Discard your unsaved social changes?'
+  );
 
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebouncedValue(searchQuery.trim(), 300);
@@ -681,7 +694,7 @@ export default function SocialsPage() {
       </Dialog>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+      <Dialog open={isCreateOpen} onOpenChange={handleCreateOpenChange}>
         <DialogContent className='sm:max-w-[700px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleCreateSubmit}>
             <DialogHeader>
@@ -877,7 +890,7 @@ export default function SocialsPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsCreateOpen(false)}
+                onClick={() => handleCreateOpenChange(false)}
               >
                 Cancel
               </Button>
@@ -891,7 +904,7 @@ export default function SocialsPage() {
       </Dialog>
 
       {/* Edit Dialog */}
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+      <Dialog open={isEditOpen} onOpenChange={handleEditOpenChange}>
         <DialogContent className='sm:max-w-[700px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleEditSubmit}>
             <DialogHeader>
@@ -1078,7 +1091,7 @@ export default function SocialsPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsEditOpen(false)}
+                onClick={() => handleEditOpenChange(false)}
               >
                 Cancel
               </Button>

@@ -66,6 +66,11 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import {
+  confirmDiscardIf,
+  isEqual,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { ColoredText } from '@/components/ColoredText';
 import { stripXmlLiteColors } from '@/utils/colorUtils';
@@ -97,6 +102,20 @@ type Ability = GetAllAbilitiesQuery['abilities'][number];
 type ClassCircle = GetClassCirclesQuery['classCirclesList'][number];
 type CircleSpell = NonNullable<ClassCircle['spells']>[number];
 
+const DISCARD_MESSAGE = 'Discard your unsaved class changes?';
+
+/** The details form as it reads for a saved class. */
+function classToForm(cls: ClassData) {
+  return {
+    name: cls.name,
+    description: cls.description || '',
+    hitDice: cls.hitDice,
+    primaryStat: cls.primaryStat || '',
+    alignmentBias: cls.alignmentBias,
+    tags: cls.tags.join(', '),
+  };
+}
+
 export default function ClassesPage() {
   const { isHeadBuilder } = usePermissions();
   const apolloClient = useApolloClient();
@@ -117,6 +136,12 @@ export default function ClassesPage() {
     tags: '',
   });
   const [isEditing, setIsEditing] = useState(false);
+  // Unsaved class details: the form differs from the selected class.
+  const classDirty =
+    isEditing &&
+    selectedClass != null &&
+    !isEqual(formData, classToForm(selectedClass));
+  useUnsavedChangesGuard(classDirty, DISCARD_MESSAGE);
 
   // Skills state
   const [classSkills, setClassSkills] = useState<
@@ -349,15 +374,10 @@ export default function ClassesPage() {
   }, [selectedClass, loadClassData]);
 
   const handleClassSelect = (cls: ClassData) => {
+    // Switching classes would silently drop edits to the open one.
+    if (!confirmDiscardIf(classDirty, DISCARD_MESSAGE)) return;
     setSelectedClass(cls);
-    setFormData({
-      name: cls.name,
-      description: cls.description || '',
-      hitDice: cls.hitDice,
-      primaryStat: cls.primaryStat || '',
-      alignmentBias: cls.alignmentBias,
-      tags: cls.tags.join(', '),
-    });
+    setFormData(classToForm(cls));
     setIsEditing(false);
     setActiveTab('details');
   };
@@ -548,17 +568,16 @@ export default function ClassesPage() {
                               <Button
                                 variant='outline'
                                 onClick={() => {
+                                  if (
+                                    !confirmDiscardIf(
+                                      classDirty,
+                                      DISCARD_MESSAGE
+                                    )
+                                  ) {
+                                    return;
+                                  }
                                   setIsEditing(false);
-                                  setFormData({
-                                    name: selectedClass.name,
-                                    description:
-                                      selectedClass.description || '',
-                                    hitDice: selectedClass.hitDice,
-                                    primaryStat:
-                                      selectedClass.primaryStat || '',
-                                    alignmentBias: selectedClass.alignmentBias,
-                                    tags: selectedClass.tags.join(', '),
-                                  });
+                                  setFormData(classToForm(selectedClass));
                                 }}
                               >
                                 Cancel

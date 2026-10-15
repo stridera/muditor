@@ -17,6 +17,7 @@ import { RoomFlagsSection } from './RoomFlagsSection';
 import { useTheme } from 'next-themes';
 import TriggerManager from '@/components/TriggerManager';
 import { normalizeExitEdit } from './exit-update';
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
 import React, { useEffect, useState } from 'react';
 
 interface Room extends RoomFlagFields {
@@ -184,6 +185,16 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   const [newExitKeyword, setNewExitKeyword] = useState('');
   const [editingExitId, setEditingExitId] = useState<string | null>(null);
   const [editExitData, setEditExitData] = useState<Partial<RoomExit>>({});
+
+  // Half-typed exit drafts are unsaved edits too (reload / app navigation).
+  useUnsavedChangesGuard(
+    (showCreateExit &&
+      (newExitDestination !== '' ||
+        newExitDescription !== '' ||
+        newExitKeyword !== '')) ||
+      (editingExitId !== null && Object.keys(editExitData).length > 0),
+    'Discard your unsaved exit changes?'
+  );
 
   // Reset form when room changes
   useEffect(() => {

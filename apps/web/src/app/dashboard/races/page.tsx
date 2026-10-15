@@ -29,6 +29,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { CheckCircle, Loader2, Pencil, XCircle } from 'lucide-react';
+import { useGuardedDialog } from '@/hooks/use-unsaved-changes-guard';
 import { useState } from 'react';
 
 const GET_RACES = gql`
@@ -130,6 +131,13 @@ export default function RacesPage() {
     expFactor: 100,
     hpFactor: 100,
   });
+
+  const handleEditOpenChange = useGuardedDialog(
+    isEditOpen,
+    formData,
+    setIsEditOpen,
+    'Discard your unsaved race changes?'
+  );
 
   const { data, loading, error, refetch } = useQuery(GET_RACES);
 
@@ -363,7 +371,7 @@ export default function RacesPage() {
       </div>
 
       {/* Edit Dialog */}
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+      <Dialog open={isEditOpen} onOpenChange={handleEditOpenChange}>
         <DialogContent className='sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
@@ -600,7 +608,7 @@ export default function RacesPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsEditOpen(false)}
+                onClick={() => handleEditOpenChange(false)}
               >
                 Cancel
               </Button>

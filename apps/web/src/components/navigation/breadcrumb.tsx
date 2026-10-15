@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight, Home, Map, X } from 'lucide-react';
 import { useZoneContext } from '@/hooks/use-zone-context';
 import { useZonesForSelector } from '@/hooks/use-zones-for-selector';
 import { useZone } from '@/contexts/zone-context';
+import { confirmUnsavedNavigation } from '@/hooks/use-unsaved-changes-guard';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { gql } from '@apollo/client';
@@ -94,6 +95,7 @@ function ZonePicker() {
   };
 
   const handleSelectZone = (zId: number) => {
+    if (!confirmUnsavedNavigation()) return;
     setSelectedZone(zId);
     setOpen(false);
     setSearch('');
@@ -102,6 +104,7 @@ function ZonePicker() {
 
   const handleClearZone = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!confirmUnsavedNavigation()) return;
     setSelectedZone(null);
     setOpen(false);
     setSearch('');
@@ -391,6 +394,7 @@ export function Breadcrumb({ items: customItems }: BreadcrumbProps) {
                   onClick={e => {
                     e.preventDefault();
                     e.stopPropagation();
+                    if (!confirmUnsavedNavigation()) return;
                     setSelectedZone(null);
                     if (pathname.includes('/mobs'))
                       router.push('/dashboard/mobs');

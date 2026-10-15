@@ -8,6 +8,7 @@ import { useZone } from '@/contexts/zone-context';
 import { gql } from '@/generated/gql';
 import { ReportOpenCountDocument } from '@/generated/graphql';
 import { usePermissions } from '@/hooks/use-permissions';
+import { confirmUnsavedNavigation } from '@/hooks/use-unsaved-changes-guard';
 import { hrefWithZone } from '@/lib/zone-nav';
 import { useMutation, useQuery } from '@apollo/client/react';
 import {
@@ -181,6 +182,7 @@ export function Sidebar() {
 
   const handleViewModeToggle = useCallback(
     async (mode: 'player' | 'admin') => {
+      if (!confirmUnsavedNavigation()) return;
       setViewMode(mode);
 
       // Navigate to last known path for the target mode

@@ -47,6 +47,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { useGuardedDialog } from '@/hooks/use-unsaved-changes-guard';
 import { useMemo, useState } from 'react';
 
 type Recipe = GetCreationRecipesQuery['creationRecipes'][number];
@@ -109,6 +110,12 @@ export default function CreationRecipesPage() {
   const [deleting, setDeleting] = useState<Recipe | null>(null);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [formError, setFormError] = useState('');
+  const handleFormOpenChange = useGuardedDialog(
+    isFormOpen,
+    formData,
+    setIsFormOpen,
+    'Discard your unsaved recipe changes?'
+  );
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -355,7 +362,7 @@ export default function CreationRecipesPage() {
       </div>
 
       {/* Create / Edit Dialog */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog open={isFormOpen} onOpenChange={handleFormOpenChange}>
         <DialogContent className='sm:max-w-[480px]'>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
@@ -480,7 +487,7 @@ export default function CreationRecipesPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsFormOpen(false)}
+                onClick={() => handleFormOpenChange(false)}
               >
                 Cancel
               </Button>

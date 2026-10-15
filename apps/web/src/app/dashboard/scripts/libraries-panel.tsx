@@ -17,6 +17,7 @@ import { extractErrorMessage } from '@/lib/error-utils';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { Eye, FileText, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
 import { useMemo, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 
@@ -64,6 +65,13 @@ const DELETE_LIBRARY = gql(`
   }
 `);
 
+interface LibraryDraft {
+  name: string;
+  zone: string;
+  description: string;
+  code: string;
+}
+
 interface LibraryData {
   id: number;
   name: string;
@@ -107,6 +115,8 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
   const [zone, setZone] = useState('');
   const [description, setDescription] = useState('');
   const [code, setCode] = useState('');
+  // The values the editor opened with; dirty is measured against these.
+  const [loaded, setLoaded] = useState<LibraryDraft | null>(null);
 
   const libraries: LibraryData[] = useMemo(
     () => (data?.scriptLibraries as LibraryData[]) ?? [],
@@ -132,6 +142,16 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
   const readOnly =
     !isCreating && selected != null && !canEditLibrary(selected.zoneId);
 
+  const isDirty =
+    isEditing &&
+    !readOnly &&
+    loaded != null &&
+    (name !== loaded.name ||
+      zone !== loaded.zone ||
+      description !== loaded.description ||
+      code.replace(/\r\n?/g, '\n') !== loaded.code.replace(/\r\n?/g, '\n'));
+  const { guard } = useUnsavedChangesGuard(isDirty);
+
   const openLibrary = (library: LibraryData) => {
     setSelected(library);
     setIsCreating(false);
@@ -139,6 +159,12 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
     setZone(library.zoneId == null ? '' : String(library.zoneId));
     setDescription(library.description ?? '');
     setCode(library.code);
+    setLoaded({
+      name: library.name,
+      zone: library.zoneId == null ? '' : String(library.zoneId),
+      description: library.description ?? '',
+      code: library.code,
+    });
     setIsEditing(true);
   };
 
@@ -149,6 +175,12 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
     setZone('');
     setDescription('');
     setCode(NEW_LIBRARY_TEMPLATE);
+    setLoaded({
+      name: '',
+      zone: '',
+      description: '',
+      code: NEW_LIBRARY_TEMPLATE,
+    });
     setIsEditing(true);
   };
 
@@ -156,7 +188,10 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
     setIsEditing(false);
     setIsCreating(false);
     setSelected(null);
+    setLoaded(null);
   };
+  // Cancel asks first when there are unsaved edits; saving closes directly.
+  const cancel = guard(close);
 
   const handleSave = async () => {
     if (!NAME_PATTERN.test(name)) {
@@ -235,7 +270,7 @@ export default function LibrariesPanel({ header }: LibrariesPanelProps) {
             )}
           </h1>
           <div className='flex gap-2'>
-            <Button variant='outline' onClick={close}>
+            <Button variant='outline' onClick={cancel}>
               Cancel
             </Button>
             {!readOnly && <Button onClick={handleSave}>Save</Button>}

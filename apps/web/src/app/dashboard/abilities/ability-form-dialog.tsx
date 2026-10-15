@@ -22,6 +22,10 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import type { AbilitySchool, Position } from '@/generated/graphql';
 import { Loader2 } from 'lucide-react';
+import {
+  useDirtyBaseline,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
 import { useEffect, useState, type FC } from 'react';
 import {
   ABILITY_TYPES,
@@ -59,11 +63,25 @@ export const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
   loading,
 }) => {
   const [formData, setFormData] = useState<AbilityFormData>(EMPTY_ABILITY_FORM);
+  const { isDirty, setBaseline } = useDirtyBaseline(formData);
+  const { confirmDiscard } = useUnsavedChangesGuard(
+    open && isDirty,
+    'Discard your unsaved ability changes?'
+  );
 
-  // Seed the form from the full ability, or reset it for a new one.
+  // Seed the form from the full ability, or reset it for a new one (also each
+  // time the dialog opens, so discarded edits never reappear).
   useEffect(() => {
-    setFormData(ability ? abilityToFormData(ability) : EMPTY_ABILITY_FORM);
-  }, [ability]);
+    const seeded = ability ? abilityToFormData(ability) : EMPTY_ABILITY_FORM;
+    setFormData(seeded);
+    setBaseline(seeded);
+  }, [ability, open, setBaseline]);
+
+  // Every dismissal (Escape, overlay click, X, Cancel) asks first when dirty.
+  const handleOpenChange = (next: boolean) => {
+    if (!next && !confirmDiscard()) return;
+    onOpenChange(next);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +92,7 @@ export const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
 
   if (isEditing && !ability) {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className='sm:max-w-[600px]'>
           <DialogHeader>
             <DialogTitle>Edit Ability</DialogTitle>
@@ -100,7 +118,7 @@ export const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
@@ -473,7 +491,7 @@ export const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
             <Button
               type='button'
               variant='outline'
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
               disabled={loading}
             >
               Cancel

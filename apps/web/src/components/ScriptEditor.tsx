@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Editor from './MonacoEditor';
 import type { editor } from 'monaco-editor';
 import { useTheme } from 'next-themes';
@@ -27,6 +27,8 @@ interface ScriptEditorProps {
   onSave?: (script: Partial<Script>) => void;
   onTest?: (script: Partial<Script>) => void;
   onChange?: (value: string) => void;
+  /** Reports whether the editor differs from the script it was loaded with. */
+  onDirtyChange?: (dirty: boolean) => void;
   readOnly?: boolean;
   height?: string;
 }
@@ -540,11 +542,14 @@ end`,
   },
 };
 
+const normalizeEol = (text: string) => text.replace(/\r\n?/g, '\n');
+
 export default function ScriptEditor({
   script,
   onSave,
   onTest,
   onChange,
+  onDirtyChange,
   readOnly = false,
   height = '600px',
 }: ScriptEditorProps) {
@@ -577,6 +582,29 @@ export default function ScriptEditor({
     if (script?.flags !== undefined) setFlags(script.flags);
     if (script?.argList !== undefined) setArgList(script.argList || '');
   }, [script]);
+
+  // Dirty = differs from what was loaded (line endings are normalised because
+  // Monaco rewrites CRLF, which must not count as an edit).
+  const loaded = useMemo(
+    () => ({
+      code: normalizeEol(script?.commands || ''),
+      name: script?.name ?? '',
+      attachType: script?.attachType || 'MOB',
+      flags: [...(script?.flags ?? [])].sort().join(','),
+      argList: script?.argList || '',
+    }),
+    [script]
+  );
+  const dirty =
+    !readOnly &&
+    (normalizeEol(code) !== loaded.code ||
+      scriptName !== loaded.name ||
+      attachType !== loaded.attachType ||
+      [...flags].sort().join(',') !== loaded.flags ||
+      argList !== loaded.argList);
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
 
   const handleEditorWillMount = (monaco: typeof import('monaco-editor')) => {
     if (!monaco.languages.getLanguages().find(lang => lang.id === 'lua')) {

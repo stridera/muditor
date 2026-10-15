@@ -1,6 +1,10 @@
 'use client';
 
 import { useMutation } from '@apollo/client/react';
+import {
+  isEqual,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { roleAtLeast } from '@/lib/roles';
@@ -72,6 +76,30 @@ export function EditZoneModal({
   const [isGodZone, setIsGodZone] = useState(zone.isGodZone);
   const [isInternal, setIsInternal] = useState(zone.isInternal);
 
+  // Dirty = differs from the zone as loaded. Closing without saving asks first.
+  const isDirty =
+    isOpen &&
+    !isEqual(
+      { formData, isGodZone, isInternal },
+      {
+        formData: {
+          name: zone.name,
+          lifespan: zone.lifespan,
+          resetMode: zone.resetMode,
+          hemisphere: zone.hemisphere,
+          climate: zone.climate,
+          mobsSleepAtNight: zone.mobsSleepAtNight,
+        },
+        isGodZone: zone.isGodZone,
+        isInternal: zone.isInternal,
+      }
+    );
+  const { guard } = useUnsavedChangesGuard(
+    isDirty,
+    'Discard your unsaved zone changes?'
+  );
+  const requestClose = guard(onClose);
+
   const [updateZone, { loading, error }] = useMutation(UpdateZoneDocument, {
     onCompleted: () => {
       onSuccess();
@@ -101,7 +129,7 @@ export function EditZoneModal({
             Edit Zone: {zone.name}
           </h2>
           <button
-            onClick={onClose}
+            onClick={requestClose}
             className='text-muted-foreground hover:text-foreground'
             type='button'
           >
@@ -323,7 +351,7 @@ export function EditZoneModal({
           <div className='flex items-center gap-3 pt-4'>
             <button
               type='button'
-              onClick={onClose}
+              onClick={requestClose}
               className='flex-1 px-4 py-2 border border-border rounded-lg hover:bg-accent transition-colors'
               disabled={loading}
             >

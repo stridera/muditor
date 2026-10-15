@@ -12,6 +12,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
 import { useState } from 'react';
 
 const RESET_MODES: ResetMode[] = ['NEVER', 'EMPTY', 'NORMAL'];
@@ -62,8 +63,19 @@ function NewZoneForm() {
   const [hemisphere, setHemisphere] = useState<Hemisphere>('NORTHWEST');
   const [climate, setClimate] = useState<Climate>('NONE');
 
+  // Anything typed since the form opened with its defaults is unsaved.
+  const isDirty =
+    zoneId !== '' ||
+    name !== '' ||
+    lifespan !== '30' ||
+    resetMode !== 'NORMAL' ||
+    hemisphere !== 'NORTHWEST' ||
+    climate !== 'NONE';
+  const { disarm } = useUnsavedChangesGuard(isDirty);
+
   const [createZone, { loading, error }] = useMutation(CreateZoneDocument, {
     onCompleted: data => {
+      disarm();
       // Navigate with the id the API returned, never with form state
       router.push(`/dashboard/zones/${data.createZone.id}`);
     },

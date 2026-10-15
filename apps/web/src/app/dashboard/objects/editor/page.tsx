@@ -50,6 +50,10 @@ import TriggerManager from '@/components/TriggerManager';
 import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import {
+  useDirtyBaseline,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
 import { Suspense, useEffect, useState } from 'react';
 import type { ValidationRules } from '../../../../hooks/useRealTimeValidation';
 import {
@@ -160,6 +164,22 @@ const NEXT_OBJECT_ID = gql`
     nextObjectId(zoneId: $zoneId)
   }
 `;
+
+/** Everything the object save sends from the main form (dirty-checked as one). */
+interface ObjectEditState {
+  formData: ObjectFormData;
+  selectedFlags: string[];
+  selectedWearFlags: string[];
+  selectedRestrictions: string[];
+  restrictedAlignments: string[];
+  restrictedRaces: string[];
+  allowedRaces: string[];
+  restrictedClassIds: number[];
+  minSize: string;
+  maxSize: string;
+  passengerCapacity: number;
+  presenceOverride: string;
+}
 
 interface ObjectFormData {
   type: string;
@@ -393,6 +413,22 @@ function ObjectEditorContent() {
   const [maxSize, setMaxSize] = useState<string>('');
   const [passengerCapacity, setPassengerCapacity] = useState<number>(0);
   const [presenceOverride, setPresenceOverride] = useState<string>('');
+  const { isDirty: editDirty, setBaseline } = useDirtyBaseline<ObjectEditState>(
+    {
+      formData,
+      selectedFlags,
+      selectedWearFlags,
+      selectedRestrictions,
+      restrictedAlignments,
+      restrictedRaces,
+      allowedRaces,
+      restrictedClassIds,
+      minSize,
+      maxSize,
+      passengerCapacity,
+      presenceOverride,
+    }
+  );
 
   // New objects: the API suggests the next free id in the chosen zone; the
   // builder can override it (the API rejects an id that is already taken).
@@ -530,7 +566,7 @@ function ObjectEditorContent() {
     if (typedData?.object) {
       const object = typedData.object;
       setLoadedType(object.type);
-      setFormData({
+      const loadedForm: ObjectFormData = {
         type: object.type || 'NOTHING',
         // The API returns a string[]; the TagInput edits a comma-joined string
         keywords: keywordsToInput(object.keywords),
@@ -553,18 +589,34 @@ function ObjectEditorContent() {
         weaponDamageType: object.weaponDamageType ?? '',
         weaponElement: object.weaponElement ?? '',
         armorPct: object.armorPct ?? 0,
-      });
-      setSelectedFlags(object.flags || []);
-      setSelectedWearFlags(object.wearFlags || []);
-      setSelectedRestrictions(object.restrictions || []);
-      setRestrictedAlignments(object.restrictedAlignments || []);
-      setRestrictedRaces(object.restrictedRaces || []);
-      setAllowedRaces(object.allowedRaces || []);
-      setRestrictedClassIds(object.restrictedClassIds || []);
-      setMinSize(object.minSize || '');
-      setMaxSize(object.maxSize || '');
-      setPassengerCapacity(object.passengerCapacity || 0);
-      setPresenceOverride(object.presenceOverride || '');
+      };
+      const loadedState: ObjectEditState = {
+        formData: loadedForm,
+        selectedFlags: object.flags || [],
+        selectedWearFlags: object.wearFlags || [],
+        selectedRestrictions: object.restrictions || [],
+        restrictedAlignments: object.restrictedAlignments || [],
+        restrictedRaces: object.restrictedRaces || [],
+        allowedRaces: object.allowedRaces || [],
+        restrictedClassIds: object.restrictedClassIds || [],
+        minSize: object.minSize || '',
+        maxSize: object.maxSize || '',
+        passengerCapacity: object.passengerCapacity || 0,
+        presenceOverride: object.presenceOverride || '',
+      };
+      setFormData(loadedState.formData);
+      setSelectedFlags(loadedState.selectedFlags);
+      setSelectedWearFlags(loadedState.selectedWearFlags);
+      setSelectedRestrictions(loadedState.selectedRestrictions);
+      setRestrictedAlignments(loadedState.restrictedAlignments);
+      setRestrictedRaces(loadedState.restrictedRaces);
+      setAllowedRaces(loadedState.allowedRaces);
+      setRestrictedClassIds(loadedState.restrictedClassIds);
+      setMinSize(loadedState.minSize);
+      setMaxSize(loadedState.maxSize);
+      setPassengerCapacity(loadedState.passengerCapacity);
+      setPresenceOverride(loadedState.presenceOverride);
+      setBaseline(loadedState);
 
       // Load granted effects
       setGrantedEffects(
@@ -600,6 +652,16 @@ function ObjectEditorContent() {
       );
     }
   }, [data]);
+
+  // Unsaved edits (main form or any of the effect lists) are guarded against
+  // Back buttons, in-app navigation, and tab close; saving disarms the guard.
+  const { disarm } = useUnsavedChangesGuard(
+    editDirty ||
+      effectsDirty ||
+      resistancesDirty ||
+      consumablesDirty ||
+      itemSpellsDirty
+  );
 
   const handleInputChange = (
     field: keyof ObjectFormData,
@@ -764,6 +826,7 @@ function ObjectEditorContent() {
       }
 
       // Redirect back to objects list
+      disarm();
       window.location.href = '/dashboard/objects';
     } catch (err) {
       // Surface the API's reason (e.g. "Object 5 already exists in zone 30").

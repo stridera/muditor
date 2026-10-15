@@ -3,6 +3,7 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
+import { confirmUnsavedNavigation } from '@/hooks/use-unsaved-changes-guard';
 import { useZone } from '@/contexts/zone-context';
 import { useZonesForSelector, type Zone } from '@/hooks/use-zones-for-selector';
 import {
@@ -268,6 +269,7 @@ export function EnhancedCommandPalette() {
 
   const selectResult = useCallback(
     (result: SearchResult) => {
+      if (!confirmUnsavedNavigation()) return;
       let targetPath = '';
 
       if (result.type === 'zone') {

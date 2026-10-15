@@ -67,6 +67,10 @@ import { extractErrorMessage, friendlyGraphQLMessage } from '@/lib/error-utils';
 import { stripMarkup } from '@/utils/xmlLiteParser';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import {
+  useDirtyBaseline,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
 import { Suspense, useEffect, useState } from 'react';
 
 interface QuestFormData {
@@ -145,6 +149,11 @@ function QuestEditorContent() {
     availabilityRequirement: '',
   });
 
+  // Phases, objectives and rewards save themselves as they are edited; the
+  // unsaved-changes guard covers the quest's own fields (the Save button).
+  const { isDirty, setBaseline } = useDirtyBaseline(formData);
+  const { disarm } = useUnsavedChangesGuard(isDirty);
+
   const [phases, setPhases] = useState<PhaseFormData[]>([]);
   const [prerequisites, setPrerequisites] = useState<PrerequisiteRow[]>([]);
 
@@ -180,7 +189,7 @@ function QuestEditorContent() {
     const typedData = data as GetQuestQuery | undefined;
     if (typedData?.quest) {
       const quest = typedData.quest;
-      setFormData({
+      const loadedForm: QuestFormData = {
         zoneId: quest.zoneId,
         id: quest.id,
         name: quest.name,
@@ -209,7 +218,9 @@ function QuestEditorContent() {
         timeLimitMinutes: quest.timeLimitMinutes ?? null,
         // Availability requirement
         availabilityRequirement: quest.availabilityRequirement || '',
-      });
+      };
+      setFormData(loadedForm);
+      setBaseline(loadedForm);
 
       setPrerequisites(
         (quest.prerequisites ?? []).map(p => ({
@@ -331,6 +342,7 @@ function QuestEditorContent() {
           },
         });
         // Navigate to the new quest
+        disarm();
         router.push(
           `/dashboard/quests/editor?zone=${formData.zoneId}&id=${formData.id}`
         );
@@ -370,6 +382,7 @@ function QuestEditorContent() {
             },
           },
         });
+        setBaseline(formData);
       }
     } catch (err) {
       console.error('Error saving quest:', err);

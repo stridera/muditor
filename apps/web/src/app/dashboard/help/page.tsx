@@ -55,6 +55,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { useGuardedDialog } from '@/hooks/use-unsaved-changes-guard';
 import { useCallback, useMemo, useState } from 'react';
 
 const GET_HELP_ENTRIES = gql`
@@ -288,6 +289,18 @@ export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [formData, setFormData] = useState<HelpFormData>(defaultFormData);
+  const handleCreateOpenChange = useGuardedDialog(
+    isCreateOpen,
+    formData,
+    setIsCreateOpen,
+    'Discard your unsaved help entry?'
+  );
+  const handleEditOpenChange = useGuardedDialog(
+    isEditOpen,
+    formData,
+    setIsEditOpen,
+    'Discard your unsaved help entry changes?'
+  );
   const [historyStack, setHistoryStack] = useState<HelpEntry[]>([]);
 
   const apolloClient = useApolloClient();
@@ -872,7 +885,7 @@ export default function HelpPage() {
       </Dialog>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+      <Dialog open={isCreateOpen} onOpenChange={handleCreateOpenChange}>
         <DialogContent className='sm:max-w-[700px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleCreateSubmit}>
             <DialogHeader>
@@ -992,7 +1005,7 @@ export default function HelpPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsCreateOpen(false)}
+                onClick={() => handleCreateOpenChange(false)}
               >
                 Cancel
               </Button>
@@ -1006,7 +1019,7 @@ export default function HelpPage() {
       </Dialog>
 
       {/* Edit Dialog */}
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+      <Dialog open={isEditOpen} onOpenChange={handleEditOpenChange}>
         <DialogContent className='sm:max-w-[700px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleEditSubmit}>
             <DialogHeader>
@@ -1120,7 +1133,7 @@ export default function HelpPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsEditOpen(false)}
+                onClick={() => handleEditOpenChange(false)}
               >
                 Cancel
               </Button>

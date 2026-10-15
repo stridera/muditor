@@ -109,6 +109,13 @@ import {
   type AbilityFormSource,
 } from './ability-form';
 import { AbilityFormDialog } from './ability-form-dialog';
+import {
+  confirmDiscardIf,
+  isEqual,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
+
+const DISCARD_MESSAGE = 'Discard your unsaved ability changes?';
 
 type AbilitySummary = Pick<
   Ability,
@@ -412,6 +419,7 @@ export default function AbilitiesPage() {
   };
 
   const handleCancelEditEffects = () => {
+    if (!confirmDiscardIf(hasUnsavedEffectEdits(), DISCARD_MESSAGE)) return;
     setEffectsBlockingError(null);
     setEditingEffects(false);
     setEditedEffects([]);
@@ -442,36 +450,46 @@ export default function AbilitiesPage() {
     });
   };
 
+  // The messages as stored (empty fields omitted), which the edit form starts
+  // from and unsaved changes are measured against.
+  const loadStoredMessages = (): typeof editedMessages => {
+    const msgs = abilityDetailsData?.ability?.messages;
+    const stored: typeof editedMessages = {};
+    if (!msgs) return stored;
+    if (msgs.startToCaster) stored.startToCaster = msgs.startToCaster;
+    if (msgs.startToVictim) stored.startToVictim = msgs.startToVictim;
+    if (msgs.startToRoom) stored.startToRoom = msgs.startToRoom;
+    if (msgs.successToCaster) stored.successToCaster = msgs.successToCaster;
+    if (msgs.successToVictim) stored.successToVictim = msgs.successToVictim;
+    if (msgs.successToRoom) stored.successToRoom = msgs.successToRoom;
+    if (msgs.successToSelf) stored.successToSelf = msgs.successToSelf;
+    if (msgs.successSelfRoom) stored.successSelfRoom = msgs.successSelfRoom;
+    if (msgs.failToCaster) stored.failToCaster = msgs.failToCaster;
+    if (msgs.failToVictim) stored.failToVictim = msgs.failToVictim;
+    if (msgs.failToRoom) stored.failToRoom = msgs.failToRoom;
+    if (msgs.wearoffToTarget) stored.wearoffToTarget = msgs.wearoffToTarget;
+    if (msgs.wearoffToRoom) stored.wearoffToRoom = msgs.wearoffToRoom;
+    if (msgs.lookMessage) stored.lookMessage = msgs.lookMessage;
+    return stored;
+  };
+
+  const hasUnsavedMessageEdits = () =>
+    editingMessages && !isEqual(editedMessages, loadStoredMessages());
+
   const handleEditMessages = () => {
-    if (abilityDetailsData?.ability?.messages) {
-      const msgs = abilityDetailsData.ability.messages;
-      const newMessages: typeof editedMessages = {};
-      if (msgs.startToCaster) newMessages.startToCaster = msgs.startToCaster;
-      if (msgs.startToVictim) newMessages.startToVictim = msgs.startToVictim;
-      if (msgs.startToRoom) newMessages.startToRoom = msgs.startToRoom;
-      if (msgs.successToCaster)
-        newMessages.successToCaster = msgs.successToCaster;
-      if (msgs.successToVictim)
-        newMessages.successToVictim = msgs.successToVictim;
-      if (msgs.successToRoom) newMessages.successToRoom = msgs.successToRoom;
-      if (msgs.successToSelf) newMessages.successToSelf = msgs.successToSelf;
-      if (msgs.successSelfRoom)
-        newMessages.successSelfRoom = msgs.successSelfRoom;
-      if (msgs.failToCaster) newMessages.failToCaster = msgs.failToCaster;
-      if (msgs.failToVictim) newMessages.failToVictim = msgs.failToVictim;
-      if (msgs.failToRoom) newMessages.failToRoom = msgs.failToRoom;
-      if (msgs.wearoffToTarget)
-        newMessages.wearoffToTarget = msgs.wearoffToTarget;
-      if (msgs.wearoffToRoom) newMessages.wearoffToRoom = msgs.wearoffToRoom;
-      if (msgs.lookMessage) newMessages.lookMessage = msgs.lookMessage;
-      setEditedMessages(newMessages);
-    } else {
-      setEditedMessages({});
-    }
+    setEditedMessages(loadStoredMessages());
     setEditingMessages(true);
   };
 
+  // Reload / tab close / in-app navigation also warn while the ability dialog
+  // holds unsaved effect or message edits.
+  useUnsavedChangesGuard(
+    !!viewingAbilityId && (hasUnsavedEffectEdits() || hasUnsavedMessageEdits()),
+    DISCARD_MESSAGE
+  );
+
   const handleCancelEditMessages = () => {
+    if (!confirmDiscardIf(hasUnsavedMessageEdits(), DISCARD_MESSAGE)) return;
     setEditingMessages(false);
     setEditedMessages({});
   };
@@ -977,8 +995,10 @@ export default function AbilitiesPage() {
         onOpenChange={open => {
           if (!open) {
             if (
-              hasUnsavedEffectEdits() &&
-              !window.confirm('Discard your unsaved effect changes?')
+              !confirmDiscardIf(
+                hasUnsavedEffectEdits() || hasUnsavedMessageEdits(),
+                DISCARD_MESSAGE
+              )
             ) {
               return;
             }

@@ -38,6 +38,10 @@ import { ArrowLeft, Save } from 'lucide-react';
 import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import {
+  useDirtyBaseline,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
 import { Suspense, useEffect, useState } from 'react';
 import type { ValidationRules } from '../../../../hooks/useRealTimeValidation';
 import {
@@ -235,6 +239,8 @@ function MobEditorContent() {
     activityRestrictions: '',
   });
 
+  const { isDirty: formDirty, setBaseline } = useDirtyBaseline(formData);
+
   // Initialize real-time validation
   const { errors, validateField, validateAllFields, clearError } =
     useRealTimeValidation<MobFormData>(mobValidationRules);
@@ -314,7 +320,7 @@ function MobEditorContent() {
       const hpDice = parseDice(mob.hpDice ?? '1d8+0');
       const damageDice = parseDice(mob.damageDice ?? '1d4+0');
 
-      setFormData({
+      const loadedForm: MobFormData = {
         keywords: mob.keywords.join(', '),
         mobClass: mob.classId != null ? String(mob.classId) : '',
         name: mob.name,
@@ -375,7 +381,9 @@ function MobEditorContent() {
         riderPresenceMessage: mob.riderPresenceMessage || '',
         aggressionFormula: mob.aggressionFormula || '',
         activityRestrictions: mob.activityRestrictions || '',
-      });
+      };
+      setFormData(loadedForm);
+      setBaseline(loadedForm);
 
       // Load default effects
       setDefaultEffects(
@@ -389,6 +397,10 @@ function MobEditorContent() {
       );
     }
   }, [data]);
+
+  // Unsaved edits (form or default effects) are guarded against Escape/Back
+  // buttons, in-app navigation, and tab close; saving disarms the guard.
+  const { disarm } = useUnsavedChangesGuard(formDirty || effectsDirty);
 
   const handleInputChange = (
     field: keyof MobFormData,
@@ -510,6 +522,7 @@ function MobEditorContent() {
       }
 
       // Redirect back to mobs list
+      disarm();
       window.location.href = '/dashboard/mobs';
     } catch (err) {
       console.error('Error saving mob:', err);

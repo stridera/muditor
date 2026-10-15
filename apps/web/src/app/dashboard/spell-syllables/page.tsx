@@ -38,6 +38,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { useGuardedDialog } from '@/hooks/use-unsaved-changes-guard';
 import { useMemo, useState } from 'react';
 
 type Syllable = GetSpellSyllablesQuery['spellSyllables'][number];
@@ -86,6 +87,12 @@ export default function SpellSyllablesPage() {
   const [deleting, setDeleting] = useState<Syllable | null>(null);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [formError, setFormError] = useState('');
+  const handleFormOpenChange = useGuardedDialog(
+    isFormOpen,
+    formData,
+    setIsFormOpen,
+    'Discard your unsaved syllable changes?'
+  );
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -319,7 +326,7 @@ export default function SpellSyllablesPage() {
       </div>
 
       {/* Create / Edit Dialog */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog open={isFormOpen} onOpenChange={handleFormOpenChange}>
         <DialogContent className='sm:max-w-[480px]'>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
@@ -395,7 +402,7 @@ export default function SpellSyllablesPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsFormOpen(false)}
+                onClick={() => handleFormOpenChange(false)}
               >
                 Cancel
               </Button>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client/react';
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -101,6 +102,23 @@ export function CreateRoomDialog({
     setDescription(DEFAULT_ROOM_DESCRIPTION);
   }, [open, zoneId]);
 
+  // Dirty = anything entered since the dialog opened with its defaults.
+  const isDirty =
+    open &&
+    (zone !== zoneId ||
+      idText !== '' ||
+      name !== '' ||
+      sector !== 'STRUCTURE' ||
+      description !== DEFAULT_ROOM_DESCRIPTION);
+  const { confirmDiscard } = useUnsavedChangesGuard(
+    isDirty,
+    'Discard this new room?'
+  );
+  const requestOpenChange = (next: boolean) => {
+    if (!next && !confirmDiscard()) return;
+    onOpenChange(next);
+  };
+
   const {
     data: roomsData,
     loading: loadingIds,
@@ -165,7 +183,7 @@ export function CreateRoomDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={requestOpenChange}>
       <DialogContent className='sm:max-w-lg'>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <DialogHeader>
@@ -289,7 +307,7 @@ export function CreateRoomDialog({
             <Button
               type='button'
               variant='outline'
-              onClick={() => onOpenChange(false)}
+              onClick={() => requestOpenChange(false)}
             >
               Cancel
             </Button>

@@ -34,6 +34,7 @@ import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { CheckCircle, Loader2, Pencil, XCircle } from 'lucide-react';
+import { useGuardedDialog } from '@/hooks/use-unsaved-changes-guard';
 import { useEffect, useState } from 'react';
 import {
   FLAG_FIELDS,
@@ -63,6 +64,12 @@ export default function CommandsPage() {
   });
   const [flagsData, setFlagsData] = useState<FlagsFormData>(flagsOf({}));
   const [formError, setFormError] = useState('');
+  const handleFormOpenChange = useGuardedDialog(
+    isFormOpen,
+    { formData, flagsData },
+    setIsFormOpen,
+    'Discard your unsaved command changes?'
+  );
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -286,7 +293,7 @@ export default function CommandsPage() {
         noun='commands'
       />
 
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog open={isFormOpen} onOpenChange={handleFormOpenChange}>
         <DialogContent className='sm:max-w-[640px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
@@ -380,7 +387,7 @@ export default function CommandsPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsFormOpen(false)}
+                onClick={() => handleFormOpenChange(false)}
               >
                 Cancel
               </Button>

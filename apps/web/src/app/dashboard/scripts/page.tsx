@@ -22,6 +22,10 @@ import {
 } from '@/components/ui/table';
 import { gql } from '@/generated/gql';
 import { usePermissions } from '@/hooks/use-permissions';
+import {
+  useEscapeToClose,
+  useUnsavedChangesGuard,
+} from '@/hooks/use-unsaved-changes-guard';
 import { useApolloClient, useQuery, useMutation } from '@apollo/client/react';
 import {
   AlertTriangle,
@@ -42,7 +46,6 @@ import {
 import {
   Suspense,
   useCallback,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -336,20 +339,27 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
     }
   };
 
-  const handleCancel = useCallback(() => {
+  const [editorDirty, setEditorDirty] = useState(false);
+  // Stable identity: ScriptEditor re-syncs its fields whenever this changes.
+  const editorScript = useMemo(
+    () =>
+      selectedTrigger ? convertTriggerToScript(selectedTrigger) : undefined,
+    [selectedTrigger]
+  );
+
+  const closeEditor = useCallback(() => {
     setIsEditing(false);
     setSelectedTrigger(null);
     setIsCreating(false);
+    setEditorDirty(false);
   }, []);
 
-  useEffect(() => {
-    if (!isEditing) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleCancel();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isEditing, handleCancel]);
+  const { guard } = useUnsavedChangesGuard(isEditing && editorDirty);
+  const handleCancel = useMemo(() => guard(closeEditor), [guard, closeEditor]);
+
+  // Escape closes the editor only when focus is outside Monaco (vim users),
+  // and still asks before discarding edits.
+  useEscapeToClose(handleCancel, isEditing);
 
   const handleNewScript = () => {
     setNewScriptZone(list.zone != null ? String(list.zone) : '');
@@ -437,9 +447,7 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
         });
       }
       await refetch();
-      setIsEditing(false);
-      setSelectedTrigger(null);
-      setIsCreating(false);
+      closeEditor();
     } catch (err) {
       console.error('Failed to save script:', err);
       toast.error(`Could not save the script: ${extractErrorMessage(err)}`);
@@ -517,11 +525,8 @@ function ScriptsPageContent({ header }: { header: ReactNode }) {
         </div>
 
         <ScriptEditor
-          script={
-            selectedTrigger
-              ? convertTriggerToScript(selectedTrigger)
-              : undefined
-          }
+          script={editorScript}
+          onDirtyChange={setEditorDirty}
           {...(editorReadOnly
             ? { readOnly: true }
             : { onSave: handleSaveScript })}

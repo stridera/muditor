@@ -41,6 +41,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { useGuardedDialog } from '@/hooks/use-unsaved-changes-guard';
 import { useMemo, useState } from 'react';
 
 type EffectAura = GetEffectAurasQuery['effectAuras'][number];
@@ -117,6 +118,12 @@ export default function EffectAurasPage() {
   const [deleting, setDeleting] = useState<EffectAura | null>(null);
   const [formData, setFormData] = useState<AuraFormData>(defaultFormData);
   const [formError, setFormError] = useState('');
+  const handleFormOpenChange = useGuardedDialog(
+    isFormOpen,
+    formData,
+    setIsFormOpen,
+    'Discard your unsaved aura changes?'
+  );
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -374,7 +381,7 @@ export default function EffectAurasPage() {
       </div>
 
       {/* Create / Edit Dialog */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog open={isFormOpen} onOpenChange={handleFormOpenChange}>
         <DialogContent className='sm:max-w-[640px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
@@ -521,7 +528,7 @@ export default function EffectAurasPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setIsFormOpen(false)}
+                onClick={() => handleFormOpenChange(false)}
               >
                 Cancel
               </Button>

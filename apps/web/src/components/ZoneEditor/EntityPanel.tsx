@@ -3,6 +3,7 @@
 import { isEditableTarget } from '@/lib/keyboard';
 import { updateMob, updateObject } from '@/lib/entity-mutations';
 import { useTheme } from 'next-themes';
+import { UnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard';
 import React, { useEffect, useState } from 'react';
 import type { EntityDetail } from './EntityDetailPanel';
 import { MobNode } from './MobNode';
@@ -665,6 +666,8 @@ export const EntityPanel: React.FC<EntityPanelProps> = ({
       }`}
       style={{ minWidth: panelWidth, maxWidth: panelWidth }}
     >
+      {/* Reload / tab close / app navigation warn while the draft is unsaved. */}
+      <UnsavedChangesGuard dirty={dirty} message='Discard unsaved changes?' />
       <div
         className={`px-4 py-4 border-b flex items-start gap-3 ${
           isDark ? 'border-gray-700' : 'border-gray-200'
