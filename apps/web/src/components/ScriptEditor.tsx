@@ -136,6 +136,7 @@ const luaLanguageConfig: any = {
     'timestamp',
     'mud_time',
     'wait',
+    'wait_hours',
     'get_room',
     'run_room_trigger',
     'reverse_direction',
@@ -1279,7 +1280,10 @@ export default function ScriptEditor({
               - Returns true n% of the time
               <br />
               <code className='bg-accent px-1 rounded'>wait(seconds)</code> -
-              Pause script execution (0.1-300s)
+              Pause script execution (fractions ok, minimum 0.1s)
+              <br />
+              <code className='bg-accent px-1 rounded'>wait_hours(n)</code> -
+              Pause for n game hours (75 real seconds each)
               <br />
               <code className='bg-accent px-1 rounded'>echo(msg)</code> - Debug
               output to server log
